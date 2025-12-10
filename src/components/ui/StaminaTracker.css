@@ -1,0 +1,204 @@
+/* Stamina Tracker - Draw Steel Character Sheet Style */
+
+.stamina-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* === MAIN STAMINA BOX === */
+.stamina-main-box {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stamina-current-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.5rem;
+}
+
+.stamina-input {
+  width: 50px;
+  padding: 0.35rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  font-family: inherit;
+}
+
+.stamina-input:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 8px var(--border-glow);
+}
+
+/* Hide number input spinners */
+.stamina-input::-webkit-inner-spin-button,
+.stamina-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stamina-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* === ADJUSTMENT SECTION (up/down arrows) === */
+.stamina-adjust-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-medium);
+  border-left: 1px solid var(--border-solid);
+}
+
+.stamina-adjust-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stamina-adjust-btn:first-child {
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.stamina-adjust-btn:hover:not(:disabled) {
+  background: var(--bg-light);
+  color: var(--accent-bright);
+}
+
+.stamina-adjust-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stamina-adjust-btn.up:hover:not(:disabled) {
+  color: var(--accent-bright);
+}
+
+.stamina-adjust-btn.down:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+/* === SECONDARY ROW (Temporary & Max) - Compact === */
+.stamina-secondary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.stamina-box-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-radius: 3px;
+}
+
+.box-label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.stamina-input.compact {
+  width: 35px;
+  padding: 0.15rem 0.25rem;
+  font-size: 0.8rem;
+  flex: 1;
+}
+
+.stamina-value-compact {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+/* === STATUS INDICATORS ROW (below boxes) === */
+.stamina-status-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding-top: 0.25rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-diamond {
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: 2px solid var(--border-solid);
+  transform: rotate(45deg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.status-diamond:hover {
+  border-color: var(--accent-dim);
+}
+
+.status-diamond.active {
+  background: var(--warning);
+  border-color: var(--warning);
+  box-shadow: 0 0 8px rgba(240, 198, 116, 0.5);
+}
+
+.status-diamond.dying.active {
+  background: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
+}
+
+.status-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 400px) {
+  .stamina-status-row {
+    gap: 1.5rem;
+  }
+
+  .stamina-input {
+    width: 60px;
+    font-size: 1.25rem;
+  }
+
+  .stamina-input.compact {
+    width: 40px;
+  }
+}

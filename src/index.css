@@ -4,6 +4,7 @@
    ============================================ */
 
 @import './styles/theme.css';
+@import './styles/ui-components.css';
 
 /* === GLOBAL RESETS === */
 * {

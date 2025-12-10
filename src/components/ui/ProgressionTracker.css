@@ -1,0 +1,395 @@
+/* Progression Tracker - Draw Steel Character Sheet Style */
+
+/* === MAIN CONTAINER === */
+.progression-tracker {
+  display: flex;
+  border: 1px solid var(--border-solid);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Main content wrapper (victories + level + stats) */
+.progression-main {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  flex: 1;
+}
+
+/* === PORTRAIT SECTION === */
+.portrait-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: var(--bg-darkest);
+  border-left: 1px solid var(--border-solid);
+}
+
+/* With portrait variant */
+.progression-tracker.with-portrait {
+  /* Layout already handled by flex */
+}
+
+/* === VICTORIES SECTION === */
+.victories-section {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-solid);
+  border-right: 1px solid var(--border-solid);
+}
+
+.victories-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.victories-boxes {
+  display: flex;
+  align-items: stretch;
+  height: 28px;
+}
+
+/* Individual Victory Box */
+.victory-box {
+  width: 24px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-right: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  position: relative;
+  padding: 0;
+}
+
+.victory-box:first-child {
+  border-radius: 2px 0 0 2px;
+}
+
+.victory-box:hover {
+  background: var(--bg-medium);
+  border-color: var(--accent-dim);
+  z-index: 1;
+}
+
+/* Filled state */
+.victory-box.filled {
+  background: var(--bg-medium);
+}
+
+.victory-box.filled::after {
+  content: '';
+  width: 8px;
+  height: 14px;
+  background: var(--accent-bright);
+  border-radius: 1px;
+  box-shadow: 0 0 6px var(--accent-glow);
+  animation: fillPop 0.2s ease-out;
+}
+
+@keyframes fillPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Focus state */
+.victory-box:focus {
+  outline: none;
+}
+
+.victory-box:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+/* End cap - pointed arrow shape */
+.victory-box-end {
+  width: 20px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.victory-box-end::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 8px solid var(--border-solid);
+}
+
+.victory-box-end::before {
+  content: '';
+  position: absolute;
+  right: -6px;
+  width: 0;
+  height: 0;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-left: 6px solid var(--bg-darkest);
+  z-index: 1;
+}
+
+/* === LEVEL SECTION === */
+.level-section {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2rem;
+  background: var(--bg-darkest);
+  min-width: 100px;
+  border-left: 1px solid var(--border-solid);
+}
+
+.level-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.level-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  line-height: 1;
+  text-shadow: 0 0 20px var(--accent-dim);
+}
+
+/* === BOTTOM STATS ROW === */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-right: 1px solid var(--border-solid);
+}
+
+.stat-cell {
+  padding: 0.75rem;
+  text-align: center;
+  border-right: 1px solid var(--border-solid);
+}
+
+.stat-cell:last-child {
+  border-right: none;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-bone);
+}
+
+.stat-value .separator {
+  color: var(--text-muted);
+  margin: 0 0.25rem;
+}
+
+.stat-value .secondary {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* === WEALTH CELL === */
+.wealth-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wealth-tier {
+  color: var(--xp);
+}
+
+.gold-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.gold-input {
+  width: 60px;
+  padding: 0.25rem 0.35rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  color: var(--xp);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+  font-family: inherit;
+}
+
+.gold-input:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 4px var(--border-glow);
+}
+
+.gold-input::-webkit-inner-spin-button,
+.gold-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.gold-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.gold-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: lowercase;
+}
+
+/* === RENOWN CELL === */
+.renown-cell .stat-label {
+  margin-bottom: 0.25rem;
+}
+
+.renown-input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.renown-input {
+  width: 40px;
+  padding: 0.35rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  color: var(--text-bone);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  font-family: inherit;
+}
+
+.renown-input:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 4px var(--border-glow);
+}
+
+.renown-input::-webkit-inner-spin-button,
+.renown-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.renown-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.renown-max {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* === HOVER PREVIEW EFFECTS === */
+/* Highlight boxes up to hovered empty one */
+.victories-boxes:hover .victory-box:not(.filled) {
+  opacity: 0.7;
+}
+
+.victory-box:not(.filled):hover {
+  opacity: 1 !important;
+  background: var(--bg-light);
+}
+
+/* Show which boxes would be filled on hover */
+.victory-box:not(.filled):hover ~ .victory-box:not(.filled) {
+  opacity: 0.4;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .progression-tracker {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .victories-section {
+    border-right: none;
+  }
+
+  .level-section {
+    grid-row: auto;
+    flex-direction: row;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-left: none;
+    border-bottom: 1px solid var(--border-solid);
+  }
+
+  .level-value {
+    font-size: 1.75rem;
+  }
+
+  .stats-row {
+    border-right: none;
+  }
+
+  .victory-box {
+    width: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .victories-boxes {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 2px;
+  }
+
+  .victory-box {
+    width: 22px;
+    height: 22px;
+    border-right: 1px solid var(--border-solid);
+    border-radius: 2px;
+  }
+
+  .victory-box-end {
+    display: none;
+  }
+}

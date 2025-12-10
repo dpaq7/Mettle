@@ -139,16 +139,109 @@
   cursor: not-allowed;
 }
 
+/* Draw Steel / End Combat buttons */
+.draw-steel-btn,
+.end-combat-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.draw-steel-btn {
+  background: var(--color-danger-dim);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+}
+
+.draw-steel-btn:hover {
+  box-shadow: 0 0 12px rgba(232, 84, 84, 0.4);
+  background: rgba(232, 84, 84, 0.25);
+}
+
+.end-combat-btn {
+  background: var(--color-warning-dim);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+}
+
+.end-combat-btn:hover {
+  box-shadow: 0 0 12px rgba(232, 168, 68, 0.4);
+  background: rgba(232, 168, 68, 0.25);
+}
+
 /* ============================================
-   ROW 2: CHARACTERISTICS (Stat Boxes)
+   ROW 2: CHARACTERISTICS + RESOURCES + PROGRESSION
    ============================================ */
-.chars-row {
+.chars-progression-row {
   gap: var(--space-sm);
   border-bottom: 1px solid var(--border-dark);
   padding-bottom: var(--space-sm);
   flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
+/* Characteristics section wrapper - scaled down 25% */
+.characteristics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  transform: scale(0.75);
+  transform-origin: top left;
+  /* Compensate for the 25% empty space from scale transform */
+  /* 5 boxes × 80px + 4 gaps × ~2.4px ≈ 410px, 25% = ~100px */
+  margin-right: -100px;
+  margin-bottom: -20px;
+}
+
+/* Pentagon stats container */
+.pentagon-stats {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-end;
+}
+
+/* Inline Resources (ResourcePanel) */
+.inline-resources {
+  flex: 0 1 auto;
+}
+
+/* Inline Progression Tracker */
+.inline-progression {
+  flex-shrink: 0;
+}
+
+/* ============================================
+   ROW 2.5: DERIVED STATS & ROLL CONTROLS
+   ============================================ */
+.derived-row {
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border-dark);
+  flex-wrap: wrap;
+}
+
+/* Derived stats container */
+.derived-stats {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-end;
+}
+
+/* Heroic resources row (Essence + Surges) */
+.heroic-resources-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+/* Legacy char styles (for fallback) */
 .char {
   display: flex;
   flex-direction: column;
@@ -462,13 +555,18 @@
 }
 
 /* ============================================
-   ROW 4: CONDITIONS
+   CONDITIONS (inline in Row 2)
    ============================================ */
-.conditions-row {
-  border-top: 1px solid var(--border-dark);
-  padding-top: var(--space-sm);
+.conditions-inline {
+  display: flex;
+  align-items: center;
   gap: var(--space-sm);
   flex-wrap: wrap;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  margin-left: auto;
 }
 
 .cond-label {

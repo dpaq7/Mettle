@@ -1,0 +1,75 @@
+/* Potency Indicator - Draw Steel Character Sheet Style */
+
+.potency-indicator {
+  display: flex;
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.potency-indicator.disabled {
+  opacity: 0.5;
+}
+
+/* Options */
+.potency-option {
+  flex: 1;
+  background: var(--bg-darkest);
+  border: none;
+  border-right: 1px solid var(--border-solid);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.potency-option:last-child {
+  border-right: none;
+}
+
+/* Size variants */
+.potency-indicator.sm .potency-option {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.65rem;
+}
+
+.potency-indicator.md .potency-option {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+.potency-indicator.lg .potency-option {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+}
+
+/* Hover state */
+.potency-option:hover:not(.selected):not(:disabled) {
+  background: var(--bg-medium);
+  color: var(--text-secondary);
+}
+
+/* Selected state */
+.potency-option.selected {
+  background: linear-gradient(180deg, var(--accent-dim) 0%, var(--bg-medium) 100%);
+  color: var(--accent-bright);
+  box-shadow: var(--inner-glow);
+}
+
+/* Focus state */
+.potency-option:focus {
+  outline: none;
+}
+
+.potency-option:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* Disabled state */
+.potency-option:disabled {
+  cursor: not-allowed;
+}

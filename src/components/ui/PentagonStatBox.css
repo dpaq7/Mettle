@@ -1,0 +1,97 @@
+/* Pentagon Stat Box - Draw Steel Character Sheet Style */
+
+.pentagon-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 80px;
+}
+
+.pentagon-stat-box.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pentagon-stat-box.clickable {
+  cursor: pointer;
+}
+
+/* SVG Container */
+.pentagon-svg {
+  width: 80px;
+  height: 90px;
+}
+
+/* Pentagon shape */
+.pentagon-shape {
+  fill: var(--bg-dark);
+  stroke: var(--border-solid);
+  stroke-width: 2;
+  transition: all var(--transition-fast);
+}
+
+/* Value text inside pentagon */
+.pentagon-value {
+  font-size: 28px;
+  font-weight: bold;
+  fill: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+/* Label below pentagon */
+.pentagon-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-bone);
+  margin-top: 4px;
+}
+
+/* Sublabel for derived stats */
+.pentagon-sublabel {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Hover state */
+.pentagon-stat-box.clickable:hover .pentagon-shape {
+  stroke: var(--accent-bright);
+  filter: drop-shadow(0 0 6px var(--border-glow));
+}
+
+.pentagon-stat-box.clickable:hover .pentagon-value {
+  fill: var(--accent-bright);
+}
+
+.pentagon-stat-box.clickable:hover .pentagon-label {
+  color: var(--accent-bright);
+}
+
+/* Active state */
+.pentagon-stat-box.active .pentagon-shape {
+  stroke: var(--accent-bright);
+  fill: rgba(0, 230, 195, 0.1);
+  filter: drop-shadow(0 0 10px var(--border-glow));
+}
+
+.pentagon-stat-box.active .pentagon-value {
+  fill: var(--accent-bright);
+}
+
+.pentagon-stat-box.active .pentagon-label {
+  color: var(--accent-bright);
+  text-shadow: var(--text-glow);
+}
+
+/* Focus state */
+.pentagon-stat-box:focus {
+  outline: none;
+}
+
+.pentagon-stat-box:focus-visible .pentagon-shape {
+  stroke: var(--accent-glow);
+  stroke-width: 3;
+}

@@ -7,6 +7,12 @@ import { useEquipment } from '../../hooks/useEquipment';
 import { ALL_CONDITIONS, ConditionDefinition } from '../../data/conditions';
 import { performPowerRoll, getTierColor, RollModifier, PowerRollResult } from '../../utils/dice';
 import { Characteristic, ConditionId } from '../../types';
+import PentagonStatBox from '../ui/PentagonStatBox';
+import StatBox from '../shared/StatBox';
+import ProgressionTracker from '../ui/ProgressionTracker';
+import ResourcePanel from '../ui/ResourcePanel';
+import SurgesTracker from '../ui/SurgesTracker';
+import SectionHeader from '../shared/SectionHeader';
 import './CharacterStatsPanel.css';
 
 // XP thresholds for each level (minimum XP required)
@@ -28,7 +34,7 @@ interface CharacterStatsPanelProps {
 
 const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp }) => {
   const { hero, updateHero } = useSummonerContext();
-  const { essenceState, spendEssence, gainEssence, isInCombat } = useCombatContext();
+  const { essenceState, spendEssence, gainEssence, isInCombat, startCombat, endCombat } = useCombatContext();
   const { addRoll } = useRollHistory();
   const {
     addCondition,
@@ -49,6 +55,8 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp }) 
   const [showConditionDropdown, setShowConditionDropdown] = useState(false);
   const [lastSaveResult, setLastSaveResult] = useState<SaveResult | null>(null);
   const [lastBleedingResult, setLastBleedingResult] = useState<BleedingDamageResult | null>(null);
+  const [windedOverride, setWindedOverride] = useState(false);
+  const [dyingOverride, setDyingOverride] = useState(false);
 
   if (!hero) return null;
 
@@ -210,6 +218,15 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp }) 
           >
             Respite
           </button>
+          {!isInCombat ? (
+            <button className="draw-steel-btn" onClick={startCombat}>
+              Draw Steel!
+            </button>
+          ) : (
+            <button className="end-combat-btn" onClick={endCombat}>
+              End Combat
+            </button>
+          )}
           {hero.level < 10 && xpInfo.canLevelUp && (
             <button className="lvl-btn ready" onClick={onLevelUp}>Level Up!</button>
           )}
@@ -220,54 +237,188 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp }) 
         </div>
       </div>
 
-      {/* Row 2: Characteristics - Stat Box Style */}
-      <div className="panel-row chars-row">
-        <div className="char clickable" onClick={() => rollCharacteristic('might')} title="Click to roll Might test">
-          <span className="val">{chars.might >= 0 ? '+' : ''}{chars.might}</span>
-          <span className="lbl">Might</span>
+      {/* Row 2: Characteristics + Resources + Progression */}
+      <div className="panel-row chars-progression-row">
+        <div className="characteristics-section">
+          <SectionHeader title="Characteristics" variant="compact" />
+          <div className="pentagon-stats">
+            <PentagonStatBox
+              value={chars.might}
+              label="Might"
+              onClick={() => rollCharacteristic('might')}
+              active={lastRoll?.char === 'Might'}
+            />
+            <PentagonStatBox
+              value={chars.agility}
+              label="Agility"
+              onClick={() => rollCharacteristic('agility')}
+              active={lastRoll?.char === 'Agility'}
+            />
+            <PentagonStatBox
+              value={chars.reason}
+              label="Reason"
+              onClick={() => rollCharacteristic('reason')}
+              active={lastRoll?.char === 'Reason'}
+            />
+            <PentagonStatBox
+              value={chars.intuition}
+              label="Intuition"
+              onClick={() => rollCharacteristic('intuition')}
+              active={lastRoll?.char === 'Intuition'}
+            />
+            <PentagonStatBox
+              value={chars.presence}
+              label="Presence"
+              onClick={() => rollCharacteristic('presence')}
+              active={lastRoll?.char === 'Presence'}
+            />
+          </div>
         </div>
-        <div className="char clickable" onClick={() => rollCharacteristic('agility')} title="Click to roll Agility test">
-          <span className="val">{chars.agility >= 0 ? '+' : ''}{chars.agility}</span>
-          <span className="lbl">Agility</span>
-        </div>
-        <div className="char clickable primary" onClick={() => rollCharacteristic('reason')} title="Click to roll Reason test">
-          <span className="val">{chars.reason >= 0 ? '+' : ''}{chars.reason}</span>
-          <span className="lbl">Reason</span>
-        </div>
-        <div className="char clickable" onClick={() => rollCharacteristic('intuition')} title="Click to roll Intuition test">
-          <span className="val">{chars.intuition >= 0 ? '+' : ''}{chars.intuition}</span>
-          <span className="lbl">Intuition</span>
-        </div>
-        <div className="char clickable" onClick={() => rollCharacteristic('presence')} title="Click to roll Presence test">
-          <span className="val">{chars.presence >= 0 ? '+' : ''}{chars.presence}</span>
-          <span className="lbl">Presence</span>
-        </div>
-        <div className="divider" />
+
+        <ResourcePanel
+          stamina={{
+            current: hero.stamina.current,
+            max: hero.stamina.max + (totalBonuses.stamina || 0),
+            temporary: 0,
+            winded: windedOverride,
+            dying: dyingOverride,
+            dyingThreshold: Math.floor(hero.stamina.winded / 2),
+          }}
+          recoveries={{
+            stamina: hero.recoveries.value,
+            current: hero.recoveries.current,
+            max: hero.recoveries.max,
+          }}
+          essence={{
+            current: essenceState?.currentEssence ?? 0,
+            max: hero.essence.maxPerTurn,
+          }}
+          onStaminaChange={(updates) => {
+            if (updates.current !== undefined) {
+              updateHero({ stamina: { ...hero.stamina, current: updates.current } });
+            }
+            if (updates.winded !== undefined) {
+              setWindedOverride(updates.winded);
+            }
+            if (updates.dying !== undefined) {
+              setDyingOverride(updates.dying);
+            }
+          }}
+          onRecoveriesChange={(current) => {
+            updateHero({ recoveries: { ...hero.recoveries, current } });
+          }}
+          onUseRecovery={useRecovery}
+          onEssenceChange={(current) => {
+            const diff = current - (essenceState?.currentEssence ?? 0);
+            if (diff > 0) {
+              gainEssence(diff);
+            } else if (diff < 0) {
+              spendEssence(-diff);
+            }
+          }}
+          hideSurges
+          className="inline-resources"
+        />
+
+        <SurgesTracker
+          current={hero.surges}
+          max={3}
+          onCurrentChange={(current) => updateHero({ surges: current })}
+        />
+
+        <ProgressionTracker
+          victories={hero.victories}
+          maxVictories={12}
+          onVictoriesChange={(count) => updateHero({ victories: count })}
+          level={hero.level}
+          gold={hero.gold}
+          onGoldChange={(gold) => updateHero({ gold })}
+          renown={hero.renown}
+          onRenownChange={(renown) => updateHero({ renown })}
+          xp={{ current: hero.xp || 0, needed: xpInfo.needed }}
+          portraitUrl={hero.portraitUrl}
+          onPortraitChange={(portraitUrl) => updateHero({ portraitUrl })}
+          className="inline-progression"
+        />
+      </div>
+
+      {/* Row 2.5: Derived Stats, Roll Controls & Conditions */}
+      <div className="panel-row derived-row">
         <button className={`roll-mod-btn ${rollModifier}`} onClick={cycleRollModifier} title="Toggle Edge/Bane">
           {rollModifier === 'edge' ? 'Edge' : rollModifier === 'bane' ? 'Bane' : 'Normal'}
         </button>
-        <div className="divider" />
-        <div className="char">
-          <span className="val">
-            {hero.speed}
-            {totalBonuses.speed > 0 && <span className="equip-bonus">+{totalBonuses.speed}</span>}
-          </span>
-          <span className="lbl">Speed</span>
+
+        <div className="derived-stats">
+          <StatBox
+            value={hero.speed + (totalBonuses.speed || 0)}
+            label="Speed"
+            size="sm"
+          />
+          <StatBox
+            value={hero.stability + (totalBonuses.stability || 0)}
+            label="Stability"
+            size="sm"
+          />
+          {totalBonuses.damage > 0 && (
+            <StatBox
+              value={`+${totalBonuses.damage}`}
+              label="Damage"
+              size="sm"
+              variant="accent"
+            />
+          )}
         </div>
-        <div className="char">
-          <span className="val">
-            {hero.stability}
-            {totalBonuses.stability > 0 && <span className="equip-bonus">+{totalBonuses.stability}</span>}
-          </span>
-          <span className="lbl">Stability</span>
-        </div>
-        {/* Damage Bonus from Equipment */}
-        {totalBonuses.damage > 0 && (
-          <div className="char equip-damage">
-            <span className="val damage-bonus">+{totalBonuses.damage}</span>
-            <span className="lbl">Damage</span>
+
+        {/* Conditions */}
+        <div className="conditions-inline">
+          <span className="cond-label">COND</span>
+          <div className="cond-badges">
+            {getActiveConditions().map(ac => {
+              const def = getConditionDef(ac.conditionId);
+              return (
+                <button
+                  key={ac.conditionId}
+                  className={`cond-badge ${def.saveEnds ? 'saveable' : 'manual'}`}
+                  title={`${def.primaryEffect}\n\nClick to ${def.saveEnds ? 'attempt save' : 'remove'}`}
+                  onClick={() => handleConditionClick(ac.conditionId, def)}
+                >
+                  {def.icon} {def.name} {def.saveEnds && '🎲'}
+                </button>
+              );
+            })}
+            {getActiveConditions().length === 0 && <span className="no-cond">None</span>}
           </div>
-        )}
+          <div className="cond-add-wrap">
+            <button className="cond-add-btn" onClick={() => setShowConditionDropdown(!showConditionDropdown)}>
+              + Add
+            </button>
+            {showConditionDropdown && (
+              <div className="cond-dropdown">
+                {ALL_CONDITIONS.map(c => (
+                  <button key={c.id} onClick={() => toggleCondition(c.id)}>
+                    {c.icon} {c.name} {hasCondition(c.id) && '✓'}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {hasCondition('bleeding') && (
+            <div className="bleed-triggers">
+              <span className="bleed-label">🩸</span>
+              <button onClick={() => triggerBleeding('Main')}>Main</button>
+              <button onClick={() => triggerBleeding('Triggered')}>Trig</button>
+              <button onClick={() => triggerBleeding('Power Roll')}>Roll</button>
+            </div>
+          )}
+          {lastSaveResult && (
+            <span className={`save-toast ${lastSaveResult.success ? 'success' : 'fail'}`}>
+              {lastSaveResult.conditionName}: {lastSaveResult.roll} {lastSaveResult.success ? '✓' : '✗'}
+            </span>
+          )}
+          {lastBleedingResult && (
+            <span className="bleed-toast">🩸 {lastBleedingResult.total} dmg</span>
+          )}
+        </div>
 
         {/* Roll Result Display */}
         {lastRoll && (
@@ -282,129 +433,6 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp }) 
             <span className="roll-tier">T{lastRoll.result.tier}</span>
             <button className="dismiss-roll" onClick={() => setLastRoll(null)}>×</button>
           </div>
-        )}
-      </div>
-
-      {/* Row 3: Resources */}
-      <div className="panel-row resources-row">
-        {/* Stamina */}
-        <div className="resource stamina">
-          <span className="lbl">HP</span>
-          <button className="adj" onClick={() => adjust('stamina', -1)}>-</button>
-          <span className={`val ${hero.stamina.current <= hero.stamina.winded ? 'winded' : ''}`}>
-            {hero.stamina.current}<span className="max">/{hero.stamina.max}</span>
-            {totalBonuses.stamina > 0 && <span className="equip-bonus">+{totalBonuses.stamina}</span>}
-          </span>
-          <button className="adj" onClick={() => adjust('stamina', 1)}>+</button>
-          <button className="use-rec" onClick={useRecovery} disabled={hero.recoveries.current <= 0} title={`Use Recovery (+${hero.recoveries.value})`}>
-            +{hero.recoveries.value}
-          </button>
-        </div>
-
-        {/* Recoveries */}
-        <div className="resource recoveries">
-          <span className="lbl">REC</span>
-          <button className="adj" onClick={() => adjust('recoveries', -1)}>-</button>
-          <span className="val">{hero.recoveries.current}<span className="max">/{hero.recoveries.max}</span></span>
-          <button className="adj" onClick={() => adjust('recoveries', 1)}>+</button>
-        </div>
-
-        {/* Essence */}
-        <div className="resource essence">
-          <span className="lbl">ESS</span>
-          <button className="adj" onClick={() => spendEssence(1)} disabled={(essenceState?.currentEssence ?? 0) <= 0}>-</button>
-          <span className="val essence-val">{essenceState?.currentEssence ?? 0}</span>
-          <button className="adj" onClick={() => gainEssence(1)}>+</button>
-        </div>
-
-        {/* Victories */}
-        <div className="resource victories">
-          <span className="lbl">VIC</span>
-          <button className="adj" onClick={() => adjust('victories', -1)}>-</button>
-          <span className="val victory-val">{hero.victories}</span>
-          <button className="adj" onClick={() => adjust('victories', 1)}>+</button>
-        </div>
-
-        {/* Surges */}
-        <div className="resource surges">
-          <span className="lbl">SRG</span>
-          <button className="adj" onClick={() => adjust('surges', -1)}>-</button>
-          <span className="val">{hero.surges}</span>
-          <button className="adj" onClick={() => adjust('surges', 1)}>+</button>
-        </div>
-
-        {/* Hero Tokens */}
-        <div className="resource tokens">
-          <span className="lbl">TKN</span>
-          <span className="val">{hero.heroTokens}</span>
-        </div>
-
-        {/* XP */}
-        <div className="resource xp">
-          <span className="lbl">XP</span>
-          <span className={`val ${xpInfo.canLevelUp ? 'level-ready' : ''}`}>
-            {hero.xp || 0}
-            {hero.level < 10 && <span className="max">/{xpInfo.needed}</span>}
-          </span>
-        </div>
-      </div>
-
-      {/* Row 4: Conditions */}
-      <div className="panel-row conditions-row">
-        <span className="cond-label">COND</span>
-
-        {/* Active condition badges */}
-        <div className="cond-badges">
-          {getActiveConditions().map(ac => {
-            const def = getConditionDef(ac.conditionId);
-            return (
-              <button
-                key={ac.conditionId}
-                className={`cond-badge ${def.saveEnds ? 'saveable' : 'manual'}`}
-                title={`${def.primaryEffect}\n\nClick to ${def.saveEnds ? 'attempt save' : 'remove'}`}
-                onClick={() => handleConditionClick(ac.conditionId, def)}
-              >
-                {def.icon} {def.name} {def.saveEnds && '🎲'}
-              </button>
-            );
-          })}
-          {getActiveConditions().length === 0 && <span className="no-cond">None</span>}
-        </div>
-
-        {/* Add dropdown */}
-        <div className="cond-add-wrap">
-          <button className="cond-add-btn" onClick={() => setShowConditionDropdown(!showConditionDropdown)}>
-            + Add
-          </button>
-          {showConditionDropdown && (
-            <div className="cond-dropdown">
-              {ALL_CONDITIONS.map(c => (
-                <button key={c.id} onClick={() => toggleCondition(c.id)}>
-                  {c.icon} {c.name} {hasCondition(c.id) && '✓'}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Bleeding triggers */}
-        {hasCondition('bleeding') && (
-          <div className="bleed-triggers">
-            <span className="bleed-label">🩸</span>
-            <button onClick={() => triggerBleeding('Main')}>Main</button>
-            <button onClick={() => triggerBleeding('Triggered')}>Trig</button>
-            <button onClick={() => triggerBleeding('Power Roll')}>Roll</button>
-          </div>
-        )}
-
-        {/* Toast notifications */}
-        {lastSaveResult && (
-          <span className={`save-toast ${lastSaveResult.success ? 'success' : 'fail'}`}>
-            {lastSaveResult.conditionName}: {lastSaveResult.roll} {lastSaveResult.success ? '✓' : '✗'}
-          </span>
-        )}
-        {lastBleedingResult && (
-          <span className="bleed-toast">🩸 {lastBleedingResult.total} dmg</span>
         )}
       </div>
 

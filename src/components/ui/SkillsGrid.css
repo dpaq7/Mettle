@@ -1,0 +1,142 @@
+/* Skills Grid - Draw Steel Character Sheet Style */
+
+.skills-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.skills-grid-container.compact {
+  gap: 1rem;
+}
+
+.skills-grid-container.disabled {
+  opacity: 0.5;
+}
+
+/* Section */
+.skills-section {
+  margin-bottom: 0.5rem;
+}
+
+/* Section Header */
+.skills-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.skills-header-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-solid) 20%,
+    var(--border-solid) 80%,
+    transparent 100%
+  );
+}
+
+.skills-header-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-bone);
+  white-space: nowrap;
+}
+
+.skills-grid-container.compact .skills-header-text {
+  font-size: 0.65rem;
+}
+
+/* Grid */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem 1.5rem;
+}
+
+.skills-grid-container.compact .skills-grid {
+  gap: 0.15rem 1rem;
+}
+
+/* Skill Item */
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.skills-grid-container.compact .skill-item {
+  padding: 0.15rem 0;
+  gap: 0.35rem;
+}
+
+.skill-item:hover .skill-diamond {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 6px var(--border-glow);
+}
+
+/* Diamond checkbox */
+.skill-diamond {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--border-solid);
+  background: transparent;
+  transform: rotate(45deg);
+  transition: all var(--transition-fast);
+}
+
+.skills-grid-container.compact .skill-diamond {
+  width: 8px;
+  height: 8px;
+}
+
+.skill-diamond.checked {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Skill name */
+.skill-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.skills-grid-container.compact .skill-name {
+  font-size: 0.75rem;
+}
+
+.skill-item.trained .skill-name {
+  color: var(--text-primary);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Focus state */
+.skill-item:focus {
+  outline: none;
+}
+
+.skill-item:focus-visible .skill-diamond {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 3px;
+}
+
+/* Disabled state */
+.skills-grid-container.disabled .skill-item {
+  cursor: not-allowed;
+}
+
+.skills-grid-container.disabled .skill-item:hover .skill-diamond {
+  border-color: var(--border-solid);
+  box-shadow: none;
+}

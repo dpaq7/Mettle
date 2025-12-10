@@ -1,0 +1,295 @@
+/* ============================================
+   DRAW STEEL SUMMONER - UI Components
+   Centralized styles for reusable UI elements
+   ============================================ */
+
+/* Import all UI component styles */
+/* Note: These are imported individually in each component,
+   but this file provides additional utility styles */
+
+/* ============================================
+   DIAMOND CHECKBOX UTILITY
+   ============================================ */
+.diamond-checkbox-native {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--border-solid);
+  background: transparent;
+  transform: rotate(45deg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.diamond-checkbox-native:hover {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 6px var(--border-glow);
+}
+
+.diamond-checkbox-native:checked {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+.diamond-checkbox-native:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 3px;
+}
+
+/* ============================================
+   CIRCULAR MARKERS
+   ============================================ */
+.circle-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-solid);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  background: var(--bg-darkest);
+}
+
+.circle-marker.filled {
+  background: var(--accent-dim);
+  border-color: var(--accent-bright);
+}
+
+.circle-marker.sm {
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+}
+
+.circle-marker.lg {
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   STAT DISPLAY UTILITIES
+   ============================================ */
+.stat-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-inline-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.stat-inline-value {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.stat-inline-value.accent {
+  color: var(--accent-bright);
+}
+
+.stat-inline-value.danger {
+  color: var(--danger);
+}
+
+.stat-inline-value.warning {
+  color: var(--warning);
+}
+
+.stat-inline-value.essence {
+  color: var(--essence);
+}
+
+/* ============================================
+   BADGE UTILITIES
+   ============================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 2px;
+  background: var(--bg-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-solid);
+}
+
+.badge.accent {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  border-color: var(--accent-bright);
+}
+
+.badge.danger {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.badge.warning {
+  background: var(--warning-dim);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.badge.success {
+  background: var(--success-dim);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.badge.essence {
+  background: var(--essence-dim);
+  color: var(--essence);
+  border-color: var(--essence);
+}
+
+/* ============================================
+   DIVIDER UTILITIES
+   ============================================ */
+.divider {
+  height: 1px;
+  background: var(--border-solid);
+  margin: var(--space-md) 0;
+}
+
+.divider.gradient {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-solid) 20%,
+    var(--border-solid) 80%,
+    transparent 100%
+  );
+}
+
+.divider.glow {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-glow) 20%,
+    var(--accent-dim) 50%,
+    var(--border-glow) 80%,
+    transparent 100%
+  );
+}
+
+.divider.vertical {
+  width: 1px;
+  height: auto;
+  margin: 0 var(--space-md);
+}
+
+/* ============================================
+   CARD FRAME UTILITIES
+   ============================================ */
+.card-frame {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.card-frame-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.card-frame-body {
+  padding: 0.75rem;
+}
+
+.card-frame-footer {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border-solid);
+  background: var(--bg-darkest);
+}
+
+/* ============================================
+   FIELD BOX UTILITIES
+   ============================================ */
+.field-box {
+  margin-bottom: 0.5rem;
+}
+
+.field-box-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.field-box-value {
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   ANIMATED GLOW EFFECT
+   ============================================ */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--border-glow);
+  }
+  50% {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   LOADING/SKELETON UTILITIES
+   ============================================ */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-medium) 25%,
+    var(--bg-light) 50%,
+    var(--bg-medium) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+  height: 1em;
+  width: 100%;
+}
+
+.skeleton-box {
+  height: 40px;
+  width: 60px;
+}

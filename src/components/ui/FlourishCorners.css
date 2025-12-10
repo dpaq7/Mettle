@@ -1,0 +1,79 @@
+/* Flourish Corners - Draw Steel Character Sheet Style */
+
+.flourish-corners {
+  position: relative;
+  padding: 8px;
+}
+
+/* Corner elements */
+.flourish-corner {
+  position: absolute;
+  border-color: var(--accent-dim);
+  border-style: solid;
+  pointer-events: none;
+}
+
+/* Size variants */
+.flourish-corners.sm .flourish-corner {
+  width: 12px;
+  height: 12px;
+}
+
+.flourish-corners.md .flourish-corner {
+  width: 20px;
+  height: 20px;
+}
+
+.flourish-corners.lg .flourish-corner {
+  width: 28px;
+  height: 28px;
+}
+
+/* Corner positions */
+.flourish-corner.top-left {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.flourish-corner.top-right {
+  top: 0;
+  right: 0;
+  border-width: 2px 2px 0 0;
+}
+
+.flourish-corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2px 2px;
+}
+
+.flourish-corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* Content wrapper */
+.flourish-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Variant: Accent - with glow */
+.flourish-corners.accent .flourish-corner {
+  border-color: var(--accent-glow);
+  filter: drop-shadow(0 0 4px var(--border-glow));
+}
+
+/* Variant: Subtle - less prominent */
+.flourish-corners.subtle .flourish-corner {
+  border-color: var(--border-solid);
+  opacity: 0.6;
+}
+
+/* Hover effect (optional, add 'interactive' class) */
+.flourish-corners.interactive:hover .flourish-corner {
+  border-color: var(--accent-bright);
+  filter: drop-shadow(0 0 6px var(--border-glow));
+}

@@ -1,0 +1,170 @@
+/* Hex Resource Box - Draw Steel Character Sheet Style */
+
+.hex-resource-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hex-resource-box.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hex-resource-box.clickable {
+  cursor: pointer;
+}
+
+/* Hex shape container */
+.hex-shape {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-medium);
+  clip-path: polygon(
+    10% 0%, 90% 0%,
+    100% 50%,
+    90% 100%, 10% 100%,
+    0% 50%
+  );
+  transition: all var(--transition-fast);
+}
+
+/* Size variants */
+.hex-resource-box.sm .hex-shape {
+  width: 70px;
+  height: 50px;
+  padding: 8px 16px;
+}
+
+.hex-resource-box.md .hex-shape {
+  width: 100px;
+  height: 60px;
+  padding: 10px 20px;
+}
+
+.hex-resource-box.lg .hex-shape {
+  width: 130px;
+  height: 75px;
+  padding: 12px 24px;
+}
+
+/* Label */
+.hex-label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.hex-resource-box.sm .hex-label {
+  font-size: 0.5rem;
+}
+
+.hex-resource-box.lg .hex-label {
+  font-size: 0.65rem;
+}
+
+/* Value container */
+.hex-value-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Value */
+.hex-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--accent-bright);
+}
+
+.hex-resource-box.sm .hex-value {
+  font-size: 1rem;
+}
+
+.hex-resource-box.lg .hex-value {
+  font-size: 1.5rem;
+}
+
+.hex-max {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+/* Adjust buttons */
+.hex-adjust-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.hex-adjust-btn:hover:not(:disabled) {
+  color: var(--accent-bright);
+}
+
+.hex-adjust-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Color variants */
+.hex-resource-box.accent .hex-value {
+  color: var(--accent-bright);
+}
+
+.hex-resource-box.essence .hex-value {
+  color: var(--essence);
+}
+
+.hex-resource-box.essence .hex-shape {
+  border: 1px solid rgba(168, 125, 232, 0.3);
+}
+
+.hex-resource-box.warning .hex-value {
+  color: var(--warning);
+}
+
+.hex-resource-box.warning .hex-shape {
+  border: 1px solid rgba(240, 198, 116, 0.3);
+}
+
+.hex-resource-box.danger .hex-value {
+  color: var(--danger);
+}
+
+.hex-resource-box.danger .hex-shape {
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* Hover state */
+.hex-resource-box.clickable:hover .hex-shape {
+  background: var(--bg-light);
+}
+
+.hex-resource-box.clickable:hover.accent .hex-shape {
+  box-shadow: 0 0 10px var(--border-glow);
+}
+
+.hex-resource-box.clickable:hover.essence .hex-shape {
+  box-shadow: 0 0 10px rgba(168, 125, 232, 0.3);
+}
+
+/* Focus state */
+.hex-resource-box:focus {
+  outline: none;
+}
+
+.hex-resource-box:focus-visible .hex-shape {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+}

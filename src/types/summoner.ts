@@ -63,6 +63,9 @@ export interface SummonerHero {
   heroTokens: number;
   victories: number; // Tracks current victories - converted to XP during respite
   xp: number; // Experience points - accumulated from victories during respite
+  wealth: number; // Wealth tier (1-6+)
+  gold: number; // Gold pieces (0-99999)
+  renown: number; // Renown score (0-12)
 
   // Portfolio
   portfolio: Portfolio;
@@ -85,6 +88,7 @@ export interface SummonerHero {
   kit: Kit;
   items: Item[];
   notes: string;
+  portraitUrl: string | null; // Character portrait image (base64)
 
   // Active conditions affecting the hero
   activeConditions: ActiveCondition[];

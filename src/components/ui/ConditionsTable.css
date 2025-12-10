@@ -1,0 +1,123 @@
+/* Conditions Table - Draw Steel Character Sheet Style */
+
+.conditions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.conditions-table.disabled {
+  opacity: 0.5;
+}
+
+.conditions-table.compact {
+  font-size: 0.75rem;
+}
+
+/* Header */
+.conditions-table th {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.conditions-table.compact th {
+  padding: 0.35rem;
+  font-size: 0.6rem;
+}
+
+.condition-name-header {
+  text-align: left !important;
+}
+
+/* Rows */
+.conditions-table td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--bg-medium);
+}
+
+.conditions-table.compact td {
+  padding: 0.25rem 0.35rem;
+}
+
+.conditions-table tr:nth-child(even) {
+  background: var(--bg-darkest);
+}
+
+.conditions-table tr:nth-child(odd) {
+  background: var(--bg-dark);
+}
+
+/* Active condition row highlight */
+.conditions-table tr.active {
+  background: rgba(74, 234, 220, 0.1);
+  box-shadow: inset 0 0 0 1px var(--border-glow);
+}
+
+/* Condition name */
+.condition-name {
+  color: var(--text-bone);
+  font-weight: 500;
+}
+
+.conditions-table tr.active .condition-name {
+  color: var(--accent-bright);
+}
+
+/* Checkbox cell */
+.condition-checkbox {
+  text-align: center;
+}
+
+/* Diamond checkbox */
+.diamond-check {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--border-solid);
+  background: transparent;
+  transform: rotate(45deg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.conditions-table.compact .diamond-check {
+  width: 10px;
+  height: 10px;
+}
+
+.diamond-check:hover {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 6px var(--border-glow);
+}
+
+.diamond-check.checked {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Focus state */
+.diamond-check:focus {
+  outline: none;
+}
+
+.diamond-check:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 3px;
+}
+
+/* Disabled state */
+.conditions-table.disabled .diamond-check {
+  cursor: not-allowed;
+}
+
+.conditions-table.disabled .diamond-check:hover {
+  border-color: var(--border-solid);
+  box-shadow: none;
+}

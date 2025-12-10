@@ -1,0 +1,271 @@
+/* Minion Card - Draw Steel Character Sheet Style */
+
+.minion-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: 100%;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.minion-card:hover {
+  border-color: var(--accent-dim);
+  box-shadow: var(--inner-glow);
+}
+
+.minion-card.selected {
+  border-color: var(--accent-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+.minion-card.unaffordable {
+  opacity: 0.6;
+}
+
+/* Header */
+.minion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.minion-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.essence-cost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  background: var(--bg-darkest);
+  border: 1px solid rgba(168, 125, 232, 0.4);
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--essence);
+}
+
+/* Role badge */
+.minion-role {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-bone);
+  border-bottom: 1px solid var(--border-solid);
+  background: var(--bg-darkest);
+}
+
+/* Stats Row */
+.minion-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.minion-quick-stats span {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-right: 1px solid var(--border-solid);
+}
+
+.minion-quick-stats span:last-child {
+  border-right: none;
+}
+
+/* Full Stats Row (for expanded view) */
+.minion-stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.minion-stat {
+  padding: 0.5rem;
+  text-align: center;
+  border-right: 1px solid var(--border-solid);
+}
+
+.minion-stat:last-child {
+  border-right: none;
+}
+
+.minion-stat-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.minion-stat-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+/* Summon Info */
+.minion-summon-info {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  border-bottom: 1px solid var(--border-solid);
+}
+
+/* Trait Preview */
+.minion-trait-preview {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--accent-bright);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+/* Details Section */
+.minion-details {
+  padding: 0.75rem;
+}
+
+.minion-detail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.minion-detail-label {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.minion-detail-value {
+  flex: 1;
+  border-bottom: 1px solid var(--border-solid);
+  color: var(--text-secondary);
+  min-height: 1.2em;
+}
+
+/* Characteristics */
+.minion-characteristics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border-solid);
+}
+
+.minion-char {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.minion-char-circle {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border-solid);
+  border-radius: 50%;
+}
+
+.minion-char.primary .minion-char-circle {
+  background: var(--accent-dim);
+  border-color: var(--accent-bright);
+}
+
+/* Keywords */
+.minion-keywords {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border-solid);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.minion-keyword {
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
+  margin-right: 0.25rem;
+  background: var(--bg-medium);
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Summon Button */
+.summon-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0;
+  background: var(--accent-bright);
+  color: var(--bg-darkest);
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.summon-button:hover:not(:disabled) {
+  background: var(--accent-glow);
+  box-shadow: var(--shadow-glow);
+}
+
+.summon-button:disabled {
+  background: var(--bg-medium);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Signature Badge */
+.minion-signature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--xp);
+  background: var(--xp-dim);
+  padding: 0.125rem 0.375rem;
+  border-radius: 2px;
+  margin-left: 0.5rem;
+}
+
+.minion-signature-badge .diamond {
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--xp);
+}
+
+/* Cost/Count Circles */
+.minion-cost-count {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.minion-cost-count span {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-solid);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--text-primary);
+  background: var(--bg-darkest);
+}

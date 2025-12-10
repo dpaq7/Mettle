@@ -4,8 +4,10 @@ import './SectionHeader.css';
 interface SectionHeaderProps {
   title: string;
   showArrow?: boolean;
-  variant?: 'default' | 'compact' | 'subtle';
+  variant?: 'default' | 'compact' | 'subtle' | 'accent';
   className?: string;
+  onClick?: () => void;
+  collapsed?: boolean;
 }
 
 /**
@@ -20,9 +22,25 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   showArrow = false,
   variant = 'default',
   className = '',
+  onClick,
+  collapsed,
 }) => {
+  const isCollapsible = onClick !== undefined;
+  const collapsedClass = collapsed !== undefined ? (collapsed ? 'collapsed' : 'expanded') : '';
+
   return (
-    <div className={`section-header-component ${variant} ${className}`}>
+    <div
+      className={`section-header-component ${variant} ${isCollapsible ? 'collapsible' : ''} ${collapsedClass} ${className}`}
+      onClick={onClick}
+      role={isCollapsible ? 'button' : undefined}
+      tabIndex={isCollapsible ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (isCollapsible && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+    >
       <div className="section-header-line">
         <span className="section-header-text">{title}</span>
       </div>

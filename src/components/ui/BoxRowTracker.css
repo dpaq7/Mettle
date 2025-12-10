@@ -1,0 +1,146 @@
+/* Box Row Tracker - Draw Steel Character Sheet Style */
+
+.box-row-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.box-row-tracker.disabled {
+  opacity: 0.5;
+}
+
+.box-row-tracker.disabled .box-cell {
+  cursor: not-allowed;
+}
+
+/* Header/Label */
+.box-row-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.box-row-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-bone);
+}
+
+/* Box Row Container */
+.box-row {
+  display: flex;
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Individual Cells */
+.box-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border-solid);
+  background: var(--bg-darkest);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.box-cell:last-child {
+  border-right: none;
+}
+
+/* Size variants */
+.box-row-tracker.sm .box-cell {
+  width: 20px;
+  height: 20px;
+}
+
+.box-row-tracker.md .box-cell {
+  width: 28px;
+  height: 28px;
+}
+
+.box-row-tracker.lg .box-cell {
+  width: 36px;
+  height: 36px;
+}
+
+/* Hover state */
+.box-cell:hover {
+  background: var(--bg-medium);
+}
+
+/* Filled state */
+.box-cell.filled {
+  background: var(--accent-dim);
+}
+
+.box-cell.filled::after {
+  content: '';
+  width: 60%;
+  height: 60%;
+  background: var(--accent-bright);
+  border-radius: 2px;
+}
+
+/* Winded/Dying markers */
+.box-cell.winded-marker::before,
+.box-cell.dying-marker::before {
+  content: '◇';
+  position: absolute;
+  font-size: 10px;
+  color: var(--border-solid);
+  top: 2px;
+  right: 2px;
+  line-height: 1;
+}
+
+.box-cell.winded-marker.threshold-active::before {
+  content: '◆';
+  color: var(--warning);
+}
+
+.box-cell.dying-marker.threshold-active::before {
+  content: '◆';
+  color: var(--danger);
+}
+
+/* Threshold active states */
+.box-cell.winded-marker.threshold-active {
+  border-color: var(--warning);
+  background: var(--warning-dim);
+}
+
+.box-cell.dying-marker.threshold-active {
+  border-color: var(--danger);
+  background: var(--danger-dim);
+}
+
+/* Labels row */
+.box-row-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+
+.winded-label {
+  color: var(--warning);
+}
+
+/* Focus state */
+.box-cell:focus {
+  outline: none;
+}
+
+.box-cell:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: -2px;
+  z-index: 1;
+}

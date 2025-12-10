@@ -1,5 +1,6 @@
 import React from 'react';
 import { MinionTemplate } from '../../types';
+import './MinionCard.css';
 
 interface MinionCardProps {
   minion: MinionTemplate;

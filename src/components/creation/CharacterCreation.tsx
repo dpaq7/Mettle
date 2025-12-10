@@ -389,6 +389,9 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
       heroTokens: 0,
       victories: 0,
       xp: 0,
+      wealth: 2, // Default starting wealth tier (Poor)
+      gold: 0, // Starting gold
+      renown: 0, // Starting renown
       portfolio: {
         ...portfolio,
         signatureMinions: selectedSignatureMinions,
@@ -402,6 +405,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
       kit: selectedKit,
       items: [],
       notes: '',
+      portraitUrl: null,
       activeConditions: [],
       progressionChoices: {},
       activeProjects: [],

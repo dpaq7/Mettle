@@ -1,0 +1,116 @@
+/* Resource Panel - Combined Layout */
+
+.resource-panel {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: 4px;
+}
+
+.resource-panel-left,
+.resource-panel-center,
+.resource-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Section headers within panel */
+.resource-panel .section-header-component {
+  margin-bottom: 0.25rem;
+}
+
+/* Adjustments for centered content in right panel */
+.resource-panel-right {
+  align-items: center;
+}
+
+.resource-panel-right .section-header-component {
+  width: 100%;
+}
+
+/* Essence and Surges side by side */
+.essence-surges-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* === RESPONSIVE LAYOUTS === */
+@media (max-width: 900px) {
+  .resource-panel {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .resource-panel-left {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .resource-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-panel-left {
+    grid-column: span 1;
+  }
+
+  .resource-panel-center,
+  .resource-panel-right {
+    align-items: stretch;
+  }
+}
+
+/* === COMPACT VARIANT === */
+.resource-panel.compact {
+  padding: 0.75rem;
+  gap: 1rem;
+}
+
+.resource-panel.compact .resource-panel-left,
+.resource-panel.compact .resource-panel-center,
+.resource-panel.compact .resource-panel-right {
+  gap: 0.5rem;
+}
+
+/* === INLINE VARIANT (for integration into stats panel) === */
+.resource-panel.inline {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* === INLINE-RESOURCES VARIANT (horizontal compact layout) === */
+.resource-panel.inline-resources {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.resource-panel.inline-resources .resource-panel-left,
+.resource-panel.inline-resources .resource-panel-center,
+.resource-panel.inline-resources .resource-panel-right {
+  gap: 0.35rem;
+}
+
+/* Scale down recoveries section by 25% in inline mode */
+.resource-panel.inline-resources .resource-panel-center {
+  transform: scale(0.75);
+  transform-origin: top left;
+  /* Compensate for the 25% empty space from scale transform */
+  margin-right: -40px;
+  margin-bottom: -15px;
+}
+
+/* Section headers visible in inline-resources */

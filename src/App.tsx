@@ -89,17 +89,6 @@ function App() {
           <button onClick={() => setShowCharacterManager(true)} className="manage-chars-btn">
             Characters
           </button>
-          <div className="combat-toggle">
-            {!isInCombat ? (
-              <button onClick={startCombat} className="start-combat-btn">
-                Start Combat
-              </button>
-            ) : (
-              <button onClick={endCombat} className="end-combat-btn">
-                End Combat
-              </button>
-            )}
-          </div>
           <button onClick={() => setDarkMode(!darkMode)} className="mode-toggle">
             {darkMode ? '☀️' : '🌙'}
           </button>

@@ -1,0 +1,130 @@
+/* Recoveries Tracker - Draw Steel Character Sheet Style */
+
+.recoveries-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recoveries-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border-solid);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.recovery-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: var(--bg-darkest);
+  gap: 0.25rem;
+}
+
+.recovery-box:first-child {
+  border-right: 1px solid var(--border-solid);
+}
+
+.recovery-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.recovery-sublabel {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.recovery-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.recovery-value.stamina-value {
+  color: var(--accent-bright);
+}
+
+.recovery-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.counter-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.counter-btn:hover:not(:disabled) {
+  background: var(--bg-light);
+  border-color: var(--accent-dim);
+}
+
+.counter-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.recovery-max {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Use Recovery Button */
+.use-recovery-btn {
+  padding: 0.5rem 1rem;
+  background: var(--bg-medium);
+  border: 1px solid var(--accent-dim);
+  border-radius: 3px;
+  color: var(--accent-bright);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.use-recovery-btn:hover:not(:disabled) {
+  background: var(--bg-light);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 8px var(--border-glow);
+}
+
+.use-recovery-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border-solid);
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .recoveries-boxes {
+    grid-template-columns: 1fr;
+  }
+
+  .recovery-box:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border-solid);
+  }
+}

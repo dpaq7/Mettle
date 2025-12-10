@@ -1,0 +1,156 @@
+/* Essence Tracker - Horizontal Hexagon Style */
+
+.essence-tracker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* === HEXAGON SHAPE === */
+.essence-hexagon-wrapper {
+  position: relative;
+  width: 140px;
+  height: 90px;
+}
+
+/* Outer shape (border) - horizontal hexagon pointed left/right */
+.essence-hexagon-border {
+  position: absolute;
+  inset: 0;
+  background: var(--border-solid);
+  clip-path: polygon(
+    8% 50%,
+    20% 5%,
+    80% 5%,
+    92% 50%,
+    80% 95%,
+    20% 95%
+  );
+  transition: all 0.2s ease;
+}
+
+/* Inner shape (background) */
+.essence-hexagon-inner {
+  position: absolute;
+  inset: 2px;
+  background: var(--bg-darkest);
+  clip-path: polygon(
+    8% 50%,
+    20% 5%,
+    80% 5%,
+    92% 50%,
+    80% 95%,
+    20% 95%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+/* Hover glow effect */
+.essence-hexagon-wrapper:hover .essence-hexagon-border {
+  background: var(--accent-dim);
+  box-shadow: 0 0 10px rgba(0, 230, 195, 0.3);
+}
+
+/* Focus-within glow */
+.essence-hexagon-wrapper:focus-within .essence-hexagon-border {
+  background: var(--accent-glow);
+  box-shadow: 0 0 15px rgba(0, 230, 195, 0.5), 0 0 30px rgba(0, 230, 195, 0.25);
+}
+
+/* === CONTENT === */
+.essence-label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.essence-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.essence-value {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--essence, var(--accent-bright));
+  min-width: 2ch;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(168, 125, 232, 0.5);
+}
+
+.essence-max {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.essence-btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: 2px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.essence-btn:hover:not(:disabled) {
+  background: var(--bg-light);
+  border-color: var(--accent-dim);
+}
+
+.essence-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* === INFO TEXT === */
+.essence-info {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.essence-info p {
+  margin: 0;
+}
+
+/* Blank line styling for "Damage ____" */
+.essence-info p:first-child::after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  border-bottom: 1px solid var(--border-solid);
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 400px) {
+  .essence-hexagon-wrapper {
+    width: 120px;
+    height: 75px;
+  }
+
+  .essence-value {
+    font-size: 1.5rem;
+  }
+
+  .essence-info {
+    font-size: 0.6rem;
+  }
+}
