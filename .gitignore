@@ -28,3 +28,12 @@ src-tauri/target/
 
 # Claude Code plans
 .claude/plans/
+
+# Project documentation and reference files
+Magic Items.md
+Summoner v1.0.pdf
+summoner v10.md
+Ancestry carrer culture domain.md
+Projects.md
+Design Aesthetic/
+changing width/

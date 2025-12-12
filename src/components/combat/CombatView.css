@@ -2,21 +2,32 @@
    COMBAT VIEW - Draw Steel Summoner Style
    ============================================ */
 
-/* Main Layout - Vertical Stack (page scrolls) */
+/* Main Layout - Horizontal Split (left summon, right squads) */
 .combat-view-merged {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--space-lg);
+  height: 100%;
+  min-height: 0;
 }
 
-/* Top Panel - Active Squads (Horizontal) */
-.combat-top-panel {
-  /* No constraints - flows naturally */
+/* Left Panel - Summon Cards (Scrollable) */
+.combat-left-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* Bottom Panel - Summon Cards */
-.combat-bottom-panel {
-  /* No overflow constraints - let page scroll */
+/* Right Panel - Active Squads (Vertical) */
+.combat-right-panel {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* ============================================
@@ -83,7 +94,7 @@
   50% { opacity: 0.7; }
 }
 
-/* Horizontal Squads List */
+/* Horizontal Squads List (legacy) */
 .squads-list-horizontal {
   display: flex;
   gap: var(--space-md);
@@ -96,6 +107,19 @@
   width: 320px;
 }
 
+/* Vertical Squads List (right panel) */
+.squads-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.squads-list-vertical .squad-card {
+  width: 100%;
+}
+
 /* ============================================
    SUMMON PANEL
    ============================================ */
@@ -104,15 +128,38 @@
   border: 1px solid var(--border-dark);
   border-radius: var(--radius-lg);
   padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.summon-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-dark);
+  flex-shrink: 0;
 }
 
 .summon-panel h3 {
-  margin: 0 0 var(--space-md) 0;
+  margin: 0;
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--accent-primary);
+}
+
+.summon-cards-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: 0;
 }
 
 .not-in-combat {
@@ -1082,8 +1129,35 @@
 /* ============================================
    RESPONSIVE
    ============================================ */
+@media (max-width: 1100px) {
+  .combat-right-panel {
+    width: 320px;
+  }
+}
+
 @media (max-width: 900px) {
+  /* Stack vertically on smaller screens */
+  .combat-view-merged {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .combat-left-panel {
+    max-height: 50vh;
+  }
+
+  .combat-right-panel {
+    width: 100%;
+    max-height: 50vh;
+  }
+
   .squads-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .summon-panel-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-sm);
@@ -1104,6 +1178,14 @@
 }
 
 @media (max-width: 600px) {
+  .combat-left-panel {
+    max-height: 60vh;
+  }
+
+  .combat-right-panel {
+    max-height: 40vh;
+  }
+
   .squads-list-horizontal .squad-card {
     width: 260px;
   }

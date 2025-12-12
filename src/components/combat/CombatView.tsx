@@ -239,37 +239,163 @@ const CombatView: React.FC = () => {
 
   return (
     <div className="combat-view-merged">
-      {/* Top Panel: Active Squads (Horizontal) */}
-      <div className="combat-top-panel">
-        <div className="squads-header">
-          <h3>Active Squads</h3>
-          <div className="combat-constraints-inline">
-            <div className="constraint-inline essence-constraint">
-              <span className="constraint-label">Essence</span>
-              <span className="constraint-value essence-val">{currentEssence}</span>
-            </div>
-            <div className="constraint-inline minion-constraint">
-              <span className="constraint-label">Minions</span>
-              <span className={`constraint-value ${totalActiveMinions >= maxMinions ? 'at-cap' : ''}`}>
-                {totalActiveMinions}/{maxMinions}
-              </span>
-            </div>
-            <div className="constraint-inline squad-constraint">
-              <span className="constraint-label">Squads</span>
-              <span className={`constraint-value ${squadCount >= maxSquads ? 'at-cap' : ''}`}>
-                {squadCount}/{maxSquads}
-              </span>
+      {/* Left Panel: Summon Cards (Scrollable) */}
+      <div className="combat-left-panel">
+        <div className="summon-panel">
+          <div className="summon-panel-header">
+            <h3>Summon Minions</h3>
+            <div className="combat-constraints-inline">
+              <div className="constraint-inline essence-constraint">
+                <span className="constraint-label">Essence</span>
+                <span className="constraint-value essence-val">{currentEssence}</span>
+              </div>
+              <div className="constraint-inline minion-constraint">
+                <span className="constraint-label">Minions</span>
+                <span className={`constraint-value ${totalActiveMinions >= maxMinions ? 'at-cap' : ''}`}>
+                  {totalActiveMinions}/{maxMinions}
+                </span>
+              </div>
+              <div className="constraint-inline squad-constraint">
+                <span className="constraint-label">Squads</span>
+                <span className={`constraint-value ${squadCount >= maxSquads ? 'at-cap' : ''}`}>
+                  {squadCount}/{maxSquads}
+                </span>
+              </div>
             </div>
           </div>
+          {!isInCombat && <div className="not-in-combat">Start combat to summon</div>}
+
+          <div className="summon-cards-scroll">
+            {/* Signature Minions */}
+            <div className="summon-section">
+              <h4 className="section-header">Signature Minions</h4>
+              <div className="summon-cards-row">
+                {signatureMinions.map(minion => {
+                  const check = canSummon(minion);
+                  const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
+                  return (
+                    <SummonMinionCard
+                      key={minion.id}
+                      minion={minion}
+                      isSignature={true}
+                      canSummon={check.canSummon}
+                      reason={check.reason}
+                      totalMinions={totalMinions}
+                      totalCost={totalCost}
+                      multiplier={multiplier}
+                      imageUrl={getMinionPortrait(minion.id)}
+                      onSummon={() => handleSummon(minion)}
+                      onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
+                      onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3-Essence Minions */}
+            {unlockedMinions.filter(m => m.essenceCost === 3).length > 0 && (
+              <div className="summon-section">
+                <h4 className="section-header">3 Essence Minions</h4>
+                <div className="summon-cards-row">
+                  {unlockedMinions.filter(m => m.essenceCost === 3).map(minion => {
+                    const check = canSummon(minion);
+                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
+                    return (
+                      <SummonMinionCard
+                        key={minion.id}
+                        minion={minion}
+                        isSignature={false}
+                        canSummon={check.canSummon}
+                        reason={check.reason}
+                        totalMinions={totalMinions}
+                        totalCost={totalCost}
+                        multiplier={multiplier}
+                        imageUrl={getMinionPortrait(minion.id)}
+                        onSummon={() => handleSummon(minion)}
+                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
+                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 5-Essence Minions */}
+            {unlockedMinions.filter(m => m.essenceCost === 5).length > 0 && (
+              <div className="summon-section">
+                <h4 className="section-header">5 Essence Minions</h4>
+                <div className="summon-cards-row">
+                  {unlockedMinions.filter(m => m.essenceCost === 5).map(minion => {
+                    const check = canSummon(minion);
+                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
+                    return (
+                      <SummonMinionCard
+                        key={minion.id}
+                        minion={minion}
+                        isSignature={false}
+                        canSummon={check.canSummon}
+                        reason={check.reason}
+                        totalMinions={totalMinions}
+                        totalCost={totalCost}
+                        multiplier={multiplier}
+                        imageUrl={getMinionPortrait(minion.id)}
+                        onSummon={() => handleSummon(minion)}
+                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
+                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 7-Essence Minions */}
+            {unlockedMinions.filter(m => m.essenceCost === 7).length > 0 && (
+              <div className="summon-section">
+                <h4 className="section-header">7 Essence Minions</h4>
+                <div className="summon-cards-row">
+                  {unlockedMinions.filter(m => m.essenceCost === 7).map(minion => {
+                    const check = canSummon(minion);
+                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
+                    return (
+                      <SummonMinionCard
+                        key={minion.id}
+                        minion={minion}
+                        isSignature={false}
+                        canSummon={check.canSummon}
+                        reason={check.reason}
+                        totalMinions={totalMinions}
+                        totalCost={totalCost}
+                        multiplier={multiplier}
+                        imageUrl={getMinionPortrait(minion.id)}
+                        onSummon={() => handleSummon(minion)}
+                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
+                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel: Active Squads (Vertical) */}
+      <div className="combat-right-panel">
+        <div className="squads-header">
+          <h3>Active Squads</h3>
         </div>
 
         {hero.activeSquads.length === 0 ? (
           <div className="no-squads">
             <p>No active squads</p>
-            <p className="hint">{isInCombat ? 'Use the summon panel below to call forth minions' : 'Start combat to begin'}</p>
+            <p className="hint">{isInCombat ? 'Summon minions from the left panel' : 'Start combat to begin'}</p>
           </div>
         ) : (
-          <div className="squads-list-horizontal">
+          <div className="squads-list-vertical">
             {hero.activeSquads.map(squad => {
               const template = getMinionById(squad.templateId);
               if (!template) return null;
@@ -433,131 +559,6 @@ const CombatView: React.FC = () => {
             })}
           </div>
         )}
-      </div>
-
-      {/* Bottom Panel: Summon */}
-      <div className="combat-bottom-panel">
-        {/* Summon Panel */}
-        <div className="summon-panel">
-          <h3>Summon Minions</h3>
-          {!isInCombat && <div className="not-in-combat">Start combat to summon</div>}
-
-          <div className="summon-cards-grid">
-            {/* Signature Minions */}
-            <div className="summon-section">
-              <h4 className="section-header">Signature Minions</h4>
-              <div className="summon-cards-row">
-                {signatureMinions.map(minion => {
-                  const check = canSummon(minion);
-                  const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
-                  return (
-                    <SummonMinionCard
-                      key={minion.id}
-                      minion={minion}
-                      isSignature={true}
-                      canSummon={check.canSummon}
-                      reason={check.reason}
-                      totalMinions={totalMinions}
-                      totalCost={totalCost}
-                      multiplier={multiplier}
-                      imageUrl={getMinionPortrait(minion.id)}
-                      onSummon={() => handleSummon(minion)}
-                      onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
-                      onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3-Essence Minions */}
-            {unlockedMinions.filter(m => m.essenceCost === 3).length > 0 && (
-              <div className="summon-section">
-                <h4 className="section-header">3 Essence Minions</h4>
-                <div className="summon-cards-row">
-                  {unlockedMinions.filter(m => m.essenceCost === 3).map(minion => {
-                    const check = canSummon(minion);
-                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
-                    return (
-                      <SummonMinionCard
-                        key={minion.id}
-                        minion={minion}
-                        isSignature={false}
-                        canSummon={check.canSummon}
-                        reason={check.reason}
-                        totalMinions={totalMinions}
-                        totalCost={totalCost}
-                        multiplier={multiplier}
-                        imageUrl={getMinionPortrait(minion.id)}
-                        onSummon={() => handleSummon(minion)}
-                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
-                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 5-Essence Minions */}
-            {unlockedMinions.filter(m => m.essenceCost === 5).length > 0 && (
-              <div className="summon-section">
-                <h4 className="section-header">5 Essence Minions</h4>
-                <div className="summon-cards-row">
-                  {unlockedMinions.filter(m => m.essenceCost === 5).map(minion => {
-                    const check = canSummon(minion);
-                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
-                    return (
-                      <SummonMinionCard
-                        key={minion.id}
-                        minion={minion}
-                        isSignature={false}
-                        canSummon={check.canSummon}
-                        reason={check.reason}
-                        totalMinions={totalMinions}
-                        totalCost={totalCost}
-                        multiplier={multiplier}
-                        imageUrl={getMinionPortrait(minion.id)}
-                        onSummon={() => handleSummon(minion)}
-                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
-                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 7-Essence Minions */}
-            {unlockedMinions.filter(m => m.essenceCost === 7).length > 0 && (
-              <div className="summon-section">
-                <h4 className="section-header">7 Essence Minions</h4>
-                <div className="summon-cards-row">
-                  {unlockedMinions.filter(m => m.essenceCost === 7).map(minion => {
-                    const check = canSummon(minion);
-                    const { totalMinions, totalCost, multiplier } = getSummonInfo(minion);
-                    return (
-                      <SummonMinionCard
-                        key={minion.id}
-                        minion={minion}
-                        isSignature={false}
-                        canSummon={check.canSummon}
-                        reason={check.reason}
-                        totalMinions={totalMinions}
-                        totalCost={totalCost}
-                        multiplier={multiplier}
-                        imageUrl={getMinionPortrait(minion.id)}
-                        onSummon={() => handleSummon(minion)}
-                        onAdjustMultiplier={(delta) => adjustSummonMultiplier(minion.id, delta)}
-                        onImageChange={(url) => handleMinionPortraitChange(minion.id, url)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );
