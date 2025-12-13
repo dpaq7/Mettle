@@ -65,9 +65,9 @@ const RollHistoryPanel: React.FC = () => {
                     </span>
                     <span className="result-details">
                       [{entry.result.dice[0]}+{entry.result.dice[1]}]
-                      {entry.result.secondRoll !== undefined && entry.result.secondDice && (
-                        <span className="discarded">
-                          /[{entry.result.secondDice[0]}+{entry.result.secondDice[1]}]
+                      {entry.result.edgeBaneBonus !== 0 && (
+                        <span className={entry.result.edgeBaneBonus > 0 ? 'edge-bonus' : 'bane-penalty'}>
+                          {entry.result.edgeBaneBonus > 0 ? '+' : ''}{entry.result.edgeBaneBonus}
                         </span>
                       )}
                       {entry.result.modifier !== 0 && (

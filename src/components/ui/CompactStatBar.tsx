@@ -142,16 +142,7 @@ export const CompactStatBar = ({
       setIsRolling(false);
 
       // Add to roll history
-      addRoll({
-        naturalRoll: rollResult.naturalRoll,
-        dice: rollResult.dice,
-        modifier: 0,
-        total: rollResult.total,
-        tier: rollResult.tier,
-        hadEdge: rollResult.hadEdge,
-        hadBane: rollResult.hadBane,
-        timestamp: Date.now(),
-      }, 'Power Roll', 'hero');
+      addRoll(rollResult, 'Power Roll', 'hero');
 
       // Clear result after 3 seconds
       setTimeout(() => setLastRoll(null), 3000);
@@ -167,13 +158,18 @@ export const CompactStatBar = ({
       setLastD3Roll(result);
       setIsRollingD3(false);
 
-      // Add to roll history
+      // Add to roll history (d3 roll doesn't use edge/bane)
       addRoll({
         naturalRoll: result,
         dice: [result, 0],
         modifier: 0,
+        edgeBaneBonus: 0,
         total: result,
+        baseTier: 1,
         tier: 1,
+        tierAdjustment: 0,
+        edgeBaneState: { edges: 0, banes: 0 },
+        resolvedEdgeBane: { type: 'normal' },
         hadEdge: false,
         hadBane: false,
         timestamp: Date.now(),
@@ -195,16 +191,7 @@ export const CompactStatBar = ({
       setRollingChar(null);
 
       // Add to roll history
-      addRoll({
-        naturalRoll: rollResult.naturalRoll,
-        dice: rollResult.dice,
-        modifier: charValue,
-        total: rollResult.total,
-        tier: rollResult.tier,
-        hadEdge: rollResult.hadEdge,
-        hadBane: rollResult.hadBane,
-        timestamp: Date.now(),
-      }, `${charName} Test`, 'hero');
+      addRoll(rollResult, `${charName} Test`, 'hero');
 
       // Clear result after 3 seconds
       setTimeout(() => setLastCharRoll(null), 3000);
@@ -234,8 +221,13 @@ export const CompactStatBar = ({
         naturalRoll: 0,
         dice: [0, 0],
         modifier: 0,
+        edgeBaneBonus: 0,
         total: 0,
+        baseTier: 1,
         tier: 1,
+        tierAdjustment: 0,
+        edgeBaneState: { edges: 0, banes: 0 },
+        resolvedEdgeBane: { type: 'normal' },
         hadEdge: false,
         hadBane: false,
         timestamp: Date.now(),
@@ -250,8 +242,13 @@ export const CompactStatBar = ({
         naturalRoll: recoveryValue,
         dice: [recoveryValue, 0],
         modifier: 0,
+        edgeBaneBonus: 0,
         total: recoveryValue,
+        baseTier: 3,
         tier: 3,
+        tierAdjustment: 0,
+        edgeBaneState: { edges: 0, banes: 0 },
+        resolvedEdgeBane: { type: 'normal' },
         hadEdge: false,
         hadBane: false,
         timestamp: Date.now(),

@@ -197,8 +197,10 @@ const AbilityCard: React.FC<AbilityCardProps> = ({
                     </span>
                     <span className="result-breakdown">
                       ({rollResult.naturalRoll}
-                      {rollResult.secondRoll !== undefined && (
-                        <span className="discarded"> / {rollResult.secondRoll}</span>
+                      {rollResult.edgeBaneBonus !== 0 && (
+                        <span className={rollResult.edgeBaneBonus > 0 ? 'edge-bonus' : 'bane-penalty'}>
+                          {rollResult.edgeBaneBonus > 0 ? '+' : ''}{rollResult.edgeBaneBonus}
+                        </span>
                       )}
                       {rollResult.modifier !== 0 && (
                         <> {rollResult.modifier >= 0 ? '+' : ''}{rollResult.modifier}</>

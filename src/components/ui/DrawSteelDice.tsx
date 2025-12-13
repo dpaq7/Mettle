@@ -106,16 +106,7 @@ export const DrawSteelDice = ({
 
       // Add to roll history
       const rollLabel = characteristic ? `${characteristic.name} Test` : 'Power Roll';
-      addRoll({
-        naturalRoll: rollResult.naturalRoll,
-        dice: rollResult.dice,
-        modifier: charMod,
-        total: rollResult.total,
-        tier: rollResult.tier,
-        hadEdge: rollResult.hadEdge,
-        hadBane: rollResult.hadBane,
-        timestamp: Date.now(),
-      }, rollLabel, 'hero');
+      addRoll(rollResult, rollLabel, 'hero');
 
       // Notify parent that characteristic roll is complete
       if (characteristic) {
