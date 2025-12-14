@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { useTheme } from '../../context/ThemeContext';
 import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand } from '../../types';
 import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
@@ -533,7 +533,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
           current: 0,
           maxPerTurn: maxEssencePerTurn,
         },
-        circle: selectedCircle!,
+        subclass: selectedCircle!,
         formation: selectedFormation!,
         quickCommand,
         portfolio: {
@@ -567,7 +567,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
               minimum: -(1 + reasonScore), // Can go negative
             },
             isStrained: false,
-            tradition: undefined,
+            subclass: undefined,
           } as TalentHero;
           break;
 
@@ -586,7 +586,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'conduit',
             heroicResource: { type: 'piety', current: 0 },
-            domain: 'protection', // Default domain
+            subclass: 'protection', // Default domain
             prayState: { hasPrayedThisTurn: false, lastPrayResult: null },
           } as ConduitHero;
           break;
@@ -596,7 +596,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'elementalist',
             heroicResource: { type: 'essence', current: 0, persistent: 0 },
-            element: 'fire', // Default element
+            subclass: 'fire', // Default element
             mantleActive: false,
             persistentAbilities: [],
           } as ElementalistHero;
@@ -608,7 +608,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             heroClass: 'fury',
             heroicResource: { type: 'ferocity', current: 0 },
             growingFerocityTier: 0,
-            aspect: undefined,
+            subclass: undefined,
           } as FuryHero;
           break;
 
@@ -624,7 +624,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'null',
             heroicResource: { type: 'discipline', current: 0 },
-            tradition: selectedNullTradition ?? undefined,
+            subclass: selectedNullTradition ?? undefined,
             augmentation: selectedPsionicAugmentation ?? undefined,
             // Apply augmentation stat bonuses
             stamina: {
@@ -659,7 +659,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'shadow',
             heroicResource: { type: 'insight', current: 0 },
-            college: 'black-ash', // Default college
+            subclass: 'black-ash', // Default college
             isHidden: false,
           } as ShadowHero;
           break;
@@ -671,7 +671,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             heroicResource: { type: 'focus', current: 0 },
             markedTargets: [],
             secondaryKit: null,
-            doctrine: undefined,
+            subclass: undefined,
           } as TacticianHero;
           break;
 
@@ -683,7 +683,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             activeRoutine: null,
             scenePartners: [],
             heroPartners: [],
-            class: undefined,
+            subclass: undefined,
           } as TroubadourHero;
           break;
 

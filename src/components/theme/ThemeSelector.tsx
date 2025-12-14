@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme, setThemeOverride, clearThemeOverride, getDefaultThemeForClass } from '../../context/ThemeContext';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useHeroContext } from '../../context/HeroContext';
 import { ThemeDefinition, ThemeId } from '../../types/theme';
 import { HeroClass } from '../../types/hero';
 import { classThemes, getThemeById } from '../../data/themes';
@@ -13,13 +13,13 @@ interface ThemeSelectorProps {
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
   const { currentTheme, setTheme, themes } = useTheme();
-  const { hero } = useSummonerContext();
+  const { hero } = useHeroContext();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get hero info for theme selection
   const heroId = hero?.id;
-  const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+  const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
   const defaultTheme = getDefaultThemeForClass(heroClass);
   const isUsingDefault = heroId ? isUsingDefaultTheme(heroId, heroClass) : true;
 

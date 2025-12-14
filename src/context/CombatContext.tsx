@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { EssenceEconomy, TurnState, TurnPhase, Squad, Minion, MinionTemplate } from '../types';
-import { useSummonerContext } from './SummonerContext';
+import { useHeroContext } from './HeroContext';
 import { isSummonerHero, SummonerHeroV2 } from '../types/hero';
 import { generateId, calculateMinionBonusStamina } from '../utils/calculations';
 
@@ -41,7 +41,7 @@ interface CombatProviderProps {
 }
 
 export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
-  const { hero: genericHero, updateHero } = useSummonerContext();
+  const { hero: genericHero, updateHero } = useHeroContext();
 
   // CombatContext is primarily for Summoner; other classes use basic combat tracking
   const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
@@ -177,19 +177,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
   }, [hero, createSingleMinion]);
 
   const startCombat = () => {
-    if (!hero) return;
-
-    // SRD: Start of Combat - Essence = Current Victories
-    const startingEssence = hero.victories || 0;
-
-    // SRD: Start of Combat - Summon up to 2 signature minions for free
-    const freeSquads = summonFreeSignatureMinions(FREE_SUMMONS_COMBAT_START, []);
-
-    // Update hero with the new squads
-    updateHero({
-      activeSquads: freeSquads,
-    });
-
+    // Set combat state for ALL classes
     setIsInCombat(true);
     setHasSacrificedThisTurn(false);
     setTurnState({
@@ -197,13 +185,37 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       roundNumber: 1,
       phasesCompleted: [],
     });
-    setEssenceState({
-      currentEssence: startingEssence,
-      essenceGainedThisTurn: 0,
-      turnNumber: 1,
-      signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
-      minionDeathEssenceGainedThisRound: false,
-    });
+
+    // Summoner-specific: Initialize essence and summon free minions
+    if (hero) {
+      // SRD: Start of Combat - Essence = Current Victories
+      const startingEssence = hero.victories || 0;
+
+      // SRD: Start of Combat - Summon up to 2 signature minions for free
+      const freeSquads = summonFreeSignatureMinions(FREE_SUMMONS_COMBAT_START, []);
+
+      // Update hero with the new squads
+      updateHero({
+        activeSquads: freeSquads,
+      });
+
+      setEssenceState({
+        currentEssence: startingEssence,
+        essenceGainedThisTurn: 0,
+        turnNumber: 1,
+        signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
+        minionDeathEssenceGainedThisRound: false,
+      });
+    } else {
+      // Non-Summoner: Reset essence state to defaults
+      setEssenceState({
+        currentEssence: 0,
+        essenceGainedThisTurn: 0,
+        turnNumber: 1,
+        signatureMinionsSpawnedThisTurn: false,
+        minionDeathEssenceGainedThisRound: false,
+      });
+    }
 
     // Call the combat start callback (e.g., to switch to combat tab)
     if (onCombatStartCallback) {

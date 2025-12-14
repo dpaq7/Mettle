@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 import { useCombatContext } from '../context/CombatContext';
 import { Squad, Minion, MinionTemplate, GridPosition } from '../types';
 import { isSummonerHero, SummonerHeroV2 } from '../types/hero';

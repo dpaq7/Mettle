@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import './VictoryTracker.css';
 
 const VictoryTracker: React.FC = () => {

@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { SummonerHero } from '../types';
-import { Hero, SummonerHeroV2, isSummonerHero } from '../types/hero';
+import { Hero, SummonerHeroV2 } from '../types/hero';
 import { saveCharacter, loadCharacter, getActiveCharacterId, setActiveCharacterId } from '../utils/storage';
 
 // HeroContext supports all 10 Draw Steel hero classes
-// The name is kept as SummonerContext for backward compatibility
-interface SummonerContextType {
+interface HeroContextType {
   hero: Hero | null;
   setHero: (hero: Hero | null) => void;
   updateHero: (updates: Partial<Hero>) => void;
@@ -14,17 +13,20 @@ interface SummonerContextType {
   createNewHero: (hero: Hero) => void;
 }
 
-const SummonerContext = createContext<SummonerContextType | undefined>(undefined);
+const HeroContext = createContext<HeroContextType | undefined>(undefined);
 
-export const useSummonerContext = () => {
-  const context = useContext(SummonerContext);
+export const useHeroContext = () => {
+  const context = useContext(HeroContext);
   if (!context) {
-    throw new Error('useSummonerContext must be used within a SummonerProvider');
+    throw new Error('useHeroContext must be used within a HeroProvider');
   }
   return context;
 };
 
-interface SummonerProviderProps {
+// Backward compatibility alias
+export const useSummonerContext = useHeroContext;
+
+interface HeroProviderProps {
   children: ReactNode;
 }
 
@@ -50,7 +52,7 @@ const migrateLegacyHero = (data: any): Hero => {
   } as SummonerHeroV2;
 };
 
-export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) => {
+export const HeroProvider: React.FC<HeroProviderProps> = ({ children }) => {
   const [hero, setHeroInternal] = useState<Hero | null>(null);
 
   const setHero = (newHero: Hero | null) => {
@@ -102,7 +104,7 @@ export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) 
     saveCharacter(newHero);
   };
 
-  const value: SummonerContextType = {
+  const value: HeroContextType = {
     hero,
     setHero,
     updateHero,
@@ -111,5 +113,11 @@ export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) 
     createNewHero,
   };
 
-  return <SummonerContext.Provider value={value}>{children}</SummonerContext.Provider>;
+  return <HeroContext.Provider value={value}>{children}</HeroContext.Provider>;
 };
+
+// Backward compatibility alias
+export const SummonerProvider = HeroProvider;
+
+// Also export the type for backward compatibility
+export type SummonerContextType = HeroContextType;

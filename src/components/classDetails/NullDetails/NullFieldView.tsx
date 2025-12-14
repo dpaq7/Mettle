@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useSummonerContext } from '../../../context/SummonerContext';
+import { useSummonerContext } from '../../../context/HeroContext';
 import {
   isNullHero,
   NullHero,
@@ -41,7 +41,7 @@ export const NullFieldView: React.FC = () => {
   const nullHero = hero as NullHero;
   const {
     heroicResource,
-    tradition,
+    subclass: tradition, // Renamed from tradition to subclass in types
     augmentation,
     order,
     level,

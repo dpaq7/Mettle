@@ -82,8 +82,8 @@ export const DrawSteelDice = ({
       const charMod = characteristic?.value ?? 0;
       const rollResult = performPowerRoll(charMod, edgeBaneState);
 
-      // Crit only on natural 19 or 20 on 2d10
-      const isCritical = rollResult.naturalRoll >= 19;
+      // Crit on 19 or 20 total (including bonuses)
+      const isCritical = rollResult.total >= 19;
 
       const result: PowerRollResult = {
         type: 'power',
@@ -302,7 +302,7 @@ export const DrawSteelDice = ({
                 ) : (
                   <>Tier {powerResult.tier}</>
                 )}
-                {powerResult.isCritical && <span className="crit-badge">CRIT!</span>}
+                {powerResult.isCritical && <span className="crit-badge">Crit! Gain an extra action!</span>}
               </div>
             </div>
           )}

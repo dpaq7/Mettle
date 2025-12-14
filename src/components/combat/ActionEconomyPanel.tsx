@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { standardManeuvers, standardTriggeredActions, moveActions, quickCommands } from '../../data/action-economy';
 import { isSummonerHero } from '../../types/hero';
 import { Ability } from '../../types';

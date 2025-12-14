@@ -1,4 +1,12 @@
-// Summoner Hero type and related definitions
+/**
+ * @deprecated Legacy Summoner types - Use types from './hero.ts' instead
+ *
+ * This file is kept for backward compatibility with stored character data.
+ * New code should import from './hero.ts':
+ * - SummonerHeroV2 (replaces SummonerHero)
+ * - SummonerCircle, Formation, QuickCommand (now in hero.ts)
+ * - Use 'subclass' field instead of 'circle' for consistency across all classes
+ */
 
 import { Ancestry, Career, Culture, Kit, Item, Characteristics, ActiveCondition } from './common';
 import { Ability, Feature } from './abilities';
@@ -35,6 +43,7 @@ export interface EssencePool {
   maxPerTurn: number;
 }
 
+/** @deprecated Use SummonerHeroV2 from './hero.ts' instead */
 export interface SummonerHero {
   id: string;
   name: string;

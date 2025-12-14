@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useEquipment } from '../../hooks/useEquipment';
 import { usePortrait } from '../../hooks/usePortrait';
 import { useCustomItems, CustomMagicItem } from '../../hooks/useCustomItems';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { MagicItem, EquipmentSlot } from '../../data/magicItems';
 import { EquippedItem } from '../../types/equipment';
 import { VisualSlot, SLOT_CONFIG } from './slotConfig';

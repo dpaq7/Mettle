@@ -595,12 +595,13 @@
 }
 
 .crit-badge {
-  padding: 0.1rem 0.3rem;
+  padding: 0.15rem 0.4rem;
   background: var(--accent-primary);
   color: var(--bg-darkest);
   border-radius: 3px;
   font-size: 0.55rem;
   font-weight: bold;
+  white-space: nowrap;
   animation: crit-pulse 0.5s ease-in-out infinite alternate;
 }
 

@@ -124,6 +124,37 @@ export type TalentTradition = 'empath' | 'metamorph' | 'telekinetic';
 export type TroubadourClass = 'dancer' | 'duelist' | 'wordsmith';
 
 // =================================================================
+// UNIFIED SUBCLASS TYPE
+// =================================================================
+
+// Union of all subclass types for generic handling
+export type Subclass =
+  | CensorOrder
+  | ConduitDomain
+  | ElementalistElement
+  | FuryAspect
+  | NullTradition
+  | ShadowCollege
+  | SummonerCircle
+  | TacticianDoctrine
+  | TalentTradition
+  | TroubadourClass;
+
+// Helper type to get subclass type for a given hero class
+export type SubclassForHeroClass<T extends HeroClass> =
+  T extends 'censor' ? CensorOrder :
+  T extends 'conduit' ? ConduitDomain :
+  T extends 'elementalist' ? ElementalistElement :
+  T extends 'fury' ? FuryAspect :
+  T extends 'null' ? NullTradition :
+  T extends 'shadow' ? ShadowCollege :
+  T extends 'summoner' ? SummonerCircle :
+  T extends 'tactician' ? TacticianDoctrine :
+  T extends 'talent' ? TalentTradition :
+  T extends 'troubadour' ? TroubadourClass :
+  never;
+
+// =================================================================
 // CLASS-SPECIFIC STATE TYPES
 // =================================================================
 
@@ -242,14 +273,14 @@ export interface CensorHero extends HeroBase {
 export interface ConduitHero extends HeroBase {
   heroClass: 'conduit';
   heroicResource: HeroicResource<'piety'>;
-  domain: ConduitDomain;
+  subclass?: ConduitDomain;
   prayState: PrayState;
 }
 
 export interface ElementalistHero extends HeroBase {
   heroClass: 'elementalist';
   heroicResource: ElementalistResource;
-  element: ElementalistElement;
+  subclass?: ElementalistElement;
   mantleActive: boolean;
   persistentAbilities: PersistentAbility[];
 }
@@ -258,7 +289,7 @@ export interface FuryHero extends HeroBase {
   heroClass: 'fury';
   heroicResource: HeroicResource<'ferocity'>;
   growingFerocityTier: number;
-  aspect?: FuryAspect;
+  subclass?: FuryAspect;
 }
 
 // Null Field state tracking
@@ -288,8 +319,8 @@ export interface NullHero extends HeroBase {
   heroClass: 'null';
   heroicResource: HeroicResource<'discipline'>;
 
-  // Subclass and permanent choices
-  tradition?: NullTradition;
+  // Subclass (tradition) and secondary choice (augmentation)
+  subclass?: NullTradition;
   augmentation?: PsionicAugmentation;
 
   // Null Field state
@@ -305,14 +336,14 @@ export interface NullHero extends HeroBase {
 export interface ShadowHero extends HeroBase {
   heroClass: 'shadow';
   heroicResource: HeroicResource<'insight'>;
-  college: ShadowCollege;
+  subclass?: ShadowCollege;
   isHidden: boolean;
 }
 
 export interface SummonerHeroV2 extends HeroBase {
   heroClass: 'summoner';
   heroicResource: SummonerResource;
-  circle: SummonerCircle;
+  subclass?: SummonerCircle;
   formation: Formation;
   quickCommand: QuickCommand;
   portfolio: Portfolio;
@@ -328,14 +359,14 @@ export interface TacticianHero extends HeroBase {
   heroicResource: HeroicResource<'focus'>;
   markedTargets: string[];
   secondaryKit: Kit | null; // Field Arsenal allows two kits
-  doctrine?: TacticianDoctrine;
+  subclass?: TacticianDoctrine;
 }
 
 export interface TalentHero extends HeroBase {
   heroClass: 'talent';
   heroicResource: TalentResource;
   isStrained: boolean; // true when clarity < 0
-  tradition?: TalentTradition;
+  subclass?: TalentTradition;
 }
 
 export interface TroubadourHero extends HeroBase {
@@ -344,7 +375,7 @@ export interface TroubadourHero extends HeroBase {
   activeRoutine: Routine | null;
   scenePartners: ScenePartner[];
   heroPartners: string[]; // Hero IDs bonded for Equal Billing
-  class?: TroubadourClass;
+  subclass?: TroubadourClass;
 }
 
 // =================================================================
@@ -425,10 +456,13 @@ export type HeroicResourceForClass<T extends HeroClass> =
   T extends 'troubadour' ? 'drama' :
   never;
 
-// Circle to Portfolio mapping (for Summoner)
-export const circleToPortfolio: Record<SummonerCircle, 'demon' | 'elemental' | 'fey' | 'undead'> = {
+// Summoner subclass to Portfolio mapping
+export const subclassToPortfolio: Record<SummonerCircle, 'demon' | 'elemental' | 'fey' | 'undead'> = {
   blight: 'demon',
   graves: 'undead',
   spring: 'fey',
   storms: 'elemental',
 };
+
+// Backward compatibility alias
+export const circleToPortfolio = subclassToPortfolio;

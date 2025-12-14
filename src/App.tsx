@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSummonerContext } from './context/SummonerContext';
+import { useHeroContext } from './context/HeroContext';
 import { useCombatContext } from './context/CombatContext';
 import { useTheme } from './context/ThemeContext';
 import CharacterCreation from './components/creation/CharacterCreation';
@@ -24,7 +24,7 @@ import './App.css';
 type View = ViewType;
 
 function App() {
-  const { hero, setHero, updateHero } = useSummonerContext();
+  const { hero, setHero, updateHero } = useHeroContext();
   const { isInCombat, startCombat, endCombat, setOnCombatStartCallback, essenceState, gainEssence, spendEssence } = useCombatContext();
   const { applyThemeForHero, applyCreatorTheme } = useTheme();
   const [activeView, setActiveView] = useState<View>('character');
@@ -36,7 +36,7 @@ function App() {
   // Apply theme when hero changes
   useEffect(() => {
     if (hero && !showCharacterCreation) {
-      const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+      const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
       applyThemeForHero(hero.id, heroClass);
     } else if (!showCharacterCreation) {
       // No hero and not in creation - apply MCDM theme
@@ -48,7 +48,7 @@ function App() {
   // Register callback to switch to minions tab when combat starts (Summoner only)
   useEffect(() => {
     // Only switch to minions tab for Summoners
-    const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+    const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
     if (heroClass === 'summoner') {
       setOnCombatStartCallback(() => setActiveView('minions'));
     } else {
@@ -114,7 +114,7 @@ function App() {
   if (!hero) return null;
 
   // Get hero class (handle both old SummonerHero and new Hero types)
-  const heroClass: HeroClass = (hero as any).heroClass || 'summoner';
+  const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
 
   // Get dynamic tabs based on hero's class
   const tabs = getTabsForClass(heroClass);

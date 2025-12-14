@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PortraitSettings, DEFAULT_PORTRAIT_SETTINGS } from '../types/portrait';
 import { processPortraitImage, validateImageUrl } from '../utils/imageProcessing';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 
 const PORTRAIT_STORAGE_PREFIX = 'summoner_portrait_';
 

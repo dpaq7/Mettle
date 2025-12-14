@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { ActiveProject, ProjectTemplate, ProjectRoll } from '../../types/projects';
 import { PROJECT_TEMPLATES, BREAKTHROUGH_THRESHOLD, PROJECT_MODIFIERS, getProjectsByType } from '../../data/projects';
 import './ProjectsView.css';

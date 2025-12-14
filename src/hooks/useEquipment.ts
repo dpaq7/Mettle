@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 import { EquippedItem, StatBonus } from '../types/equipment';
 import {
   MagicItem,

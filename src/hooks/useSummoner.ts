@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 import { isSummonerHero } from '../types/hero';
 import {
   calculateMaxStamina,
@@ -84,8 +84,8 @@ export const useSummoner = () => {
     const newLevel = hero.level + 1;
     const newMaxStamina = calculateMaxStamina({ ...hero, level: newLevel });
     const newRecoveryValue = calculateRecoveryValue({ ...hero, level: newLevel });
-    // Only pass circle if hero is a Summoner
-    const circle = isSummonerHero(hero) ? hero.circle : undefined;
+    // Only pass subclass (circle) if hero is a Summoner
+    const circle = isSummonerHero(hero) ? hero.subclass : undefined;
     const newMaxRecoveries = calculateMaxRecoveries(circle);
 
     updateHero({

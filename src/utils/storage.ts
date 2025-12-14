@@ -24,11 +24,14 @@ const hasLegacyData = (): boolean => {
 /**
  * Migrate legacy SummonerHero to new SummonerHeroV2 format
  */
-const migrateSummonerToV2 = (legacy: Partial<SummonerHero>): SummonerHeroV2 => {
+const migrateSummonerToV2 = (legacy: Partial<SummonerHero> & { subclass?: string }): SummonerHeroV2 => {
+  // Get subclass (could be from new 'subclass' field or old 'circle' field)
+  const subclass = (legacy.subclass || (legacy as any).circle) as SummonerHeroV2['subclass'];
+
   // Refresh portfolio data from current definitions
   let portfolio = legacy.portfolio;
-  if (legacy.circle && portfolio) {
-    const portfolioType = circleToPortfolio[legacy.circle];
+  if (subclass && portfolio) {
+    const portfolioType = circleToPortfolio[subclass];
     const currentPortfolio = portfolios[portfolioType];
 
     // Keep user's selected signature minions but update with fresh data
@@ -47,8 +50,8 @@ const migrateSummonerToV2 = (legacy: Partial<SummonerHero>): SummonerHeroV2 => {
 
   // Recalculate recovery values with correct formula
   let recoveries = legacy.recoveries;
-  if (legacy.circle && recoveries) {
-    const maxRecoveries = calculateMaxRecoveries(legacy.circle);
+  if (subclass && recoveries) {
+    const maxRecoveries = calculateMaxRecoveries(subclass);
     const recoveryValue = calculateRecoveryValue(legacy);
     recoveries = {
       ...recoveries,
@@ -68,6 +71,7 @@ const migrateSummonerToV2 = (legacy: Partial<SummonerHero>): SummonerHeroV2 => {
     ...legacy,
     heroClass: 'summoner' as const,
     heroicResource,
+    subclass, // Use standardized field name
     // Add missing fields with defaults
     victories: legacy.victories ?? 0,
     xp: legacy.xp ?? 0,
@@ -92,22 +96,59 @@ const migrateSummonerToV2 = (legacy: Partial<SummonerHero>): SummonerHeroV2 => {
 };
 
 /**
+ * Migrate old subclass field names to standardized 'subclass' field
+ * Handles: domain, element, aspect, tradition, college, circle, doctrine, class
+ */
+const migrateSubclassFields = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (!hero.heroClass) return hero;
+
+  const migrated = { ...hero };
+
+  // Map of old field names to migrate per class
+  const fieldMigrations: Record<string, string> = {
+    conduit: 'domain',
+    elementalist: 'element',
+    fury: 'aspect',
+    null: 'tradition',
+    shadow: 'college',
+    summoner: 'circle',
+    tactician: 'doctrine',
+    talent: 'tradition',
+    troubadour: 'class',
+  };
+
+  const heroClass = hero.heroClass as string;
+  const oldField = fieldMigrations[heroClass];
+
+  // If there's an old field to migrate and subclass doesn't exist yet
+  if (oldField && oldField in migrated && !('subclass' in migrated)) {
+    migrated.subclass = migrated[oldField];
+    delete migrated[oldField];
+  }
+
+  return migrated;
+};
+
+/**
  * Migrate older character data to include new fields and refresh portfolio data
  * This handles both legacy SummonerHero and already-migrated Hero data
  */
 const migrateCharacter = (character: Partial<SummonerHero> | Partial<Hero>): Hero => {
+  // First migrate subclass fields to standardized format
+  let migrated = migrateSubclassFields(character as Record<string, unknown>);
+
   // Check if this is already a new Hero type (has heroClass field)
-  if ('heroClass' in character && character.heroClass) {
+  if ('heroClass' in migrated && migrated.heroClass) {
     // Already migrated, just ensure all fields are present
-    if (character.heroClass === 'summoner') {
-      return migrateSummonerToV2(character as Partial<SummonerHero>);
+    if (migrated.heroClass === 'summoner') {
+      return migrateSummonerToV2(migrated as Partial<SummonerHero>);
     }
     // For other classes, return as-is for now (they will be created with new system)
-    return character as Hero;
+    return migrated as unknown as Hero;
   }
 
   // Legacy SummonerHero without heroClass - migrate to V2
-  return migrateSummonerToV2(character as Partial<SummonerHero>);
+  return migrateSummonerToV2(migrated as Partial<SummonerHero>);
 };
 
 /**

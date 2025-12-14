@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MagicItem, ItemCategory, CONSUMABLE_ITEMS, TRINKET_ITEMS, LEVELED_ITEMS, ARTIFACT_ITEMS, parseItemBonuses } from '../../data/magicItems';
 import { useEquipment } from '../../hooks/useEquipment';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import './MagicItemsView.css';
 
 type CategoryFilter = 'all' | ItemCategory;

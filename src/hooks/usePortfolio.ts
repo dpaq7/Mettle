@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 import { MinionTemplate } from '../types';
 import { isSummonerHero } from '../types/hero';
 import { calculateEssenceCost } from '../utils/calculations';

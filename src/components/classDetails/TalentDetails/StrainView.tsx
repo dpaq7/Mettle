@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useSummonerContext } from '../../../context/SummonerContext';
+import { useSummonerContext } from '../../../context/HeroContext';
 import { isTalentHero, TalentHero, TalentTradition } from '../../../types/hero';
 import { ClarityGauge } from './ClarityGauge';
 import { StrainDamagePreview } from './StrainDamagePreview';
@@ -68,7 +68,7 @@ export const StrainView: React.FC = () => {
   }
 
   const talentHero = hero as TalentHero;
-  const { heroicResource, isStrained, tradition, level, characteristics } = talentHero;
+  const { heroicResource, isStrained, subclass: tradition, level, characteristics } = talentHero;
 
   // Calculate minimum clarity: -(1 + Reason score)
   const reasonScore = characteristics?.reason ?? 2;

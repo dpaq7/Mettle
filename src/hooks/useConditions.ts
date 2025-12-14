@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSummonerContext } from '../context/SummonerContext';
+import { useSummonerContext } from '../context/HeroContext';
 import { ActiveCondition, ConditionId } from '../types/common';
 import { CONDITIONS, performSavingThrow, calculateBleedingDamage, ConditionDefinition } from '../data/conditions';
 

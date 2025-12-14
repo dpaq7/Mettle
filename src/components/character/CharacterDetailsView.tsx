@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { languages as allLanguages } from '../../data/reference-data';
 import { formations } from '../../data/formations';
 import { Formation, HeroClass } from '../../types';
@@ -294,7 +294,7 @@ const CharacterDetailsView: React.FC = () => {
       {/* Summoner Circle Section - Only for Summoners */}
       {isSummoner && summonerHero && (
         <section className="details-section circle-section">
-          <h2>Circle: {summonerHero.circle.charAt(0).toUpperCase() + summonerHero.circle.slice(1)}</h2>
+          <h2>Circle: {summonerHero.subclass ? summonerHero.subclass.charAt(0).toUpperCase() + summonerHero.subclass.slice(1) : 'Unknown'}</h2>
 
           <div className="circle-info">
             <div className="circle-stat">

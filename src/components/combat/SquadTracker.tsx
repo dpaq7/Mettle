@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { useSquads } from '../../hooks/useSquads';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useRollHistory } from '../../context/RollHistoryContext';

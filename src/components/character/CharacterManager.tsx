@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { Hero, isSummonerHero } from '../../types/hero';
 import { classDefinitions } from '../../data/classes/class-definitions';
 import {

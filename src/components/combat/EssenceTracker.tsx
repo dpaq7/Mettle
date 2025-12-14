@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCombatContext } from '../../context/CombatContext';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import './EssenceTracker.css';
 
 const EssenceTracker: React.FC = () => {

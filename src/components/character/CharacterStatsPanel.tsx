@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { useCombatContext } from '../../context/CombatContext';
 import { useConditions, SaveResult, BleedingDamageResult } from '../../hooks/useConditions';
 import { useEquipment } from '../../hooks/useEquipment';
@@ -210,7 +210,7 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
           {/* Only show Circle and Formation for Summoners */}
           {isSummoner && summonerHero && (
             <>
-              <span className="tag circle">{circleShort[summonerHero.circle]}</span>
+              <span className="tag circle">{summonerHero.subclass ? circleShort[summonerHero.subclass] : ''}</span>
               <span className="tag formation">{summonerHero.formation}</span>
             </>
           )}

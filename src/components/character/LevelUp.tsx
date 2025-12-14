@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useSummonerContext } from '../../context/SummonerContext';
+import { useSummonerContext } from '../../context/HeroContext';
 import { getProgressionForLevel, getCircleUpgrades } from '../../data/progression';
 import { summonerAbilitiesByLevel } from '../../data/abilities/summoner-abilities';
 import { LevelFeature, ProgressionChoices, WardType } from '../../types/progression';
@@ -52,8 +52,8 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
   const filteredFeatures = useMemo(() => {
     if (!progression) return [];
     return progression.features.map(feature => {
-      if (feature.category === 'circle-upgrade' && summonerHero) {
-        const circleChoices = getCircleUpgrades(summonerHero.circle);
+      if (feature.category === 'circle-upgrade' && summonerHero?.subclass) {
+        const circleChoices = getCircleUpgrades(summonerHero.subclass);
         return {
           ...feature,
           choices: circleChoices.map(u => ({
@@ -65,7 +65,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
       }
       return feature;
     });
-  }, [progression, summonerHero?.circle]);
+  }, [progression, summonerHero?.subclass]);
 
   const automaticFeatures = filteredFeatures.filter(f => f.type === 'automatic');
   const choiceFeatures = filteredFeatures.filter(f => f.type === 'choice');
