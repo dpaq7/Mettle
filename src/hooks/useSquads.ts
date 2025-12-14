@@ -2,14 +2,18 @@ import { useCallback } from 'react';
 import { useSummonerContext } from '../context/SummonerContext';
 import { useCombatContext } from '../context/CombatContext';
 import { Squad, Minion, MinionTemplate, GridPosition } from '../types';
+import { isSummonerHero, SummonerHeroV2 } from '../types/hero';
 import { generateId, calculateMinionBonusStamina } from '../utils/calculations';
 
 // SRD: Overflow damage to summoner when squad wiped = 2 + Level
 const calculateOverflowDamage = (level: number) => 2 + level;
 
 export const useSquads = () => {
-  const { hero, updateHero } = useSummonerContext();
+  const { hero: genericHero, updateHero } = useSummonerContext();
   const { onMinionDeath } = useCombatContext();
+
+  // This hook is only for Summoner heroes
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   const createSquad = useCallback(
     (template: MinionTemplate): Squad => {

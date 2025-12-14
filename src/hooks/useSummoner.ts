@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useSummonerContext } from '../context/SummonerContext';
+import { isSummonerHero } from '../types/hero';
 import {
   calculateMaxStamina,
   calculateWindedThreshold,
@@ -13,6 +14,9 @@ import {
 
 export const useSummoner = () => {
   const { hero, updateHero } = useSummonerContext();
+
+  // Check if hero is a Summoner for Summoner-specific calculations
+  const isSummoner = hero && isSummonerHero(hero);
 
   const dealDamage = useCallback(
     (amount: number) => {
@@ -80,7 +84,9 @@ export const useSummoner = () => {
     const newLevel = hero.level + 1;
     const newMaxStamina = calculateMaxStamina({ ...hero, level: newLevel });
     const newRecoveryValue = calculateRecoveryValue({ ...hero, level: newLevel });
-    const newMaxRecoveries = calculateMaxRecoveries(hero.circle);
+    // Only pass circle if hero is a Summoner
+    const circle = isSummonerHero(hero) ? hero.circle : undefined;
+    const newMaxRecoveries = calculateMaxRecoveries(circle);
 
     updateHero({
       level: newLevel,
@@ -100,14 +106,24 @@ export const useSummoner = () => {
   const getStats = useCallback(() => {
     if (!hero) return null;
 
+    // Summoner-specific stats
+    const summonerStats = isSummonerHero(hero)
+      ? {
+          summonerRange: calculateSummonerRange(hero),
+          maxMinions: calculateMaxMinions(hero.formation, hero.level),
+        }
+      : {
+          summonerRange: 0,
+          maxMinions: 0,
+        };
+
     return {
       maxStamina: hero.stamina.max,
       winded: hero.stamina.winded,
       recoveryValue: hero.recoveries.value,
       speed: calculateSpeed(hero.kit),
       stability: calculateStability(hero.kit),
-      summonerRange: calculateSummonerRange(hero),
-      maxMinions: calculateMaxMinions(hero.formation),
+      ...summonerStats,
     };
   }, [hero]);
 

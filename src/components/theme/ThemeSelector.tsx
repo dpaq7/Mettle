@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useTheme } from '../../context/ThemeContext';
-import { ThemeDefinition } from '../../types/theme';
+import { useTheme, setThemeOverride, clearThemeOverride, getDefaultThemeForClass } from '../../context/ThemeContext';
+import { useSummonerContext } from '../../context/SummonerContext';
+import { ThemeDefinition, ThemeId } from '../../types/theme';
+import { HeroClass } from '../../types/hero';
+import { classThemes, getThemeById } from '../../data/themes';
+import { applyTheme, getCurrentThemeId, isUsingDefaultTheme } from '../../utils/themeManager';
 import './ThemeSelector.css';
 
 interface ThemeSelectorProps {
@@ -9,8 +13,15 @@ interface ThemeSelectorProps {
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
   const { currentTheme, setTheme, themes } = useTheme();
+  const { hero } = useSummonerContext();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Get hero info for theme selection
+  const heroId = hero?.id;
+  const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+  const defaultTheme = getDefaultThemeForClass(heroClass);
+  const isUsingDefault = heroId ? isUsingDefaultTheme(heroId, heroClass) : true;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -41,17 +52,40 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
     }
   };
 
-  const handleThemeSelect = (themeId: string) => {
-    setTheme(themeId as typeof currentTheme);
+  const handleThemeSelect = (theme: ThemeDefinition) => {
+    // If we have a hero, save the override
+    if (heroId) {
+      // If selecting the default theme for this class, clear the override
+      if (theme.id === defaultTheme.id) {
+        clearThemeOverride(heroId);
+      } else {
+        setThemeOverride(heroId, theme.id);
+      }
+    }
+
+    applyTheme(theme);
+    setTheme(theme.id as ThemeId);
     setIsOpen(false);
   };
 
-  const handleOptionKeyDown = (event: React.KeyboardEvent, themeId: string) => {
+  const handleResetToDefault = () => {
+    if (heroId) {
+      clearThemeOverride(heroId);
+      applyTheme(defaultTheme);
+      setTheme(defaultTheme.id as ThemeId);
+    }
+    setIsOpen(false);
+  };
+
+  const handleOptionKeyDown = (event: React.KeyboardEvent, theme: ThemeDefinition) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      handleThemeSelect(themeId);
+      handleThemeSelect(theme);
     }
   };
+
+  // Use class themes for selection (excludes MCDM theme)
+  const selectableThemes = classThemes;
 
   return (
     <div
@@ -70,15 +104,34 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
       </button>
 
       <div className={`theme-selector__dropdown ${isOpen ? 'theme-selector__dropdown--open' : ''}`}>
-        <div className="theme-selector__header">Select Theme</div>
+        <div className="theme-selector__header">
+          <span>Select Theme</span>
+          {hero && !isUsingDefault && (
+            <button
+              className="theme-selector__reset-btn"
+              onClick={handleResetToDefault}
+              title={`Reset to ${defaultTheme.name} (default for ${heroClass})`}
+            >
+              Reset
+            </button>
+          )}
+        </div>
+
+        {hero && (
+          <div className="theme-selector__hint">
+            Default: <strong>{defaultTheme.name}</strong>
+          </div>
+        )}
+
         <ul className="theme-selector__list" role="listbox" aria-label="Available themes">
-          {themes.map((theme) => (
+          {selectableThemes.map((theme) => (
             <ThemeOption
               key={theme.id}
               theme={theme}
               isSelected={currentTheme === theme.id}
-              onSelect={() => handleThemeSelect(theme.id)}
-              onKeyDown={(e) => handleOptionKeyDown(e, theme.id)}
+              isDefault={hero ? theme.defaultForClass === heroClass : false}
+              onSelect={() => handleThemeSelect(theme)}
+              onKeyDown={(e) => handleOptionKeyDown(e, theme)}
             />
           ))}
         </ul>
@@ -90,6 +143,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
 interface ThemeOptionProps {
   theme: ThemeDefinition;
   isSelected: boolean;
+  isDefault: boolean;
   onSelect: () => void;
   onKeyDown: (event: React.KeyboardEvent) => void;
 }
@@ -97,12 +151,13 @@ interface ThemeOptionProps {
 const ThemeOption: React.FC<ThemeOptionProps> = ({
   theme,
   isSelected,
+  isDefault,
   onSelect,
   onKeyDown,
 }) => {
   return (
     <li
-      className={`theme-option ${isSelected ? 'theme-option--selected' : ''}`}
+      className={`theme-option ${isSelected ? 'theme-option--selected' : ''} ${isDefault ? 'theme-option--default' : ''}`}
       role="option"
       aria-selected={isSelected}
       tabIndex={0}
@@ -113,7 +168,10 @@ const ThemeOption: React.FC<ThemeOptionProps> = ({
         {isSelected && <div className="theme-option__radio-dot" />}
       </div>
       <div className="theme-option__content">
-        <div className="theme-option__name">{theme.name}</div>
+        <div className="theme-option__name">
+          {theme.name}
+          {isDefault && <span className="theme-option__default-badge">Default</span>}
+        </div>
         <div className="theme-option__description">{theme.description}</div>
       </div>
       <div className="theme-option__swatches">

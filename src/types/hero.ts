@@ -95,8 +95,14 @@ export type ElementalistElement = 'earth' | 'fire' | 'green' | 'void';
 // Fury Aspects
 export type FuryAspect = 'berserker' | 'reaver' | 'stormwight';
 
-// Null Traditions
-export type NullTradition = 'chronopath' | 'cloister' | 'manticore';
+// Null Traditions (corrected from Draw Steel rules)
+export type NullTradition = 'chronokinetic' | 'cryokinetic' | 'metakinetic';
+
+// Psionic Augmentation choices
+export type PsionicAugmentation = 'density' | 'force' | 'speed';
+
+// Null Field enhancement options
+export type NullFieldEnhancement = 'graviticDisruption' | 'inertialAnchor' | 'synapticBreak';
 
 // Shadow Colleges
 export type ShadowCollege =
@@ -255,12 +261,45 @@ export interface FuryHero extends HeroBase {
   aspect?: FuryAspect;
 }
 
+// Null Field state tracking
+export interface NullFieldState {
+  isActive: boolean;
+  baseSize: number; // Always 1
+  bonusSize: number; // From Order spending at combat start
+  currentEnhancement: NullFieldEnhancement | null;
+  enhancementUsedThisTurn: boolean;
+}
+
+// Inertial Shield usage tracking
+export interface InertialShieldState {
+  usedThisRound: boolean;
+  disciplineSpentOnPotencyReduction: number;
+  traditionBonusUsed: boolean;
+}
+
+// Order (L10 epic resource) state
+export interface OrderState {
+  current: number;
+  spentAsDiscipline: number; // This encounter
+  fieldSizeBonus: number; // From spending at combat start
+}
+
 export interface NullHero extends HeroBase {
   heroClass: 'null';
   heroicResource: HeroicResource<'discipline'>;
-  nullFieldActive: boolean;
-  nullFieldRadius: number;
+
+  // Subclass and permanent choices
   tradition?: NullTradition;
+  augmentation?: PsionicAugmentation;
+
+  // Null Field state
+  nullField: NullFieldState;
+
+  // Combat tracking
+  inertialShield: InertialShieldState;
+
+  // L10 epic resource
+  order?: OrderState;
 }
 
 export interface ShadowHero extends HeroBase {

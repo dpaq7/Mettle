@@ -3,6 +3,7 @@ import { useSummonerContext } from '../../context/SummonerContext';
 import { useSquads } from '../../hooks/useSquads';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useRollHistory } from '../../context/RollHistoryContext';
+import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
 import { Squad, MinionTemplate } from '../../types';
 import { performPowerRoll, PowerRollResult, getTierColor, RollModifier } from '../../utils/dice';
 import './SquadTracker.css';
@@ -14,13 +15,16 @@ interface RollState {
 }
 
 const SquadTracker: React.FC = () => {
-  const { hero } = useSummonerContext();
+  const { hero: genericHero } = useSummonerContext();
   const { removeSquad, updateSquad, damageSquad, healSquad, getAliveCount } = useSquads();
   const { getMinionById } = usePortfolio();
   const { addRoll } = useRollHistory();
   const [rollStates, setRollStates] = useState<Record<string, RollState>>({});
   const [rollModifiers, setRollModifiers] = useState<Record<string, RollModifier>>({});
   const [damageInput, setDamageInput] = useState<Record<string, string>>({});
+
+  // Only for Summoner heroes
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   if (!hero || hero.activeSquads.length === 0) {
     return (

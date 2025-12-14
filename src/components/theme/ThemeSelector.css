@@ -55,6 +55,9 @@
 }
 
 .theme-selector__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-solid);
   font-weight: 600;
@@ -64,10 +67,59 @@
   letter-spacing: 0.1em;
 }
 
+.theme-selector__reset-btn {
+  padding: 0.2rem 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-selector__reset-btn:hover {
+  border-color: var(--accent-bright);
+  color: var(--accent-bright);
+}
+
+.theme-selector__hint {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.theme-selector__hint strong {
+  color: var(--accent-bright);
+}
+
 .theme-selector__list {
   list-style: none;
   margin: 0;
   padding: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for theme list */
+.theme-selector__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.theme-selector__list::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+  border-radius: 3px;
+}
+
+.theme-selector__list::-webkit-scrollbar-thumb {
+  background: var(--border-solid);
+  border-radius: 3px;
+}
+
+.theme-selector__list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
 }
 
 /* Theme Option */
@@ -153,6 +205,37 @@
 .theme-option--selected .theme-option__name {
   color: var(--accent-bright);
   text-shadow: var(--text-glow);
+}
+
+.theme-option__default-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.theme-option--default {
+  position: relative;
+}
+
+.theme-option--default::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background: var(--accent-bright);
+  border-radius: 2px;
+  opacity: 0.5;
 }
 
 .theme-option__description {

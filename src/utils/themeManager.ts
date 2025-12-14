@@ -1,15 +1,24 @@
 // Theme manager utility for applying and switching themes
-// Supports both legacy themes and class-specific themes
+// Supports hero-specific overrides and class default themes
 
 import { HeroClass } from '../types/hero';
-import { classThemes, defaultClassTheme, ClassTheme } from '../data/class-themes';
-import { themes as legacyThemes, getThemeById } from '../data/themes';
-import { ThemeDefinition } from '../types/theme';
+import { ThemeDefinition, ThemeId } from '../types/theme';
+import {
+  allThemes,
+  classThemes,
+  getThemeById,
+  getDefaultThemeForClass,
+  getCreatorTheme,
+  mcdmTheme,
+} from '../data/themes';
 
 const THEME_STORAGE_KEY = 'mettle-active-theme';
-const THEME_MODE_KEY = 'mettle-theme-mode'; // 'auto' | 'manual'
+const THEME_OVERRIDE_KEY = 'mettle-theme-override';
 
-export type ThemeMode = 'auto' | 'manual';
+interface ThemePreference {
+  heroId: string;
+  themeId: string;
+}
 
 // Apply CSS variables from a theme to the document root
 function applyThemeVariables(cssVariables: Record<string, string>): void {
@@ -20,153 +29,169 @@ function applyThemeVariables(cssVariables: Record<string, string>): void {
   });
 }
 
-// Apply a class-specific theme
-export function applyClassTheme(heroClass: HeroClass): void {
-  const theme = classThemes[heroClass];
-  if (!theme) {
-    console.warn(`No theme found for class: ${heroClass}`);
-    return;
+/**
+ * Apply a theme's colors to CSS custom properties
+ */
+export function applyTheme(theme: ThemeDefinition): void {
+  applyThemeVariables(theme.cssVariables);
+  localStorage.setItem(THEME_STORAGE_KEY, theme.id);
+
+  // Set data attribute for CSS targeting
+  document.documentElement.dataset.theme = theme.id;
+}
+
+/**
+ * Apply the MCDM creator theme (for character creation)
+ */
+export function applyCreatorTheme(): void {
+  applyTheme(getCreatorTheme());
+}
+
+/**
+ * Apply theme for a specific hero
+ * Checks for user override first, then falls back to class default
+ */
+export function applyThemeForHero(heroId: string, heroClass: HeroClass): void {
+  // Check for user override
+  const override = getThemeOverride(heroId);
+
+  if (override) {
+    const theme = getThemeById(override);
+    if (theme) {
+      applyTheme(theme);
+      return;
+    }
   }
 
-  applyThemeVariables(theme.cssVariables);
-  localStorage.setItem(THEME_STORAGE_KEY, theme.themeId);
+  // Fall back to class default
+  const defaultTheme = getDefaultThemeForClass(heroClass);
+  applyTheme(defaultTheme);
 }
 
-// Apply a legacy theme by ID
-export function applyLegacyTheme(themeId: string): void {
-  const theme = getThemeById(themeId);
-  if (!theme) {
-    console.warn(`No legacy theme found with ID: ${themeId}`);
-    return;
+/**
+ * Get user's theme override for a hero
+ */
+export function getThemeOverride(heroId: string): string | null {
+  try {
+    const stored = localStorage.getItem(THEME_OVERRIDE_KEY);
+    if (!stored) return null;
+
+    const preferences: ThemePreference[] = JSON.parse(stored);
+    const pref = preferences.find((p) => p.heroId === heroId);
+    return pref?.themeId || null;
+  } catch {
+    return null;
   }
-
-  applyThemeVariables(theme.cssVariables);
-  localStorage.setItem(THEME_STORAGE_KEY, themeId);
 }
 
-// Apply the default theme (summoner/cyan)
-export function applyDefaultTheme(): void {
-  applyThemeVariables(defaultClassTheme.cssVariables);
-  localStorage.setItem(THEME_STORAGE_KEY, defaultClassTheme.themeId);
+/**
+ * Set user's theme override for a hero
+ */
+export function setThemeOverride(heroId: string, themeId: string): void {
+  try {
+    const stored = localStorage.getItem(THEME_OVERRIDE_KEY);
+    let preferences: ThemePreference[] = stored ? JSON.parse(stored) : [];
+
+    // Remove existing preference for this hero
+    preferences = preferences.filter((p) => p.heroId !== heroId);
+
+    // Add new preference
+    preferences.push({ heroId, themeId });
+
+    localStorage.setItem(THEME_OVERRIDE_KEY, JSON.stringify(preferences));
+  } catch (error) {
+    console.error('Failed to save theme preference:', error);
+  }
 }
 
-// Load and apply the saved theme (or default if none saved)
+/**
+ * Clear theme override for a hero (revert to class default)
+ */
+export function clearThemeOverride(heroId: string): void {
+  try {
+    const stored = localStorage.getItem(THEME_OVERRIDE_KEY);
+    if (!stored) return;
+
+    let preferences: ThemePreference[] = JSON.parse(stored);
+    preferences = preferences.filter((p) => p.heroId !== heroId);
+
+    localStorage.setItem(THEME_OVERRIDE_KEY, JSON.stringify(preferences));
+  } catch (error) {
+    console.error('Failed to clear theme preference:', error);
+  }
+}
+
+/**
+ * Get the current theme ID for a hero (override or default)
+ */
+export function getCurrentThemeId(heroId: string, heroClass: HeroClass): ThemeId {
+  const override = getThemeOverride(heroId);
+  if (override) return override as ThemeId;
+  return getDefaultThemeForClass(heroClass).id;
+}
+
+/**
+ * Load and apply the saved theme (or MCDM theme if none saved)
+ */
 export function loadSavedTheme(): void {
   const savedThemeId = localStorage.getItem(THEME_STORAGE_KEY);
 
   if (!savedThemeId) {
-    applyDefaultTheme();
+    applyCreatorTheme();
     return;
   }
 
-  // Try to find as class theme first
-  const classTheme = Object.values(classThemes).find((t) => t.themeId === savedThemeId);
-  if (classTheme) {
-    applyThemeVariables(classTheme.cssVariables);
+  const theme = getThemeById(savedThemeId);
+  if (theme) {
+    applyTheme(theme);
     return;
   }
 
-  // Try to find as legacy theme
-  const legacyTheme = getThemeById(savedThemeId);
-  if (legacyTheme) {
-    applyThemeVariables(legacyTheme.cssVariables);
-    return;
+  // Fall back to MCDM theme
+  applyCreatorTheme();
+}
+
+/**
+ * Apply a theme by ID
+ */
+export function applyThemeById(themeId: string): void {
+  const theme = getThemeById(themeId);
+  if (theme) {
+    applyTheme(theme);
+  } else {
+    console.warn(`Theme not found: ${themeId}`);
   }
-
-  // Fall back to default
-  applyDefaultTheme();
 }
 
-// Get the current theme mode setting
-export function getThemeMode(): ThemeMode {
-  const mode = localStorage.getItem(THEME_MODE_KEY);
-  return mode === 'manual' ? 'manual' : 'auto';
-}
-
-// Set the theme mode
-export function setThemeMode(mode: ThemeMode): void {
-  localStorage.setItem(THEME_MODE_KEY, mode);
-}
-
-// Get the class theme for a hero class
-export function getThemeForClass(heroClass: HeroClass): ClassTheme {
-  return classThemes[heroClass];
-}
-
-// Get the current saved theme ID
-export function getCurrentThemeId(): string | null {
+/**
+ * Get the current saved theme ID
+ */
+export function getCurrentSavedThemeId(): string | null {
   return localStorage.getItem(THEME_STORAGE_KEY);
 }
 
-// Check if a theme is a class theme
-export function isClassTheme(themeId: string): boolean {
-  return themeId.startsWith('class-');
+/**
+ * Check if a hero is using their default class theme (no override)
+ */
+export function isUsingDefaultTheme(heroId: string, heroClass: HeroClass): boolean {
+  const override = getThemeOverride(heroId);
+  if (!override) return true;
+  return override === getDefaultThemeForClass(heroClass).id;
 }
 
-// Extract hero class from class theme ID
-export function getClassFromThemeId(themeId: string): HeroClass | null {
-  if (!isClassTheme(themeId)) return null;
-  const classId = themeId.replace('class-', '') as HeroClass;
-  return classThemes[classId] ? classId : null;
+/**
+ * Get all selectable themes for the picker (excludes MCDM theme)
+ */
+export function getSelectableThemes(): ThemeDefinition[] {
+  return classThemes;
 }
 
-// Get all available themes (both class and legacy)
-export interface ThemeOption {
-  id: string;
-  name: string;
-  description: string;
-  previewColors: { bg: string; primary: string; secondary: string };
-  isClassTheme: boolean;
-  heroClass?: HeroClass;
+/**
+ * Get all themes including MCDM
+ */
+export function getAllThemes(): ThemeDefinition[] {
+  return allThemes;
 }
 
-export function getAllThemeOptions(): ThemeOption[] {
-  const classOptions: ThemeOption[] = Object.values(classThemes).map((theme) => ({
-    id: theme.themeId,
-    name: theme.name,
-    description: theme.description,
-    previewColors: theme.previewColors,
-    isClassTheme: true,
-    heroClass: theme.id,
-  }));
-
-  const legacyOptions: ThemeOption[] = legacyThemes.map((theme) => ({
-    id: theme.id,
-    name: theme.name,
-    description: theme.description,
-    previewColors: theme.previewColors,
-    isClassTheme: false,
-  }));
-
-  return [...classOptions, ...legacyOptions];
-}
-
-// Auto-apply theme based on hero class if in auto mode
-export function autoApplyThemeForHero(heroClass: HeroClass | null): void {
-  const mode = getThemeMode();
-
-  if (mode === 'auto' && heroClass) {
-    applyClassTheme(heroClass);
-  }
-}
-
-// Apply a theme by ID (works for both class and legacy themes)
-export function applyThemeById(themeId: string): void {
-  // Try class theme first
-  const classTheme = Object.values(classThemes).find((t) => t.themeId === themeId);
-  if (classTheme) {
-    applyThemeVariables(classTheme.cssVariables);
-    localStorage.setItem(THEME_STORAGE_KEY, themeId);
-    return;
-  }
-
-  // Try legacy theme
-  const legacyTheme = getThemeById(themeId);
-  if (legacyTheme) {
-    applyThemeVariables(legacyTheme.cssVariables);
-    localStorage.setItem(THEME_STORAGE_KEY, themeId);
-    return;
-  }
-
-  console.warn(`Theme not found: ${themeId}`);
-}
+// Re-export useful items from themes.ts
+export { getThemeById, getDefaultThemeForClass, getCreatorTheme, mcdmTheme };

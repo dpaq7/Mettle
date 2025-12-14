@@ -63,13 +63,6 @@
 }
 
 /* === CONTENT === */
-.essence-label {
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-}
-
 .essence-controls {
   display: flex;
   align-items: center;

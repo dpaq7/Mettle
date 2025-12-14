@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSummonerContext } from '../../context/SummonerContext';
-import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate } from '../../types';
-import { HeroClass } from '../../types/hero';
+import { useTheme } from '../../context/ThemeContext';
+import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand } from '../../types';
+import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
 import { ancestries, cultures, careers, kits, getSelectableLanguages, languages as allLanguages } from '../../data/reference-data';
 import { portfolios } from '../../data/portfolios';
 import { formations } from '../../data/formations';
 import { circleToPortfolio } from '../../types/summoner';
 import { summonerAbilitiesByLevel } from '../../data/abilities/summoner-abilities';
+import { NULL_TRADITIONS, TraditionData } from '../../data/null/traditions';
+import { PSIONIC_AUGMENTATIONS, AugmentationData, getAugmentationBonuses } from '../../data/null/augmentations';
+import { NullTradition, PsionicAugmentation } from '../../types/hero';
 import { skills, getSkillsByGroup, SkillGroup, Skill, isSkillGroup, findSkillByName } from '../../data/skills';
 import { classDefinitions, getClassRoleColor, getSubclassTypeName } from '../../data/classes/class-definitions';
 import ClassSelector from './ClassSelector';
@@ -21,13 +25,16 @@ import {
   calculateEssencePerTurn,
 } from '../../utils/calculations';
 
-type Step = 'name' | 'class' | 'subclass' | 'ancestry' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'kit' | 'characteristics';
+type Step = 'name' | 'class' | 'subclass' | 'ancestry' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'nullTradition' | 'psionicAugmentation' | 'kit' | 'characteristics';
 
 // Base steps that all classes share
 const BASE_STEPS: Step[] = ['name', 'class', 'ancestry', 'culture', 'cultureSkills', 'career', 'careerSkills', 'languages', 'kit', 'characteristics'];
 
 // Summoner-specific steps (inserted after languages)
 const SUMMONER_STEPS: Step[] = ['circle', 'signatureMinions', 'formation'];
+
+// Null-specific steps (inserted after languages)
+const NULL_STEPS: Step[] = ['nullTradition', 'psionicAugmentation'];
 
 // Get steps for a specific class
 function getStepsForClass(heroClass: HeroClass | null): Step[] {
@@ -38,6 +45,14 @@ function getStepsForClass(heroClass: HeroClass | null): Step[] {
     const steps = [...BASE_STEPS];
     const langIndex = steps.indexOf('languages');
     steps.splice(langIndex + 1, 0, ...SUMMONER_STEPS);
+    return steps;
+  }
+
+  if (heroClass === 'null') {
+    // Insert null steps after languages, before kit
+    const steps = [...BASE_STEPS];
+    const langIndex = steps.indexOf('languages');
+    steps.splice(langIndex + 1, 0, ...NULL_STEPS);
     return steps;
   }
 
@@ -61,6 +76,12 @@ interface SkillSelection {
 
 const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => {
   const { createNewHero } = useSummonerContext();
+  const { applyCreatorTheme } = useTheme();
+
+  // Apply MCDM theme when character creation opens
+  useEffect(() => {
+    applyCreatorTheme();
+  }, [applyCreatorTheme]);
 
   const [step, setStep] = useState<Step>('name');
   const [name, setName] = useState('');
@@ -72,6 +93,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
   const [selectedSignatureMinions, setSelectedSignatureMinions] = useState<MinionTemplate[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
   const [selectedKit, setSelectedKit] = useState<Kit | null>(null);
+
+  // Null-specific state
+  const [selectedNullTradition, setSelectedNullTradition] = useState<NullTradition | null>(null);
+  const [selectedPsionicAugmentation, setSelectedPsionicAugmentation] = useState<PsionicAugmentation | null>(null);
 
   // Get the steps for the current class selection
   const currentSteps = useMemo(() => getStepsForClass(selectedClass), [selectedClass]);
@@ -156,14 +181,53 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
     setSelectedCharacteristic(null);
   };
 
-  // Apply recommended Summoner array (Presence 2, Reason 2, Intuition 1, Might 0, Agility -1)
+  // Get recommended characteristic array based on class
+  const getRecommendedArray = (): Record<string, number> => {
+    if (!selectedClass) {
+      return { might: 2, agility: 2, reason: 1, intuition: 0, presence: -1 };
+    }
+
+    const classDef = classDefinitions[selectedClass];
+    const fixed = classDef.startingCharacteristics;
+    const potency = classDef.potencyCharacteristic;
+
+    // Start with fixed characteristics from class
+    const recommended: Record<string, number> = { ...fixed };
+
+    // Assign remaining values to prioritize potency characteristic
+    const remaining = [2, 2, 1, 0, -1];
+    const chars = ['might', 'agility', 'reason', 'intuition', 'presence'];
+
+    // Remove values already used by fixed characteristics
+    Object.values(fixed).forEach(val => {
+      const idx = remaining.indexOf(val as number);
+      if (idx !== -1) remaining.splice(idx, 1);
+    });
+
+    // Assign remaining values, prioritizing potency characteristic
+    chars.forEach(char => {
+      if (!(char in recommended)) {
+        if (char === potency && remaining.includes(2)) {
+          recommended[char] = 2;
+          remaining.splice(remaining.indexOf(2), 1);
+        } else {
+          recommended[char] = remaining.shift() ?? 0;
+        }
+      }
+    });
+
+    return recommended;
+  };
+
+  // Apply recommended array based on selected class
   const applyRecommendedArray = () => {
+    const recommended = getRecommendedArray();
     setCharacteristicAssignments({
-      might: 0,
-      agility: -1,
-      reason: 2,
-      intuition: 1,
-      presence: 2,
+      might: recommended.might ?? 0,
+      agility: recommended.agility ?? 0,
+      reason: recommended.reason ?? 0,
+      intuition: recommended.intuition ?? 0,
+      presence: recommended.presence ?? 0,
     });
     setSelectedCharacteristic(null);
   };
@@ -188,6 +252,14 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
   useEffect(() => {
     setSelectedLanguages([]);
   }, [selectedCareer]);
+
+  // Reset Null-specific selections when class changes away from Null
+  useEffect(() => {
+    if (selectedClass !== 'null') {
+      setSelectedNullTradition(null);
+      setSelectedPsionicAugmentation(null);
+    }
+  }, [selectedClass]);
 
   // Toggle language selection
   const toggleLanguage = (languageId: string) => {
@@ -325,6 +397,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
         return selectedSignatureMinions.length === 2;
       case 'formation':
         return selectedFormation !== null;
+      case 'nullTradition':
+        return selectedNullTradition !== null;
+      case 'psionicAugmentation':
+        return selectedPsionicAugmentation !== null;
       case 'kit':
         return selectedKit !== null;
       case 'characteristics':
@@ -372,37 +448,40 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
   };
 
   const createCharacter = () => {
-    if (!selectedAncestry || !selectedCulture || !selectedCareer || !selectedCircle || !selectedFormation || !selectedKit) {
+    // Validate common required fields
+    if (!selectedClass || !selectedAncestry || !selectedCulture || !selectedCareer || !selectedKit) {
+      console.error('Missing required fields:', { selectedClass, selectedAncestry, selectedCulture, selectedCareer, selectedKit });
       return;
     }
 
-    const portfolioType = circleToPortfolio[selectedCircle];
-    const portfolio = portfolios[portfolioType];
+    // Validate summoner-specific fields if creating a summoner
+    if (selectedClass === 'summoner') {
+      if (!selectedCircle || !selectedFormation) {
+        console.error('Missing summoner-specific fields:', { selectedCircle, selectedFormation });
+        return;
+      }
+    }
 
     const level = 1;
-    const tempHero: Partial<SummonerHero> = {
-      level,
-      kit: selectedKit,
-      formation: selectedFormation,
-    };
+    const classDef = classDefinitions[selectedClass];
 
-    const maxStamina = calculateMaxStamina(tempHero);
-    const recoveryValue = calculateRecoveryValue(tempHero);
-    const maxRecoveries = calculateMaxRecoveries(selectedCircle);
-    const maxEssencePerTurn = calculateEssencePerTurn(level);
+    // Calculate stamina based on class
+    const baseStamina = classDef.startingStamina;
+    const kitStaminaBonus = selectedKit.stamina || 0;
+    const maxStamina = baseStamina + kitStaminaBonus;
 
-    const quickCommand = formations[selectedFormation].quickCommands[0];
+    // Calculate recoveries based on class
+    const maxRecoveries = classDef.startingRecoveries;
+    const recoveryValue = Math.floor(maxStamina / 3);
 
-    const newHero: SummonerHero = {
+    // Build base hero properties shared by all classes
+    const baseHeroData = {
       id: generateId(),
       name,
       level,
       ancestry: selectedAncestry,
       culture: selectedCulture,
       career: selectedCareer,
-      circle: selectedCircle,
-      formation: selectedFormation,
-      quickCommand,
       characteristics,
       stamina: {
         current: maxStamina,
@@ -416,34 +495,21 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
       },
       speed: calculateSpeed(selectedKit),
       stability: calculateStability(selectedKit),
-      essence: {
-        current: 0,
-        maxPerTurn: maxEssencePerTurn,
-      },
       surges: 0,
       heroTokens: 0,
       victories: 0,
       xp: 0,
-      wealth: 2, // Default starting wealth tier (Poor)
-      gold: 0, // Starting gold
-      renown: 0, // Starting renown
-      portfolio: {
-        ...portfolio,
-        signatureMinions: selectedSignatureMinions,
-      },
-      activeSquads: [],
-      fixture: null,
-      abilities: summonerAbilitiesByLevel[1] || [],
+      wealth: 2,
+      gold: 0,
+      renown: 0,
+      abilities: [],
       features: [],
       skills: getAllSelectedSkills(),
-      languages: ['caelian', ...selectedLanguages], // All heroes know Caelian + selected
+      languages: ['caelian', ...selectedLanguages],
       kit: selectedKit,
       items: [],
       notes: '',
       portraitUrl: null,
-      minionPortraits: {},
-      fixturePortrait: null,
-      inactiveMinions: [],
       activeConditions: [],
       progressionChoices: {},
       activeProjects: [],
@@ -451,7 +517,184 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
       equippedItems: [],
     };
 
-    createNewHero(newHero);
+    // Create class-specific hero using proper Hero types
+    if (selectedClass === 'summoner') {
+      // Summoner-specific creation
+      const portfolioType = circleToPortfolio[selectedCircle!];
+      const portfolio = portfolios[portfolioType];
+      const maxEssencePerTurn = calculateEssencePerTurn(level);
+      const quickCommand = formations[selectedFormation!].quickCommands[0];
+
+      const newHero: SummonerHeroV2 = {
+        ...baseHeroData,
+        heroClass: 'summoner',
+        heroicResource: {
+          type: 'essence',
+          current: 0,
+          maxPerTurn: maxEssencePerTurn,
+        },
+        circle: selectedCircle!,
+        formation: selectedFormation!,
+        quickCommand,
+        portfolio: {
+          ...portfolio,
+          signatureMinions: selectedSignatureMinions,
+        },
+        activeSquads: [],
+        fixture: null,
+        abilities: summonerAbilitiesByLevel[1] || [],
+        minionPortraits: {},
+        fixturePortrait: null,
+        inactiveMinions: [],
+      };
+
+      createNewHero(newHero);
+    } else {
+      // Create class-specific hero with proper types
+      const reasonScore = baseHeroData.characteristics?.reason ?? 2;
+
+      // Create proper Hero type based on class
+      let newHero: Hero;
+
+      switch (selectedClass) {
+        case 'talent':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'talent',
+            heroicResource: {
+              type: 'clarity',
+              current: 0,
+              minimum: -(1 + reasonScore), // Can go negative
+            },
+            isStrained: false,
+            tradition: undefined,
+          } as TalentHero;
+          break;
+
+        case 'censor':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'censor',
+            heroicResource: { type: 'wrath', current: 0 },
+            judgment: { targetId: null, targetName: null },
+            subclass: undefined,
+          } as CensorHero;
+          break;
+
+        case 'conduit':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'conduit',
+            heroicResource: { type: 'piety', current: 0 },
+            domain: 'protection', // Default domain
+            prayState: { hasPrayedThisTurn: false, lastPrayResult: null },
+          } as ConduitHero;
+          break;
+
+        case 'elementalist':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'elementalist',
+            heroicResource: { type: 'essence', current: 0, persistent: 0 },
+            element: 'fire', // Default element
+            mantleActive: false,
+            persistentAbilities: [],
+          } as ElementalistHero;
+          break;
+
+        case 'fury':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'fury',
+            heroicResource: { type: 'ferocity', current: 0 },
+            growingFerocityTier: 0,
+            aspect: undefined,
+          } as FuryHero;
+          break;
+
+        case 'null':
+          // Apply psionic augmentation bonuses
+          const augBonuses = getAugmentationBonuses(selectedPsionicAugmentation ?? undefined, level);
+          const nullMaxStamina = baseHeroData.stamina.max + augBonuses.stamina;
+          const nullRecoveryValue = Math.floor(nullMaxStamina / 3);
+          const nullStability = baseHeroData.stability + augBonuses.stability;
+          const nullSpeed = baseHeroData.speed + augBonuses.speed;
+
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'null',
+            heroicResource: { type: 'discipline', current: 0 },
+            tradition: selectedNullTradition ?? undefined,
+            augmentation: selectedPsionicAugmentation ?? undefined,
+            // Apply augmentation stat bonuses
+            stamina: {
+              current: nullMaxStamina,
+              max: nullMaxStamina,
+              winded: calculateWindedThreshold(nullMaxStamina),
+            },
+            recoveries: {
+              ...baseHeroData.recoveries,
+              value: nullRecoveryValue,
+            },
+            stability: nullStability,
+            speed: nullSpeed,
+            nullField: {
+              isActive: false,
+              baseSize: 1,
+              bonusSize: 0,
+              currentEnhancement: null,
+              enhancementUsedThisTurn: false,
+            },
+            inertialShield: {
+              usedThisRound: false,
+              disciplineSpentOnPotencyReduction: 0,
+              traditionBonusUsed: false,
+            },
+            order: undefined,
+          } as NullHero;
+          break;
+
+        case 'shadow':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'shadow',
+            heroicResource: { type: 'insight', current: 0 },
+            college: 'black-ash', // Default college
+            isHidden: false,
+          } as ShadowHero;
+          break;
+
+        case 'tactician':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'tactician',
+            heroicResource: { type: 'focus', current: 0 },
+            markedTargets: [],
+            secondaryKit: null,
+            doctrine: undefined,
+          } as TacticianHero;
+          break;
+
+        case 'troubadour':
+          newHero = {
+            ...baseHeroData,
+            heroClass: 'troubadour',
+            heroicResource: { type: 'drama', current: 0 },
+            activeRoutine: null,
+            scenePartners: [],
+            heroPartners: [],
+            class: undefined,
+          } as TroubadourHero;
+          break;
+
+        default:
+          // Fallback (should never happen)
+          throw new Error(`Unknown class: ${selectedClass}`);
+      }
+
+      createNewHero(newHero);
+    }
+
     onComplete?.();
   };
 
@@ -827,24 +1070,34 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
         if (!selectedCircle) return null;
         const portfolioType = circleToPortfolio[selectedCircle];
         const availableSignature = portfolios[portfolioType].signatureMinions;
+        const maxMinionsReached = selectedSignatureMinions.length >= 2;
 
         return (
           <div className="creation-step">
             <h2>Choose 2 Signature Minions</h2>
-            <p className="step-description">Selected: {selectedSignatureMinions.length} / 2</p>
+            <div className="selection-counter">
+              <span className={selectedSignatureMinions.length >= 2 ? 'complete' : ''}>
+                {selectedSignatureMinions.length} / 2 selected
+              </span>
+            </div>
             <div className="options-grid">
-              {availableSignature.map((minion) => (
-                <div
-                  key={minion.id}
-                  className={`option-card ${selectedSignatureMinions.find(m => m.id === minion.id) ? 'selected' : ''}`}
-                  onClick={() => toggleSignatureMinion(minion)}
-                >
-                  <h3>{minion.name}</h3>
-                  <p>Role: {minion.role}</p>
-                  <p>Summons: {minion.minionsPerSummon} minions</p>
-                  <p>Speed: {minion.speed} | Stamina: {Array.isArray(minion.stamina) ? minion.stamina.join('/') : minion.stamina}</p>
-                </div>
-              ))}
+              {availableSignature.map((minion) => {
+                const isSelected = selectedSignatureMinions.find(m => m.id === minion.id);
+                const isDisabled = maxMinionsReached && !isSelected;
+
+                return (
+                  <div
+                    key={minion.id}
+                    className={`option-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'max-reached' : ''}`}
+                    onClick={() => !isDisabled && toggleSignatureMinion(minion)}
+                  >
+                    <h3>{minion.name}</h3>
+                    <p>Role: {minion.role}</p>
+                    <p>Summons: {minion.minionsPerSummon} minions</p>
+                    <p>Speed: {minion.speed} | Stamina: {Array.isArray(minion.stamina) ? minion.stamina.join('/') : minion.stamina}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -873,6 +1126,99 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
                   </div>
                 );
               })}
+            </div>
+          </div>
+        );
+
+      case 'nullTradition':
+        const traditions = Object.values(NULL_TRADITIONS);
+        return (
+          <div className="creation-step null-tradition-step">
+            <h2>Choose Your Null Tradition</h2>
+            <p className="step-description">
+              Your tradition defines your psionic combat style. This choice is permanent and
+              determines your Inertial Shield bonus, Discipline Mastery benefits, and unique Level 5 feature.
+            </p>
+            <div className="options-grid null-options">
+              {traditions.map((tradition) => (
+                <div
+                  key={tradition.id}
+                  className={`option-card tradition-card ${selectedNullTradition === tradition.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedNullTradition(tradition.id)}
+                >
+                  <h3>{tradition.name}</h3>
+                  <p className="tradition-focus">{tradition.focus}</p>
+                  <div className="tradition-details">
+                    <div className="detail-section">
+                      <span className="detail-label">Inertial Shield Bonus:</span>
+                      <span className="detail-value">{tradition.inertialShieldBonus}</span>
+                    </div>
+                    <div className="detail-section mastery-preview">
+                      <span className="detail-label">Discipline Mastery:</span>
+                      <ul className="mastery-list">
+                        {tradition.masteryBenefits.slice(0, 2).map((b, idx) => (
+                          <li key={idx}>At {b.threshold}: {b.benefit}</li>
+                        ))}
+                        <li className="more-hint">...and more at higher Discipline</li>
+                      </ul>
+                    </div>
+                    <div className="detail-section level5-preview">
+                      <span className="detail-label">Level 5 Feature:</span>
+                      <span className="feature-name">{tradition.level5Feature.name}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {selectedNullTradition && (
+              <div className="selection-preview">
+                <h4>{NULL_TRADITIONS[selectedNullTradition].level5Feature.name} (Level 5)</h4>
+                <p>{NULL_TRADITIONS[selectedNullTradition].level5Feature.description}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'psionicAugmentation':
+        const augmentations = Object.values(PSIONIC_AUGMENTATIONS);
+        return (
+          <div className="creation-step augmentation-step">
+            <h2>Choose Your Psionic Augmentation</h2>
+            <p className="step-description">
+              Your augmentation is a permanent psionic enhancement to your body. This choice
+              cannot be changed and affects your core statistics throughout your career.
+            </p>
+            <div className="options-grid augmentation-options">
+              {augmentations.map((augmentation) => (
+                <div
+                  key={augmentation.id}
+                  className={`option-card augmentation-card ${selectedPsionicAugmentation === augmentation.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedPsionicAugmentation(augmentation.id)}
+                >
+                  <h3>{augmentation.name}</h3>
+                  <div className="augmentation-effects">
+                    <span className="effects-label">Effects:</span>
+                    <ul className="effects-list">
+                      {augmentation.effects.map((effect, idx) => (
+                        <li key={idx} className="effect-item">{effect}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {augmentation.id === 'density' && (
+                    <p className="stat-preview">At Level 1: +6 Stamina, +1 Stability</p>
+                  )}
+                  {augmentation.id === 'force' && (
+                    <p className="stat-preview">Adds to all psionic ability damage</p>
+                  )}
+                  {augmentation.id === 'speed' && (
+                    <p className="stat-preview">Better mobility and escape options</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="augmentation-note">
+              <strong>Note:</strong> This enhancement stacks with your kit bonuses and
+              other class features. Choose based on your preferred combat role.
             </div>
           </div>
         );
@@ -910,19 +1256,37 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
           { key: 'presence', name: 'Presence', description: 'Personality, willpower, social influence' },
         ];
 
+        // Get class-specific info
+        const currentClassDef = selectedClass ? classDefinitions[selectedClass] : null;
+        const fixedChars = currentClassDef?.startingCharacteristics || {};
+        const potencyChar = currentClassDef?.potencyCharacteristic;
+        const className = currentClassDef?.name || 'Hero';
+
+        // Get fixed characteristics display text
+        const fixedCharsText = Object.entries(fixedChars)
+          .map(([char, val]) => `${char.charAt(0).toUpperCase() + char.slice(1)} +${val}`)
+          .join(', ');
+
         return (
           <div className="creation-step characteristics-step">
             <h2>Assign Characteristics</h2>
             <p className="step-description">
               Distribute the standard array values to your characteristics. Click a characteristic, then click a value to assign it.
               <br />
-              <strong>Summoners typically prioritize Presence and Reason</strong> for commanding minions.
+              <strong>{className}s</strong> have {potencyChar ? (
+                <>
+                  <strong>{potencyChar.charAt(0).toUpperCase() + potencyChar.slice(1)}</strong> as their potency characteristic
+                </>
+              ) : 'no fixed potency characteristic'}.
+              {fixedCharsText && (
+                <> Starting with: <strong>{fixedCharsText}</strong> (from class).</>
+              )}
             </p>
 
             <div className="characteristics-assignment">
               {/* Available Values */}
               <div className="available-values">
-                <h4>Available Values</h4>
+                <h4>Available Values (Standard Array: +2, +2, +1, 0, -1)</h4>
                 <div className="value-pool">
                   {availableValues.length > 0 ? (
                     availableValues.map((val, idx) => (
@@ -947,11 +1311,12 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
                   const assignedValue = characteristicAssignments[key];
                   const isSelected = selectedCharacteristic === key;
                   const isAssigned = assignedValue !== null;
+                  const isPotency = key === potencyChar;
 
                   return (
                     <div
                       key={key}
-                      className={`characteristic-slot ${isSelected ? 'selected' : ''} ${isAssigned ? 'assigned' : ''}`}
+                      className={`characteristic-slot ${isSelected ? 'selected' : ''} ${isAssigned ? 'assigned' : ''} ${isPotency ? 'potency' : ''}`}
                       onClick={() => {
                         if (isAssigned) {
                           // If already assigned, clear it
@@ -963,7 +1328,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
                       }}
                     >
                       <div className="char-header">
-                        <span className="char-name">{name}</span>
+                        <span className="char-name">
+                          {name}
+                          {isPotency && <span className="potency-badge" title="Potency Characteristic">★</span>}
+                        </span>
                         <span className="char-value">
                           {isAssigned
                             ? (assignedValue >= 0 ? `+${assignedValue}` : assignedValue)
@@ -987,7 +1355,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
                   className="quick-action-btn"
                   onClick={applyRecommendedArray}
                 >
-                  Apply Recommended (Summoner)
+                  Apply Recommended ({className})
                 </button>
                 <button
                   type="button"

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useSummonerContext } from '../context/SummonerContext';
 import { MinionTemplate } from '../types';
+import { isSummonerHero } from '../types/hero';
 import { calculateEssenceCost } from '../utils/calculations';
 
 // Level requirements for minion tiers based on portfolio progression:
@@ -17,7 +18,10 @@ const MINION_LEVEL_REQUIREMENTS: Record<number, number> = {
 };
 
 export const usePortfolio = () => {
-  const { hero } = useSummonerContext();
+  const { hero: genericHero } = useSummonerContext();
+
+  // This hook is only for Summoner heroes
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   const getSignatureMinions = useCallback((): MinionTemplate[] => {
     if (!hero) return [];

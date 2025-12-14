@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSummonerContext } from '../../context/SummonerContext';
 import { standardManeuvers, standardTriggeredActions, moveActions, quickCommands } from '../../data/action-economy';
+import { isSummonerHero } from '../../types/hero';
 import { Ability } from '../../types';
 import './ActionEconomyPanel.css';
 
@@ -12,10 +13,14 @@ const ActionEconomyPanel: React.FC = () => {
 
   if (!hero) return null;
 
-  // Filter quick commands to show only those for the hero's formation
-  const formationCommands = quickCommands.filter(
-    cmd => cmd.formation === hero.formation
-  );
+  // Check if Summoner for formation-specific commands
+  const isSummoner = isSummonerHero(hero);
+  const heroFormation = isSummoner ? hero.formation : null;
+
+  // Filter quick commands to show only those for the hero's formation (Summoner only)
+  const formationCommands = heroFormation
+    ? quickCommands.filter(cmd => cmd.formation === heroFormation)
+    : [];
 
   const renderAbilityCard = (ability: Ability) => (
     <div key={ability.id} className="action-card">

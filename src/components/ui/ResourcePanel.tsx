@@ -36,6 +36,7 @@ interface ResourcePanelProps {
   hideSurges?: boolean;
   hideEssence?: boolean;
   className?: string;
+  resourceName?: string; // Class-specific resource name (Essence, Wrath, Piety, etc.)
 }
 
 /**
@@ -55,6 +56,7 @@ const ResourcePanel: React.FC<ResourcePanelProps> = ({
   hideSurges = false,
   hideEssence = false,
   className = '',
+  resourceName = 'Essence',
 }) => {
   return (
     <div className={`resource-panel ${className}`}>
@@ -87,7 +89,7 @@ const ResourcePanel: React.FC<ResourcePanelProps> = ({
 
       {!hideEssence && (
         <div className="resource-panel-right">
-          <SectionHeader title="Heroic Resource" variant="compact" />
+          <SectionHeader title={resourceName} variant="compact" />
           <div className="essence-surges-row">
             <EssenceTracker
               current={essence.current}

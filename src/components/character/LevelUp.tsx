@@ -4,6 +4,7 @@ import { getProgressionForLevel, getCircleUpgrades } from '../../data/progressio
 import { summonerAbilitiesByLevel } from '../../data/abilities/summoner-abilities';
 import { LevelFeature, ProgressionChoices, WardType } from '../../types/progression';
 import { Characteristic } from '../../types/common';
+import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
 import { Ability } from '../../types';
 import './LevelUp.css';
 
@@ -16,6 +17,10 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
   const [choices, setChoices] = useState<Record<string, string>>({});
 
   if (!hero) return null;
+
+  // Check if Summoner for circle-specific features
+  const isSummoner = isSummonerHero(hero);
+  const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
 
   const nextLevel = hero.level + 1;
 
@@ -43,12 +48,12 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
 
   const progression = getProgressionForLevel(nextLevel);
 
-  // Filter circle-specific upgrades for current circle
+  // Filter circle-specific upgrades for current circle (Summoner only)
   const filteredFeatures = useMemo(() => {
     if (!progression) return [];
     return progression.features.map(feature => {
-      if (feature.category === 'circle-upgrade') {
-        const circleChoices = getCircleUpgrades(hero.circle);
+      if (feature.category === 'circle-upgrade' && summonerHero) {
+        const circleChoices = getCircleUpgrades(summonerHero.circle);
         return {
           ...feature,
           choices: circleChoices.map(u => ({
@@ -60,7 +65,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
       }
       return feature;
     });
-  }, [progression, hero.circle]);
+  }, [progression, summonerHero?.circle]);
 
   const automaticFeatures = filteredFeatures.filter(f => f.type === 'automatic');
   const choiceFeatures = filteredFeatures.filter(f => f.type === 'choice');

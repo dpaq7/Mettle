@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { EssenceEconomy, TurnState, TurnPhase, Squad, Minion, MinionTemplate } from '../types';
 import { useSummonerContext } from './SummonerContext';
+import { isSummonerHero, SummonerHeroV2 } from '../types/hero';
 import { generateId, calculateMinionBonusStamina } from '../utils/calculations';
 
 // SRD Constants
@@ -40,7 +41,10 @@ interface CombatProviderProps {
 }
 
 export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
-  const { hero, updateHero } = useSummonerContext();
+  const { hero: genericHero, updateHero } = useSummonerContext();
+
+  // CombatContext is primarily for Summoner; other classes use basic combat tracking
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   const [isInCombat, setIsInCombat] = useState(false);
   const [onCombatStartCallback, setOnCombatStartCallbackState] = useState<(() => void) | null>(null);

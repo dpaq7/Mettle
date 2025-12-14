@@ -2,7 +2,9 @@ import React from 'react';
 import { useSummonerContext } from '../../context/SummonerContext';
 import { languages as allLanguages } from '../../data/reference-data';
 import { formations } from '../../data/formations';
-import { Formation } from '../../types';
+import { Formation, HeroClass } from '../../types';
+import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
+import { classDefinitions } from '../../data/classes/class-definitions';
 import './CharacterDetailsView.css';
 
 const CharacterDetailsView: React.FC = () => {
@@ -10,9 +12,17 @@ const CharacterDetailsView: React.FC = () => {
 
   if (!hero) return null;
 
-  // Handle formation change
+  // Get hero class and check if Summoner
+  const heroClass: HeroClass = hero.heroClass || 'summoner';
+  const isSummoner = isSummonerHero(hero);
+  const classDef = classDefinitions[heroClass];
+
+  // Get Summoner-specific data if applicable
+  const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
+
+  // Handle formation change (Summoner only)
   const handleFormationChange = (newFormation: Formation) => {
-    if (newFormation === hero.formation) return;
+    if (!summonerHero || newFormation === summonerHero.formation) return;
 
     // Get the quick command associated with this formation
     const formationData = formations[newFormation];
@@ -281,56 +291,86 @@ const CharacterDetailsView: React.FC = () => {
         </div>
       </section>
 
-      {/* Summoner Circle Section */}
-      <section className="details-section circle-section">
-        <h2>Circle: {hero.circle.charAt(0).toUpperCase() + hero.circle.slice(1)}</h2>
+      {/* Summoner Circle Section - Only for Summoners */}
+      {isSummoner && summonerHero && (
+        <section className="details-section circle-section">
+          <h2>Circle: {summonerHero.circle.charAt(0).toUpperCase() + summonerHero.circle.slice(1)}</h2>
 
-        <div className="circle-info">
-          <div className="circle-stat">
-            <strong>Portfolio:</strong> {hero.portfolio.type.charAt(0).toUpperCase() + hero.portfolio.type.slice(1)}
+          <div className="circle-info">
+            <div className="circle-stat">
+              <strong>Portfolio:</strong> {summonerHero.portfolio.type.charAt(0).toUpperCase() + summonerHero.portfolio.type.slice(1)}
+            </div>
+            <div className="circle-stat">
+              <strong>Signature Minions:</strong> {summonerHero.portfolio.signatureMinions.map((m: { name: string }) => m.name).join(', ')}
+            </div>
+            <div className="circle-stat">
+              <strong>Fixture:</strong> {summonerHero.portfolio.fixture?.name || 'Not yet unlocked'}
+            </div>
           </div>
-          <div className="circle-stat">
-            <strong>Signature Minions:</strong> {hero.portfolio.signatureMinions.map(m => m.name).join(', ')}
-          </div>
-          <div className="circle-stat">
-            <strong>Fixture:</strong> {hero.portfolio.fixture?.name || 'Not yet unlocked'}
-          </div>
-        </div>
 
-        {/* Formation Selector */}
-        <div className="formation-selector">
-          <h4>Formation</h4>
-          <div className="formation-options">
-            {(Object.keys(formations) as Formation[]).map((formationKey) => {
-              const formationData = formations[formationKey];
-              const isSelected = hero.formation === formationKey;
-              return (
-                <button
-                  key={formationKey}
-                  className={`formation-option ${isSelected ? 'selected' : ''}`}
-                  onClick={() => handleFormationChange(formationKey)}
-                >
-                  <span className="formation-name">{formationData.name}</span>
-                  <span className="formation-desc">{formationData.description}</span>
-                  <ul className="formation-benefits">
-                    {formationData.benefits.map((benefit, idx) => (
-                      <li key={idx}>{benefit}</li>
-                    ))}
-                  </ul>
-                </button>
-              );
-            })}
+          {/* Formation Selector */}
+          <div className="formation-selector">
+            <h4>Formation</h4>
+            <div className="formation-options">
+              {(Object.keys(formations) as Formation[]).map((formationKey) => {
+                const formationData = formations[formationKey];
+                const isSelected = summonerHero.formation === formationKey;
+                return (
+                  <button
+                    key={formationKey}
+                    className={`formation-option ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleFormationChange(formationKey)}
+                  >
+                    <span className="formation-name">{formationData.name}</span>
+                    <span className="formation-desc">{formationData.description}</span>
+                    <ul className="formation-benefits">
+                      {formationData.benefits.map((benefit, idx) => (
+                        <li key={idx}>{benefit}</li>
+                      ))}
+                    </ul>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Quick Command for selected formation */}
-        <div className="formation-info">
-          <h4>Quick Command: {hero.quickCommand.name}</h4>
-          <div className="quick-command-detail">
-            <p>{hero.quickCommand.description}</p>
+          {/* Quick Command for selected formation */}
+          <div className="formation-info">
+            <h4>Quick Command: {summonerHero.quickCommand.name}</h4>
+            <div className="quick-command-detail">
+              <p>{summonerHero.quickCommand.description}</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Class Section - For non-Summoners */}
+      {!isSummoner && (
+        <section className="details-section class-section">
+          <h2>Class: {classDef?.name || 'Unknown'}</h2>
+          <p className="description">{classDef?.description || ''}</p>
+
+          <div className="class-info">
+            <div className="class-stat">
+              <strong>Role:</strong> {classDef?.role || 'Unknown'}
+            </div>
+            <div className="class-stat">
+              <strong>Heroic Resource:</strong> {classDef?.heroicResource?.name || 'Unknown'}
+            </div>
+            <div className="class-stat">
+              <strong>Potency:</strong> {classDef?.potencyCharacteristic ?
+                classDef.potencyCharacteristic.charAt(0).toUpperCase() + classDef.potencyCharacteristic.slice(1) :
+                'Unknown'}
+            </div>
+          </div>
+
+          <div className="class-feature-note">
+            <p className="coming-soon">
+              Class-specific features for {classDef?.name || 'this class'} are coming soon.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

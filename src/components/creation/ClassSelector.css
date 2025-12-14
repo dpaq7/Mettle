@@ -1,0 +1,189 @@
+/* ============================================
+   CLASS SELECTOR STYLES
+   ============================================ */
+
+/* Class Selection Step Layout */
+.class-selection-step {
+  width: 100%;
+}
+
+.class-selection-step .class-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 900px) {
+  .class-selection-step .class-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   ROLE LEGEND BOX
+   ============================================ */
+.role-legend-box {
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.role-legend-box h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.role-descriptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .role-descriptions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role-description-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.role-description-item .role-tag {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.role-desc-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ============================================
+   ROLE TAGS - Outline Style
+   ============================================ */
+.role-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: 1px solid;
+}
+
+/* Role-specific colors - Outline style */
+.role-tag.defender {
+  color: #64b5f6;
+  border-color: rgba(100, 181, 246, 0.5);
+  background: rgba(100, 181, 246, 0.1);
+}
+
+.role-tag.support {
+  color: #81c784;
+  border-color: rgba(129, 199, 132, 0.5);
+  background: rgba(129, 199, 132, 0.1);
+}
+
+.role-tag.striker {
+  color: #ff8a65;
+  border-color: rgba(255, 138, 101, 0.5);
+  background: rgba(255, 138, 101, 0.1);
+}
+
+.role-tag.controller {
+  color: #ba68c8;
+  border-color: rgba(186, 104, 200, 0.5);
+  background: rgba(186, 104, 200, 0.1);
+}
+
+/* ============================================
+   CLASS CARD STYLES
+   ============================================ */
+.class-card {
+  position: relative;
+}
+
+.class-card .class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.class-card .class-header h3 {
+  margin: 0;
+}
+
+.class-card .description {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.class-card .class-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-solid);
+}
+
+.class-card .stat-row {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.class-card .stat-label {
+  color: var(--text-muted);
+}
+
+.class-card .stat-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.class-card .stat-value.resource-name {
+  color: var(--accent-bright);
+}
+
+.class-card .class-subclass {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.class-card .subclass-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.class-card .subclass-options {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ============================================
+   POTENCY BADGE (for characteristics step)
+   ============================================ */
+.potency-badge {
+  color: var(--warning);
+  margin-left: 0.25rem;
+  font-size: 0.9em;
+}
+
+.characteristic-slot.potency {
+  border-color: var(--warning);
+}
+
+.characteristic-slot.potency .char-name {
+  color: var(--warning);
+}

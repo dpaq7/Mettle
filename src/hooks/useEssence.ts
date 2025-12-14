@@ -1,12 +1,16 @@
 import { useCallback } from 'react';
 import { useCombatContext } from '../context/CombatContext';
 import { useSummonerContext } from '../context/SummonerContext';
+import { isSummonerHero } from '../types/hero';
 import { MinionTemplate } from '../types';
 import { calculateEssenceCost } from '../utils/calculations';
 
 export const useEssence = () => {
   const { essenceState, spendEssence, gainEssence, onMinionDeath } = useCombatContext();
-  const { hero } = useSummonerContext();
+  const { hero: genericHero } = useSummonerContext();
+
+  // Essence mechanics are primarily for Summoners
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   const canAfford = useCallback(
     (cost: number): boolean => {

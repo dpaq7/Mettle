@@ -31,7 +31,6 @@ const EssenceTracker: React.FC<EssenceTrackerProps> = ({
       <div className="essence-hexagon-wrapper">
         <div className="essence-hexagon-border" />
         <div className="essence-hexagon-inner">
-          <span className="essence-label">Essence</span>
           <div className="essence-controls">
             <button
               className="essence-btn"

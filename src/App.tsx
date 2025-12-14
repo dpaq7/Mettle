@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSummonerContext } from './context/SummonerContext';
 import { useCombatContext } from './context/CombatContext';
+import { useTheme } from './context/ThemeContext';
 import CharacterCreation from './components/creation/CharacterCreation';
 import CharacterManager from './components/character/CharacterManager';
 import CharacterStatsPanel from './components/character/CharacterStatsPanel';
@@ -14,24 +15,47 @@ import InventoryView from './components/inventory/InventoryView';
 import RollHistoryPanel from './components/shared/RollHistoryPanel';
 import CollapsibleHeader from './components/ui/CollapsibleHeader';
 import { ThemeSelector } from './components/theme';
+import { StrainView } from './components/classDetails/TalentDetails/StrainView';
+import { NullFieldView } from './components/classDetails/NullDetails/NullFieldView';
+import { getTabsForClass, ViewType } from './data/class-tabs';
+import { HeroClass } from './types/hero';
 import './App.css';
 
-type View = 'character' | 'abilities' | 'combat' | 'projects' | 'items' | 'inventory';
+type View = ViewType;
 
 function App() {
   const { hero, setHero, updateHero } = useSummonerContext();
   const { isInCombat, startCombat, endCombat, setOnCombatStartCallback, essenceState, gainEssence, spendEssence } = useCombatContext();
+  const { applyThemeForHero, applyCreatorTheme } = useTheme();
   const [activeView, setActiveView] = useState<View>('character');
   const [showCharacterManager, setShowCharacterManager] = useState(false);
   const [showCharacterCreation, setShowCharacterCreation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showRespiteConfirm, setShowRespiteConfirm] = useState(false);
 
-  // Register callback to switch to combat tab when combat starts
+  // Apply theme when hero changes
   useEffect(() => {
-    setOnCombatStartCallback(() => setActiveView('combat'));
+    if (hero && !showCharacterCreation) {
+      const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+      applyThemeForHero(hero.id, heroClass);
+    } else if (!showCharacterCreation) {
+      // No hero and not in creation - apply MCDM theme
+      applyCreatorTheme();
+    }
+    // Character creation handles its own theme
+  }, [hero, showCharacterCreation, applyThemeForHero, applyCreatorTheme]);
+
+  // Register callback to switch to minions tab when combat starts (Summoner only)
+  useEffect(() => {
+    // Only switch to minions tab for Summoners
+    const heroClass: HeroClass = (hero as any)?.heroClass || 'summoner';
+    if (heroClass === 'summoner') {
+      setOnCombatStartCallback(() => setActiveView('minions'));
+    } else {
+      setOnCombatStartCallback(null);
+    }
     return () => setOnCombatStartCallback(null);
-  }, [setOnCombatStartCallback]);
+  }, [setOnCombatStartCallback, hero]);
 
   const handleCreateNew = () => {
     setHero(null);
@@ -88,6 +112,15 @@ function App() {
 
   // Type guard for hero
   if (!hero) return null;
+
+  // Get hero class (handle both old SummonerHero and new Hero types)
+  const heroClass: HeroClass = (hero as any).heroClass || 'summoner';
+
+  // Get dynamic tabs based on hero's class
+  const tabs = getTabsForClass(heroClass);
+
+  // Check if hero is a Summoner
+  const isSummoner = heroClass === 'summoner';
 
   return (
     <div className="app dark-mode">
@@ -153,44 +186,17 @@ function App() {
         <CharacterStatsPanel onLevelUp={() => setShowLevelUp(true)} />
       </CollapsibleHeader>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs - Dynamic based on hero class */}
       <nav className="view-tabs">
-        <button
-          className={activeView === 'character' ? 'active' : ''}
-          onClick={() => setActiveView('character')}
-        >
-          Character
-        </button>
-        <button
-          className={activeView === 'abilities' ? 'active' : ''}
-          onClick={() => setActiveView('abilities')}
-        >
-          Abilities
-        </button>
-        <button
-          className={activeView === 'combat' ? 'active' : ''}
-          onClick={() => setActiveView('combat')}
-        >
-          Minions
-        </button>
-        <button
-          className={activeView === 'projects' ? 'active' : ''}
-          onClick={() => setActiveView('projects')}
-        >
-          Projects
-        </button>
-        <button
-          className={activeView === 'items' ? 'active' : ''}
-          onClick={() => setActiveView('items')}
-        >
-          Magic Items
-        </button>
-        <button
-          className={activeView === 'inventory' ? 'active' : ''}
-          onClick={() => setActiveView('inventory')}
-        >
-          Inventory
-        </button>
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={activeView === tab.id ? 'active' : ''}
+            onClick={() => setActiveView(tab.id as View)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </nav>
 
       {/* Main Content */}
@@ -199,13 +205,28 @@ function App() {
 
         {activeView === 'abilities' && <AbilitiesView />}
 
-        {activeView === 'combat' && <CombatView />}
+        {/* Summoner-specific: Minions tab */}
+        {activeView === 'minions' && <CombatView />}
 
         {activeView === 'projects' && <ProjectsView />}
 
         {activeView === 'items' && <MagicItemsView />}
 
         {activeView === 'inventory' && <InventoryView />}
+
+        {/* Talent Strain View */}
+        {activeView === 'strain' && <StrainView />}
+
+        {/* Null Field View */}
+        {activeView === 'nullfield' && <NullFieldView />}
+
+        {/* Placeholder for other class-specific views */}
+        {['judgment', 'domain', 'persistent', 'ferocity', 'college', 'tactics', 'routines'].includes(activeView) && (
+          <div className="placeholder-view">
+            <h2>{tabs.find(t => t.id === activeView)?.label || 'Class Feature'}</h2>
+            <p className="coming-soon">This class-specific feature is coming soon.</p>
+          </div>
+        )}
       </main>
 
       {/* Modals */}

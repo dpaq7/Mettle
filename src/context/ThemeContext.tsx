@@ -1,9 +1,24 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ThemeId, ThemeContextType } from '../types/theme';
-import { themes, getThemeById } from '../data/themes';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { ThemeId, ThemeContextType, ThemeDefinition } from '../types/theme';
+import { HeroClass } from '../types/hero';
+import {
+  classThemes,
+  getThemeById,
+  getDefaultThemeForClass,
+  mcdmTheme,
+} from '../data/themes';
+import {
+  applyTheme,
+  applyCreatorTheme as applyCreator,
+  applyThemeForHero as applyForHero,
+  loadSavedTheme,
+  getCurrentThemeId as getThemeId,
+  setThemeOverride,
+  clearThemeOverride,
+  isUsingDefaultTheme,
+} from '../utils/themeManager';
 
-const THEME_STORAGE_KEY = 'summoner_theme';
-const DEFAULT_THEME: ThemeId = 'obsidian';
+const THEME_STORAGE_KEY = 'mettle-active-theme';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -23,53 +38,81 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<ThemeId>(() => {
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      // Validate that saved value is a valid theme ID
-      if (saved && themes.some(t => t.id === saved)) {
-        return saved as ThemeId;
+      if (saved) {
+        // Validate that saved value is a valid theme ID
+        const theme = getThemeById(saved);
+        if (theme) {
+          return saved as ThemeId;
+        }
       }
     } catch {
       // localStorage unavailable
     }
-    return DEFAULT_THEME;
+    return 'mcdm'; // Default to MCDM theme
   });
 
+  // Apply initial theme on mount
+  useEffect(() => {
+    loadSavedTheme();
+  }, []);
+
+  // Apply theme when currentTheme changes
   useEffect(() => {
     const theme = getThemeById(currentTheme);
     if (theme) {
-      const root = document.documentElement;
-
-      // Apply theme CSS variables
-      Object.entries(theme.cssVariables).forEach(([key, value]) => {
-        root.style.setProperty(key, value);
-      });
-
-      // Set data attribute for potential CSS targeting
-      root.setAttribute('data-theme', currentTheme);
-
-      // Persist selection
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
-      } catch {
-        // localStorage unavailable
-      }
+      applyTheme(theme);
     }
   }, [currentTheme]);
 
-  const setTheme = (themeId: ThemeId) => {
-    // Validate theme ID
-    if (themes.some(t => t.id === themeId)) {
+  const setTheme = useCallback((themeId: ThemeId) => {
+    const theme = getThemeById(themeId);
+    if (theme) {
       setCurrentTheme(themeId);
     } else {
       console.warn(`Invalid theme ID: ${themeId}`);
-      setCurrentTheme(DEFAULT_THEME);
     }
-  };
+  }, []);
+
+  const applyThemeForHero = useCallback((heroId: string, heroClass: HeroClass) => {
+    applyForHero(heroId, heroClass);
+    // Update the state to reflect the applied theme
+    const themeId = getThemeId(heroId, heroClass);
+    setCurrentTheme(themeId);
+  }, []);
+
+  const applyCreatorTheme = useCallback(() => {
+    applyCreator();
+    setCurrentTheme('mcdm');
+  }, []);
 
   const value: ThemeContextType = {
     currentTheme,
     setTheme,
-    themes,
+    themes: classThemes, // Only provide class themes for selection
+    applyThemeForHero,
+    applyCreatorTheme,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+};
+
+// Additional hooks for theme management
+export const useThemeForHero = (heroId: string | undefined, heroClass: HeroClass | undefined) => {
+  const { applyThemeForHero, applyCreatorTheme } = useTheme();
+
+  useEffect(() => {
+    if (heroId && heroClass) {
+      applyThemeForHero(heroId, heroClass);
+    } else {
+      applyCreatorTheme();
+    }
+  }, [heroId, heroClass, applyThemeForHero, applyCreatorTheme]);
+};
+
+// Export utility functions for use outside of React components
+export {
+  setThemeOverride,
+  clearThemeOverride,
+  isUsingDefaultTheme,
+  getDefaultThemeForClass,
 };

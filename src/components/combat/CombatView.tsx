@@ -6,6 +6,7 @@ import { usePortfolio } from '../../hooks/usePortfolio';
 import { useEssence } from '../../hooks/useEssence';
 import { useStaminaStates } from '../../hooks/useStaminaStates';
 import { useRollHistory } from '../../context/RollHistoryContext';
+import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
 import { Squad, MinionTemplate } from '../../types';
 import { calculateMaxMinions } from '../../utils/calculations';
 import { performPowerRoll, PowerRollResult, getTierColor, RollModifier } from '../../utils/dice';
@@ -14,7 +15,7 @@ import FixtureCard from '../ui/FixtureCard';
 import './CombatView.css';
 
 const CombatView: React.FC = () => {
-  const { hero, updateHero } = useSummonerContext();
+  const { hero: genericHero, updateHero } = useSummonerContext();
   const { isInCombat, essenceState, hasSacrificedThisTurn, sacrificeMinion } = useCombatContext();
   const { createSquad, addSquad, removeSquad, updateSquad, damageSquad, healSquad } = useSquads();
   const { getSignatureMinions, getUnlockedMinions, getMinionById, getActualEssenceCost, isMinionUnlockedByLevel, getRequiredLevel, isSignatureMinion } = usePortfolio();
@@ -28,7 +29,16 @@ const CombatView: React.FC = () => {
   // Track summon quantities per minion type (in multiples of minionsPerSummon)
   const [summonMultipliers, setSummonMultipliers] = useState<Record<string, number>>({});
 
-  if (!hero) return null;
+  // This view is only for Summoner heroes
+  if (!genericHero || !isSummonerHero(genericHero)) {
+    return (
+      <div className="combat-view combat-view--empty">
+        <p>This view is only available for Summoner heroes.</p>
+      </div>
+    );
+  }
+
+  const hero = genericHero as SummonerHeroV2;
 
   const signatureMinions = getSignatureMinions();
   const unlockedMinions = getUnlockedMinions();

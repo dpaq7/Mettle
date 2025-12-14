@@ -3,18 +3,22 @@ import { useSummonerContext } from '../../context/SummonerContext';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useEssence } from '../../hooks/useEssence';
 import { useSquads } from '../../hooks/useSquads';
+import { isSummonerHero } from '../../types/hero';
 import { MinionTemplate } from '../../types';
 import MinionCard from './MinionCard';
 import './PortfolioManager.css';
 
 const PortfolioManager: React.FC = () => {
-  const { hero } = useSummonerContext();
+  const { hero: genericHero } = useSummonerContext();
   const { getSignatureMinions, getUnlockedMinions, getActualEssenceCost } = usePortfolio();
   const { canAffordMinion, currentEssence, spendForMinion } = useEssence();
   const { createSquad, addSquad } = useSquads();
 
   const [selectedMinion, setSelectedMinion] = useState<MinionTemplate | null>(null);
   const [filterCost, setFilterCost] = useState<number | 'all'>('all');
+
+  // Only for Summoner heroes
+  const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
   if (!hero) return null;
 

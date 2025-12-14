@@ -3,6 +3,7 @@ import { useSummonerContext } from '../../context/SummonerContext';
 import { useRollHistory } from '../../context/RollHistoryContext';
 import { standardManeuvers, standardTriggeredActions, moveActions, quickCommands } from '../../data/action-economy';
 import { Ability } from '../../types';
+import { isSummonerHero } from '../../types/hero';
 import { PowerRollResult } from '../../utils/dice';
 import { ActionType, ActionTag } from '../../types/action';
 import AbilityCard from '../shared/AbilityCard';
@@ -18,6 +19,10 @@ const AbilitiesView: React.FC = () => {
 
   if (!hero) return null;
 
+  // Check if Summoner for formation-specific commands
+  const isSummoner = isSummonerHero(hero);
+  const heroFormation = isSummoner ? hero.formation : null;
+
   const handleAbilityRoll = (ability: Ability, result: PowerRollResult) => {
     addRoll(result, ability.name, 'ability');
   };
@@ -26,10 +31,10 @@ const AbilitiesView: React.FC = () => {
     setOpenSection(prev => prev === section ? null : section);
   };
 
-  // Filter quick commands for hero's formation
-  const formationCommands = quickCommands.filter(
-    cmd => cmd.formation === hero.formation
-  );
+  // Filter quick commands for hero's formation (Summoner only)
+  const formationCommands = heroFormation
+    ? quickCommands.filter(cmd => cmd.formation === heroFormation)
+    : [];
 
   // Map Ability actionType to ActionCard type
   const mapActionType = (actionType: string): ActionType => {
@@ -242,13 +247,15 @@ const AbilitiesView: React.FC = () => {
         </div>
 
         {/* Quick Commands */}
+        {/* Quick Commands - Summoner Only */}
+        {isSummoner && heroFormation && (
         <div className="reference-accordion">
           <button
             className={`accordion-header ${openSection === 'commands' ? 'open' : ''}`}
             onClick={() => toggleSection('commands')}
           >
             <span className="accordion-icon">{openSection === 'commands' ? '−' : '+'}</span>
-            <span>Quick Commands ({hero.formation.charAt(0).toUpperCase() + hero.formation.slice(1)})</span>
+            <span>Quick Commands ({heroFormation.charAt(0).toUpperCase() + heroFormation.slice(1)})</span>
             <span className="accordion-count">{formationCommands.length}</span>
           </button>
           {openSection === 'commands' && (
@@ -263,6 +270,7 @@ const AbilitiesView: React.FC = () => {
             </div>
           )}
         </div>
+        )}
       </section>
     </div>
   );

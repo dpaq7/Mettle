@@ -5,7 +5,9 @@ import { useConditions, SaveResult, BleedingDamageResult } from '../../hooks/use
 import { useEquipment } from '../../hooks/useEquipment';
 import { ALL_CONDITIONS, ConditionDefinition } from '../../data/conditions';
 import { EdgeBaneState } from '../../utils/dice';
-import { Characteristic, ConditionId } from '../../types';
+import { Characteristic, ConditionId, HeroClass } from '../../types';
+import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
+import { classDefinitions } from '../../data/classes/class-definitions';
 import PentagonStatBox from '../ui/PentagonStatBox';
 import StatBox from '../shared/StatBox';
 import ProgressionTracker from '../ui/ProgressionTracker';
@@ -134,11 +136,20 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
     setEditingNotes(true);
   };
 
+  // Get hero class and check if Summoner
+  const heroClass: HeroClass = hero.heroClass || 'summoner';
+  const isSummoner = isSummonerHero(hero);
+  const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
+  const classDef = classDefinitions[heroClass];
+
   const circleShort: Record<string, string> = {
     blight: 'Blight', graves: 'Graves', spring: 'Spring', storms: 'Storms',
   };
 
   const chars = hero.characteristics;
+
+  // Get class-specific resource name
+  const resourceName = classDef?.heroicResource?.name || 'Essence';
 
   const charLabels: Record<Characteristic, string> = {
     might: 'Might',
@@ -195,8 +206,14 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
         <div className="identity">
           <span className="name">{hero.name}</span>
           <span className="tag level">Lv {hero.level}</span>
-          <span className="tag circle">{circleShort[hero.circle]}</span>
-          <span className="tag formation">{hero.formation}</span>
+          <span className="tag class">{classDef?.name || 'Summoner'}</span>
+          {/* Only show Circle and Formation for Summoners */}
+          {isSummoner && summonerHero && (
+            <>
+              <span className="tag circle">{circleShort[summonerHero.circle]}</span>
+              <span className="tag formation">{summonerHero.formation}</span>
+            </>
+          )}
         </div>
         <div className="identity-actions">
           {!isInCombat ? (
@@ -280,9 +297,10 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
             max: hero.recoveries.max,
           }}
           essence={{
-            current: essenceState?.currentEssence ?? 0,
-            max: hero.essence.maxPerTurn,
+            current: essenceState?.currentEssence ?? hero.heroicResource?.current ?? 0,
+            max: isSummoner && summonerHero ? summonerHero.heroicResource.maxPerTurn : 10,
           }}
+          resourceName={resourceName}
           onStaminaChange={(updates) => {
             if (updates.current !== undefined) {
               updateHero({ stamina: { ...hero.stamina, current: updates.current } });
@@ -352,12 +370,15 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
             label="Stability"
             size="sm"
           />
-          <StatBox
-            value={5 + chars.reason}
-            label="Sum. Range"
-            size="sm"
-            title="Summoner's Range: Maximum distance to summon minions and use conjuring abilities (5 + Reason)"
-          />
+          {/* Only show Summoner's Range for Summoners */}
+          {isSummoner && (
+            <StatBox
+              value={5 + chars.reason}
+              label="Sum. Range"
+              size="sm"
+              title="Summoner's Range: Maximum distance to summon minions and use conjuring abilities (5 + Reason)"
+            />
+          )}
           {totalBonuses.damage > 0 && (
             <StatBox
               value={`+${totalBonuses.damage}`}

@@ -3,15 +3,15 @@ import { SummonerHero } from '../types';
 import { Hero, SummonerHeroV2, isSummonerHero } from '../types/hero';
 import { saveCharacter, loadCharacter, getActiveCharacterId, setActiveCharacterId } from '../utils/storage';
 
-// For backward compatibility, we continue to expose SummonerHero type
-// but internally we work with the new Hero/SummonerHeroV2 types
+// HeroContext supports all 10 Draw Steel hero classes
+// The name is kept as SummonerContext for backward compatibility
 interface SummonerContextType {
-  hero: SummonerHero | null;
-  setHero: (hero: SummonerHero | null) => void;
-  updateHero: (updates: Partial<SummonerHero>) => void;
+  hero: Hero | null;
+  setHero: (hero: Hero | null) => void;
+  updateHero: (updates: Partial<Hero>) => void;
   saveCurrentHero: () => void;
   loadHero: (id: string) => void;
-  createNewHero: (hero: SummonerHero) => void;
+  createNewHero: (hero: Hero) => void;
 }
 
 const SummonerContext = createContext<SummonerContextType | undefined>(undefined);
@@ -29,54 +29,31 @@ interface SummonerProviderProps {
 }
 
 /**
- * Convert a Hero to SummonerHero for backward compatibility
- * Only works for summoner-class heroes
+ * Convert legacy SummonerHero to polymorphic Hero type
+ * Handles migration of old character data
  */
-const heroToSummoner = (hero: Hero): SummonerHero | null => {
-  if (!isSummonerHero(hero)) {
-    return null;
+const migrateLegacyHero = (data: any): Hero => {
+  // If it already has heroClass, it's already migrated
+  if (data.heroClass) {
+    return data as Hero;
   }
 
-  // SummonerHeroV2 is compatible with SummonerHero except for:
-  // - heroClass (new field)
-  // - heroicResource (replaces essence)
-  // We need to convert heroicResource back to essence format
-  const summonerV2 = hero as SummonerHeroV2;
-
+  // Legacy data without heroClass is assumed to be Summoner
   return {
-    ...summonerV2,
-    essence: {
-      current: summonerV2.heroicResource.current,
-      maxPerTurn: summonerV2.heroicResource.maxPerTurn,
-    },
-  } as SummonerHero;
-};
-
-/**
- * Convert a SummonerHero to Hero (SummonerHeroV2)
- */
-const summonerToHero = (summoner: SummonerHero): Hero => {
-  // Check if it already has heroClass (already migrated)
-  if ('heroClass' in summoner && (summoner as any).heroClass) {
-    return summoner as unknown as Hero;
-  }
-
-  return {
-    ...summoner,
+    ...data,
     heroClass: 'summoner' as const,
     heroicResource: {
       type: 'essence' as const,
-      current: summoner.essence?.current ?? 0,
-      maxPerTurn: summoner.essence?.maxPerTurn ?? 5,
+      current: data.essence?.current ?? 0,
+      maxPerTurn: data.essence?.maxPerTurn ?? 5,
     },
   } as SummonerHeroV2;
 };
 
 export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) => {
-  const [hero, setHeroInternal] = useState<SummonerHero | null>(null);
+  const [hero, setHeroInternal] = useState<Hero | null>(null);
 
-  // Wrapper to handle Hero -> SummonerHero conversion
-  const setHero = (newHero: SummonerHero | null) => {
+  const setHero = (newHero: Hero | null) => {
     setHeroInternal(newHero);
   };
 
@@ -86,11 +63,9 @@ export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) 
     if (activeId) {
       const loaded = loadCharacter(activeId);
       if (loaded) {
-        // Convert Hero to SummonerHero for backward compatibility
-        const summonerHero = heroToSummoner(loaded);
-        if (summonerHero) {
-          setHeroInternal(summonerHero);
-        }
+        // Migrate legacy data if needed
+        const migratedHero = migrateLegacyHero(loaded);
+        setHeroInternal(migratedHero);
       }
     }
   }, []);
@@ -98,39 +73,33 @@ export const SummonerProvider: React.FC<SummonerProviderProps> = ({ children }) 
   // Auto-save when hero changes
   useEffect(() => {
     if (hero) {
-      // Convert to Hero type before saving
-      const heroData = summonerToHero(hero);
-      saveCharacter(heroData);
+      saveCharacter(hero);
     }
   }, [hero]);
 
-  const updateHero = (updates: Partial<SummonerHero>) => {
-    setHeroInternal((prev) => (prev ? { ...prev, ...updates } : null));
+  const updateHero = (updates: Partial<Hero>) => {
+    setHeroInternal((prev) => (prev ? { ...prev, ...updates } as Hero : null));
   };
 
   const saveCurrentHero = () => {
     if (hero) {
-      const heroData = summonerToHero(hero);
-      saveCharacter(heroData);
+      saveCharacter(hero);
     }
   };
 
   const loadHero = (id: string) => {
     const loaded = loadCharacter(id);
     if (loaded) {
-      const summonerHero = heroToSummoner(loaded);
-      if (summonerHero) {
-        setHeroInternal(summonerHero);
-        setActiveCharacterId(id);
-      }
+      const migratedHero = migrateLegacyHero(loaded);
+      setHeroInternal(migratedHero);
+      setActiveCharacterId(id);
     }
   };
 
-  const createNewHero = (newHero: SummonerHero) => {
+  const createNewHero = (newHero: Hero) => {
     setHeroInternal(newHero);
     setActiveCharacterId(newHero.id);
-    const heroData = summonerToHero(newHero);
-    saveCharacter(heroData);
+    saveCharacter(newHero);
   };
 
   const value: SummonerContextType = {

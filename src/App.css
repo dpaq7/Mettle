@@ -50,7 +50,10 @@ html, body {
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
   color: var(--accent-bright);
   text-shadow: var(--text-glow);
 }
@@ -62,8 +65,9 @@ html, body {
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   transition: all var(--transition-fast);
 }
 
@@ -101,7 +105,7 @@ html, body {
 }
 
 .app-header.compact h1 {
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
 }
 
 .app-header.compact .header-actions {
@@ -112,7 +116,7 @@ html, body {
 .app-header.compact .start-combat-btn,
 .app-header.compact .end-combat-btn {
   padding: 0.375rem 0.75rem;
-  font-size: 0.85rem;
+  font-size: var(--font-size-xs);
 }
 
 /* ============================================
@@ -253,7 +257,7 @@ html, body {
   text-align: left;
 }
 
-.option-card:hover {
+.option-card:hover:not(.max-reached):not(.disabled) {
   border-color: var(--accent-bright);
   transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
@@ -263,6 +267,38 @@ html, body {
   border-color: var(--accent-bright);
   background: var(--bg-light);
   box-shadow: var(--shadow-glow-strong);
+}
+
+/* Max selection reached - dim unselected options */
+.option-card.max-reached,
+.option-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(50%);
+}
+
+.option-card.max-reached:not(.selected),
+.option-card.disabled:not(.selected) {
+  border-color: var(--border-solid);
+  background: var(--bg-dark);
+}
+
+/* Selection counter styling */
+.selection-counter {
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: inline-block;
+}
+
+.selection-counter span.complete {
+  color: var(--success);
+  font-weight: 600;
 }
 
 .option-card h3 {
@@ -292,6 +328,180 @@ html, body {
 .option-card li {
   margin: 0.3rem 0;
   font-size: 0.9rem;
+}
+
+/* ============================================
+   NULL TRADITION & AUGMENTATION STEPS
+   ============================================ */
+
+.null-tradition-step,
+.augmentation-step {
+  max-width: 1200px;
+}
+
+.null-options,
+.augmentation-options {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 900px) {
+  .null-options,
+  .augmentation-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tradition Card Styling */
+.tradition-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tradition-card .tradition-focus {
+  color: var(--null-primary, #7c3aed);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.tradition-card .tradition-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.tradition-card .detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tradition-card .detail-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tradition-card .detail-value {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.tradition-card .mastery-list {
+  margin: 0.25rem 0 0 0;
+  padding-left: 1rem;
+  font-size: 0.85rem;
+}
+
+.tradition-card .mastery-list li {
+  margin: 0.15rem 0;
+}
+
+.tradition-card .more-hint {
+  color: var(--text-muted);
+  font-style: italic;
+  list-style: none;
+  margin-left: -1rem;
+}
+
+.tradition-card .feature-name {
+  font-size: 0.9rem;
+  color: var(--null-primary, #7c3aed);
+  font-weight: 500;
+}
+
+.tradition-card.selected {
+  border-color: var(--null-primary, #7c3aed);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
+}
+
+/* Selection Preview */
+.selection-preview {
+  margin-top: 1.5rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-left: 3px solid var(--null-primary, #7c3aed);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1rem 1.25rem;
+}
+
+.selection-preview h4 {
+  color: var(--null-primary, #7c3aed);
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.selection-preview p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* Augmentation Card Styling */
+.augmentation-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.augmentation-card .augmentation-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.augmentation-card .effects-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.augmentation-card .effects-list {
+  margin: 0.25rem 0 0 0;
+  padding-left: 1rem;
+}
+
+.augmentation-card .effect-item {
+  color: var(--null-primary, #7c3aed);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin: 0.2rem 0;
+}
+
+.augmentation-card .stat-preview {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-dark);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.augmentation-card.selected {
+  border-color: var(--null-primary, #7c3aed);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
+}
+
+/* Augmentation Note */
+.augmentation-note {
+  margin-top: 1.5rem;
+  background: var(--bg-dark);
+  border-left: 3px solid var(--null-primary, #7c3aed);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.augmentation-note strong {
+  color: var(--text-primary);
 }
 
 /* ============================================
@@ -915,8 +1125,11 @@ html, body {
   color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
-  font-size: 1rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
   position: relative;
 }
 
@@ -1369,7 +1582,7 @@ html, body {
 
   .view-tabs button {
     padding: 0.75rem 1.25rem;
-    font-size: 0.9rem;
+    font-size: var(--font-size-xs);
     white-space: nowrap;
   }
 }
