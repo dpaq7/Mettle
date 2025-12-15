@@ -1,0 +1,634 @@
+/* ============================================
+   CLASS ABILITY WIDGETS - Shared Styles
+   ============================================ */
+
+/* Base Widget Container */
+.class-widget {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+/* Widget Header */
+.class-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-dark);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+}
+
+.class-widget__header:hover {
+  background: var(--bg-light);
+}
+
+.class-widget__header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.class-widget__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.class-widget__badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.class-widget__toggle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  font-weight: bold;
+  font-size: 1rem;
+  transition: transform var(--transition-fast);
+}
+
+.class-widget__toggle--open {
+  transform: rotate(180deg);
+}
+
+/* Widget Content */
+.class-widget__content {
+  padding: 1rem;
+}
+
+.class-widget__content--collapsed {
+  display: none;
+}
+
+/* Compact Summary (always visible) */
+.class-widget__summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-darkest);
+  border-bottom: 1px solid var(--border-dark);
+}
+
+/* Quick Stat Display */
+.class-widget__quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--bg-medium);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-dark);
+}
+
+.class-widget__quick-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.class-widget__quick-stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Resource Tracker */
+.class-widget__resource {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+}
+
+.class-widget__resource-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 70px;
+}
+
+.class-widget__resource-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.class-widget__resource-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.class-widget__resource-btn:hover {
+  background: var(--bg-light);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.class-widget__resource-btn:active {
+  transform: scale(0.95);
+}
+
+.class-widget__resource-value {
+  min-width: 40px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  padding: 0 0.5rem;
+}
+
+/* Gain Reminder Section */
+.class-widget__gain-section {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-darkest);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+}
+
+.class-widget__gain-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.class-widget__gain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.class-widget__gain-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.class-widget__gain-item::before {
+  content: '+';
+  color: var(--success);
+  font-weight: bold;
+}
+
+.class-widget__gain-item strong {
+  color: var(--accent-primary);
+}
+
+/* Mechanic Card */
+.class-widget__mechanic {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent-primary);
+}
+
+.class-widget__mechanic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.class-widget__mechanic-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.class-widget__mechanic-status {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.class-widget__mechanic-status--active {
+  background: var(--success-dim);
+  color: var(--success);
+}
+
+.class-widget__mechanic-status--inactive {
+  background: var(--bg-dark);
+  color: var(--text-muted);
+}
+
+.class-widget__mechanic-description {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Target Input (for Judgment, Mark, etc.) */
+.class-widget__target {
+  margin-top: 0.75rem;
+}
+
+.class-widget__target-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.class-widget__target-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.class-widget__target-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.class-widget__target-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.class-widget__target-btn {
+  padding: 0.5rem 0.75rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.class-widget__target-btn:hover {
+  background: var(--accent-primary);
+  color: var(--bg-darkest);
+}
+
+.class-widget__target-btn--danger {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.class-widget__target-btn--danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Active Target Display */
+.class-widget__active-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  margin-top: 0.5rem;
+}
+
+.class-widget__active-target-name {
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+/* Tier Display (for Growing Ferocity) */
+.class-widget__tiers {
+  margin-top: 1rem;
+}
+
+.class-widget__tier {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.class-widget__tier--locked {
+  opacity: 0.5;
+  background: transparent;
+}
+
+.class-widget__tier--active {
+  background: var(--success-dim);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.class-widget__tier-threshold {
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.class-widget__tier--active .class-widget__tier-threshold {
+  background: var(--success);
+  color: white;
+}
+
+.class-widget__tier-benefit {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.class-widget__tier--active .class-widget__tier-benefit {
+  color: var(--text-primary);
+}
+
+/* Level Feature Badge */
+.class-widget__level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.4rem;
+  background: var(--accent-dim);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.class-widget__level-badge--locked {
+  background: var(--bg-dark);
+  color: var(--text-muted);
+}
+
+/* Potency Display */
+.class-widget__potency {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: var(--bg-darkest);
+  border-radius: var(--radius-sm);
+}
+
+.class-widget__potency-item {
+  flex: 1;
+  text-align: center;
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+}
+
+.class-widget__potency-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.15rem;
+}
+
+.class-widget__potency-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.class-widget__potency-item--strong {
+  background: var(--success-dim);
+}
+
+.class-widget__potency-item--strong .class-widget__potency-value {
+  color: var(--success);
+}
+
+/* === CLASS-SPECIFIC ACCENT COLORS === */
+
+/* Censor - Red/Orange for Wrath */
+.class-widget--censor {
+  border-color: rgba(244, 67, 54, 0.3);
+}
+.class-widget--censor .class-widget__header {
+  border-bottom-color: rgba(244, 67, 54, 0.3);
+}
+.class-widget--censor .class-widget__badge {
+  background: rgba(244, 67, 54, 0.2);
+  color: #ef5350;
+}
+.class-widget--censor .class-widget__resource-value {
+  color: #ef5350;
+}
+
+/* Conduit - Gold for Piety */
+.class-widget--conduit {
+  border-color: rgba(255, 193, 7, 0.3);
+}
+.class-widget--conduit .class-widget__header {
+  border-bottom-color: rgba(255, 193, 7, 0.3);
+}
+.class-widget--conduit .class-widget__badge {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+.class-widget--conduit .class-widget__resource-value {
+  color: #ffc107;
+}
+
+/* Elementalist - Purple for Essence */
+.class-widget--elementalist {
+  border-color: rgba(156, 39, 176, 0.3);
+}
+.class-widget--elementalist .class-widget__header {
+  border-bottom-color: rgba(156, 39, 176, 0.3);
+}
+.class-widget--elementalist .class-widget__badge {
+  background: rgba(156, 39, 176, 0.2);
+  color: #ba68c8;
+}
+.class-widget--elementalist .class-widget__resource-value {
+  color: #ba68c8;
+}
+
+/* Fury - Orange/Red for Ferocity */
+.class-widget--fury {
+  border-color: rgba(255, 87, 34, 0.3);
+}
+.class-widget--fury .class-widget__header {
+  border-bottom-color: rgba(255, 87, 34, 0.3);
+}
+.class-widget--fury .class-widget__badge {
+  background: rgba(255, 87, 34, 0.2);
+  color: #ff7043;
+}
+.class-widget--fury .class-widget__resource-value {
+  color: #ff7043;
+}
+
+/* Null - Blue/Cyan for Discipline */
+.class-widget--null {
+  border-color: rgba(0, 188, 212, 0.3);
+}
+.class-widget--null .class-widget__header {
+  border-bottom-color: rgba(0, 188, 212, 0.3);
+}
+.class-widget--null .class-widget__badge {
+  background: rgba(0, 188, 212, 0.2);
+  color: #4dd0e1;
+}
+.class-widget--null .class-widget__resource-value {
+  color: #4dd0e1;
+}
+
+/* Shadow - Purple/Dark for Insight */
+.class-widget--shadow {
+  border-color: rgba(103, 58, 183, 0.3);
+}
+.class-widget--shadow .class-widget__header {
+  border-bottom-color: rgba(103, 58, 183, 0.3);
+}
+.class-widget--shadow .class-widget__badge {
+  background: rgba(103, 58, 183, 0.2);
+  color: #9575cd;
+}
+.class-widget--shadow .class-widget__resource-value {
+  color: #9575cd;
+}
+
+/* Summoner - Green/Teal for Essence */
+.class-widget--summoner {
+  border-color: rgba(0, 150, 136, 0.3);
+}
+.class-widget--summoner .class-widget__header {
+  border-bottom-color: rgba(0, 150, 136, 0.3);
+}
+.class-widget--summoner .class-widget__badge {
+  background: rgba(0, 150, 136, 0.2);
+  color: #4db6ac;
+}
+.class-widget--summoner .class-widget__resource-value {
+  color: #4db6ac;
+}
+
+/* Tactician - Blue for Focus */
+.class-widget--tactician {
+  border-color: rgba(33, 150, 243, 0.3);
+}
+.class-widget--tactician .class-widget__header {
+  border-bottom-color: rgba(33, 150, 243, 0.3);
+}
+.class-widget--tactician .class-widget__badge {
+  background: rgba(33, 150, 243, 0.2);
+  color: #64b5f6;
+}
+.class-widget--tactician .class-widget__resource-value {
+  color: #64b5f6;
+}
+
+/* Talent - Cyan for Clarity */
+.class-widget--talent {
+  border-color: rgba(0, 230, 195, 0.3);
+}
+.class-widget--talent .class-widget__header {
+  border-bottom-color: rgba(0, 230, 195, 0.3);
+}
+.class-widget--talent .class-widget__badge {
+  background: rgba(0, 230, 195, 0.2);
+  color: var(--accent-primary);
+}
+.class-widget--talent .class-widget__resource-value {
+  color: var(--accent-primary);
+}
+
+/* Talent Strained State */
+.class-widget--talent.class-widget--strained {
+  border-color: rgba(244, 67, 54, 0.5);
+}
+.class-widget--talent.class-widget--strained .class-widget__resource-value {
+  color: var(--danger);
+}
+
+/* Troubadour - Pink/Magenta for Drama */
+.class-widget--troubadour {
+  border-color: rgba(233, 30, 99, 0.3);
+}
+.class-widget--troubadour .class-widget__header {
+  border-bottom-color: rgba(233, 30, 99, 0.3);
+}
+.class-widget--troubadour .class-widget__badge {
+  background: rgba(233, 30, 99, 0.2);
+  color: #f06292;
+}
+.class-widget--troubadour .class-widget__resource-value {
+  color: #f06292;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .class-widget__summary {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .class-widget__quick-stat {
+    flex: 1 1 auto;
+    min-width: 80px;
+    justify-content: center;
+  }
+
+  .class-widget__potency {
+    flex-wrap: wrap;
+  }
+
+  .class-widget__potency-item {
+    min-width: 70px;
+  }
+}

@@ -8,6 +8,7 @@ import { PowerRollResult } from '../../utils/dice';
 import { ActionType, ActionTag } from '../../types/action';
 import AbilityCard from '../shared/AbilityCard';
 import ActionCard from '../ui/ActionCard';
+import { ClassAbilityWidget } from './classWidgets';
 import './AbilitiesView.css';
 
 type ReferenceSection = 'overview' | 'moves' | 'maneuvers' | 'triggered' | 'commands' | null;
@@ -103,6 +104,9 @@ const AbilitiesView: React.FC = () => {
             <span className="reminder-action main">Action</span>
           </div>
         </div>
+
+        {/* Class-Specific Widget */}
+        <ClassAbilityWidget hero={hero} />
 
         <div className="class-abilities-grid">
           {hero.abilities.map((ability) => (

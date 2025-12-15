@@ -16,6 +16,8 @@ import {
   setThemeOverride,
   clearThemeOverride,
   isUsingDefaultTheme,
+  validateAndRepairThemeData,
+  resetAllThemePreferences,
 } from '../utils/themeManager';
 
 const THEME_STORAGE_KEY = 'mettle-active-theme';
@@ -51,8 +53,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return 'mcdm'; // Default to MCDM theme
   });
 
-  // Apply initial theme on mount
+  // Validate and apply initial theme on mount
   useEffect(() => {
+    // First validate/repair any corrupted theme data
+    validateAndRepairThemeData();
+    // Then load the saved theme
     loadSavedTheme();
   }, []);
 
@@ -115,4 +120,5 @@ export {
   clearThemeOverride,
   isUsingDefaultTheme,
   getDefaultThemeForClass,
+  resetAllThemePreferences,
 };

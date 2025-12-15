@@ -193,5 +193,70 @@ export function getAllThemes(): ThemeDefinition[] {
   return allThemes;
 }
 
+/**
+ * Reset all theme preferences to defaults
+ * Useful for recovering from corrupted theme data
+ */
+export function resetAllThemePreferences(): void {
+  try {
+    localStorage.removeItem(THEME_STORAGE_KEY);
+    localStorage.removeItem(THEME_OVERRIDE_KEY);
+    applyCreatorTheme();
+    console.log('Theme preferences reset successfully');
+  } catch (error) {
+    console.error('Failed to reset theme preferences:', error);
+  }
+}
+
+/**
+ * Safely validate and repair theme data in localStorage
+ * Returns true if data was valid or successfully repaired
+ */
+export function validateAndRepairThemeData(): boolean {
+  try {
+    // Check active theme
+    const savedThemeId = localStorage.getItem(THEME_STORAGE_KEY);
+    if (savedThemeId) {
+      const theme = getThemeById(savedThemeId);
+      if (!theme) {
+        console.warn(`Invalid saved theme ID: ${savedThemeId}, resetting...`);
+        localStorage.removeItem(THEME_STORAGE_KEY);
+      }
+    }
+
+    // Check theme overrides
+    const overridesJson = localStorage.getItem(THEME_OVERRIDE_KEY);
+    if (overridesJson) {
+      try {
+        const overrides = JSON.parse(overridesJson);
+        if (!Array.isArray(overrides)) {
+          console.warn('Theme overrides is not an array, resetting...');
+          localStorage.removeItem(THEME_OVERRIDE_KEY);
+        } else {
+          // Filter out invalid entries
+          const validOverrides = overrides.filter((entry: unknown) => {
+            if (typeof entry !== 'object' || entry === null) return false;
+            const e = entry as Record<string, unknown>;
+            return typeof e.heroId === 'string' && typeof e.themeId === 'string';
+          });
+
+          if (validOverrides.length !== overrides.length) {
+            console.warn('Some theme overrides were invalid, cleaning up...');
+            localStorage.setItem(THEME_OVERRIDE_KEY, JSON.stringify(validOverrides));
+          }
+        }
+      } catch {
+        console.warn('Theme overrides JSON is corrupted, resetting...');
+        localStorage.removeItem(THEME_OVERRIDE_KEY);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to validate theme data:', error);
+    return false;
+  }
+}
+
 // Re-export useful items from themes.ts
 export { getThemeById, getDefaultThemeForClass, getCreatorTheme, mcdmTheme };

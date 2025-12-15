@@ -41,12 +41,23 @@ npm run tauri build -- --target universal-apple-darwin
 
 ## Attribution
 
-Originally forked from [Forge Steel](https://github.com/andyaiken/forgesteel) by Andy Aiken.
+**Mettle** is a fork of [Forge Steel](https://github.com/andyaiken/forgesteel), originally created by [Andy Aiken](https://github.com/andyaiken). We gratefully acknowledge Andy's foundational work that made this project possible.
 
-**Draw Steel** is a tabletop roleplaying game by MCDM Productions.
+## Legal
+
+**Mettle** is an independent product published under the [DRAW STEEL Creator License](https://www.mcdmproductions.com/draw-steel-creator-license) and is not affiliated with MCDM Productions, LLC.
+
+**DRAW STEEL** © 2024 MCDM Productions, LLC.
+
+For more information about Draw Steel, visit [MCDM Productions](https://www.mcdmproductions.com).
 
 ## License
 
 This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
 
 This is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+### Third-Party Acknowledgments
+
+- **Forge Steel** by Andy Aiken - Original codebase ([GPL v3 License](https://github.com/andyaiken/forgesteel/blob/main/LICENSE))
+- **Draw Steel** by MCDM Productions - Game content ([Creator License](https://www.mcdmproductions.com/draw-steel-creator-license))

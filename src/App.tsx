@@ -13,6 +13,7 @@ import ProjectsView from './components/projects/ProjectsView';
 import MagicItemsView from './components/items/MagicItemsView';
 import InventoryView from './components/inventory/InventoryView';
 import RollHistoryPanel from './components/shared/RollHistoryPanel';
+import LegalModal from './components/shared/LegalModal';
 import CollapsibleHeader from './components/ui/CollapsibleHeader';
 import { ThemeSelector } from './components/theme';
 import { StrainView } from './components/classDetails/TalentDetails/StrainView';
@@ -32,6 +33,7 @@ function App() {
   const [showCharacterCreation, setShowCharacterCreation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showRespiteConfirm, setShowRespiteConfirm] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
 
   // Apply theme when hero changes
   useEffect(() => {
@@ -95,6 +97,13 @@ function App() {
               Manage Characters
             </button>
             <ThemeSelector />
+            <button
+              className="about-button"
+              onClick={() => setShowLegalModal(true)}
+              aria-label="About Mettle"
+            >
+              About
+            </button>
           </div>
         </header>
         <main className="app-main">
@@ -106,6 +115,10 @@ function App() {
             onCreateNew={handleCreateNew}
           />
         )}
+        <LegalModal
+          isOpen={showLegalModal}
+          onClose={() => setShowLegalModal(false)}
+        />
       </div>
     );
   }
@@ -132,6 +145,13 @@ function App() {
             Characters
           </button>
           <ThemeSelector />
+          <button
+            className="about-button"
+            onClick={() => setShowLegalModal(true)}
+            aria-label="About Mettle"
+          >
+            About
+          </button>
         </div>
       </header>
 
@@ -275,6 +295,12 @@ function App() {
 
       {/* Roll History Panel - Available globally */}
       <RollHistoryPanel />
+
+      {/* Legal/About Modal */}
+      <LegalModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+      />
     </div>
   );
 }

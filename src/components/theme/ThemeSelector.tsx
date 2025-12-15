@@ -17,10 +17,19 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Get hero info for theme selection
-  const heroId = hero?.id;
+  // Get hero info for theme selection (with defensive defaults)
+  const heroId = hero?.id ?? null;
   const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
-  const defaultTheme = getDefaultThemeForClass(heroClass);
+
+  // Safely get default theme with fallback
+  let defaultTheme: ThemeDefinition;
+  try {
+    defaultTheme = getDefaultThemeForClass(heroClass);
+  } catch {
+    // Fallback to summoner theme definition inline if something goes wrong
+    defaultTheme = classThemes.find(t => t.id === 'summoner') ?? classThemes[0];
+  }
+
   const isUsingDefault = heroId ? isUsingDefaultTheme(heroId, heroClass) : true;
 
   // Close dropdown when clicking outside
@@ -86,6 +95,12 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
 
   // Use class themes for selection (excludes MCDM theme)
   const selectableThemes = classThemes;
+
+  // Safety check - if no themes available, don't render
+  if (!selectableThemes || selectableThemes.length === 0) {
+    console.warn('ThemeSelector: No selectable themes available');
+    return null;
+  }
 
   return (
     <div
@@ -155,6 +170,9 @@ const ThemeOption: React.FC<ThemeOptionProps> = ({
   onSelect,
   onKeyDown,
 }) => {
+  // Defensive access to previewColors
+  const previewColors = theme?.previewColors ?? { bg: '#1a1a1a', primary: '#00e6c3', secondary: '#a87de8' };
+
   return (
     <li
       className={`theme-option ${isSelected ? 'theme-option--selected' : ''} ${isDefault ? 'theme-option--default' : ''}`}
@@ -169,25 +187,25 @@ const ThemeOption: React.FC<ThemeOptionProps> = ({
       </div>
       <div className="theme-option__content">
         <div className="theme-option__name">
-          {theme.name}
+          {theme?.name ?? 'Unknown Theme'}
           {isDefault && <span className="theme-option__default-badge">Default</span>}
         </div>
-        <div className="theme-option__description">{theme.description}</div>
+        <div className="theme-option__description">{theme?.description ?? ''}</div>
       </div>
       <div className="theme-option__swatches">
         <div
           className="theme-option__swatch"
-          style={{ backgroundColor: theme.previewColors.bg }}
+          style={{ backgroundColor: previewColors.bg }}
           title="Background"
         />
         <div
           className="theme-option__swatch"
-          style={{ backgroundColor: theme.previewColors.primary }}
+          style={{ backgroundColor: previewColors.primary }}
           title="Primary"
         />
         <div
           className="theme-option__swatch"
-          style={{ backgroundColor: theme.previewColors.secondary }}
+          style={{ backgroundColor: previewColors.secondary }}
           title="Secondary"
         />
       </div>
