@@ -1,7 +1,7 @@
 {
   "name": "mettle",
   "private": true,
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Mettle - A Draw Steel TTRPG Character Manager",
   "author": "Dan Paquin",
   "license": "GPL-3.0",
@@ -13,7 +13,10 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "tauri:build:mac": "tauri build --target universal-apple-darwin",
+    "tauri:build:win": "tauri build --target x86_64-pc-windows-msvc",
+    "tauri:build:linux": "tauri build --target x86_64-unknown-linux-gnu"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.9.1",

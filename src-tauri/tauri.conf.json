@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Mettle",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "identifier": "com.mettle.drawsteel",
   "build": {
     "frontendDist": "../dist",
@@ -28,7 +28,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "app"],
+    "targets": "all",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -36,8 +36,40 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "category": "Game",
+    "shortDescription": "Character manager for Draw Steel TTRPG",
+    "longDescription": "Mettle is a comprehensive character manager for the Draw Steel tabletop roleplaying game by MCDM Productions. Manage all 10 hero classes, track combat, and level up your characters.",
     "macOS": {
-      "minimumSystemVersion": "10.15"
+      "minimumSystemVersion": "10.15",
+      "exceptionDomain": null,
+      "signingIdentity": null,
+      "entitlements": null
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "wix": null,
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "languages": ["English"],
+        "installerIcon": "icons/icon.ico"
+      }
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false
+      },
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"],
+        "section": "games",
+        "priority": "optional"
+      },
+      "rpm": {
+        "depends": ["webkit2gtk4.1", "gtk3"],
+        "release": "1"
+      }
     }
   }
 }
