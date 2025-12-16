@@ -72,15 +72,16 @@ export interface TalentResource extends HeroicResource<'clarity'> {
 // SUBCLASS TYPES PER CLASS
 // =================================================================
 
-// Censor Orders (subclass)
-export type CensorOrder = 'inquisitor' | 'templar' | 'zealot';
+// Censor Orders (subclass) - Draw Steel SRD
+export type CensorOrder = 'exorcist' | 'oracle' | 'paragon';
 
-// Conduit Domains
+// Conduit Domains (can choose 2)
 export type ConduitDomain =
   | 'creation'
   | 'death'
   | 'fate'
   | 'knowledge'
+  | 'life'
   | 'love'
   | 'nature'
   | 'protection'
@@ -92,8 +93,17 @@ export type ConduitDomain =
 // Elementalist Elements
 export type ElementalistElement = 'earth' | 'fire' | 'green' | 'void';
 
-// Fury Aspects
+// Fury Aspects (subclasses)
 export type FuryAspect = 'berserker' | 'reaver' | 'stormwight';
+
+// Stormwight Kits (sub-subclass for Stormwight only)
+export type StormwightKit = 'boren' | 'corven' | 'raden' | 'vuken';
+
+// Primordial Storm damage types per kit
+export type PrimordialStormType = 'cold' | 'fire' | 'corruption' | 'lightning';
+
+// Fury form state (for Stormwight)
+export type FuryForm = 'humanoid' | 'animal' | 'hybrid';
 
 // Null Traditions (corrected from Draw Steel rules)
 export type NullTradition = 'chronokinetic' | 'cryokinetic' | 'metakinetic';
@@ -104,12 +114,11 @@ export type PsionicAugmentation = 'density' | 'force' | 'speed';
 // Null Field enhancement options
 export type NullFieldEnhancement = 'graviticDisruption' | 'inertialAnchor' | 'synapticBreak';
 
-// Shadow Colleges
+// Shadow Colleges - Draw Steel SRD
 export type ShadowCollege =
   | 'black-ash'
   | 'caustic-alchemy'
-  | 'harlequin-mask'
-  | 'woven-darkness';
+  | 'harlequin-mask';
 
 // Summoner Circles (already defined, re-export for consistency)
 export type SummonerCircle = 'blight' | 'graves' | 'spring' | 'storms';
@@ -117,11 +126,11 @@ export type SummonerCircle = 'blight' | 'graves' | 'spring' | 'storms';
 // Tactician Doctrines
 export type TacticianDoctrine = 'insurgent' | 'mastermind' | 'vanguard';
 
-// Talent Traditions
-export type TalentTradition = 'empath' | 'metamorph' | 'telekinetic';
+// Talent Traditions - Draw Steel SRD
+export type TalentTradition = 'chronopathy' | 'telekinesis' | 'telepathy';
 
-// Troubadour Classes
-export type TroubadourClass = 'dancer' | 'duelist' | 'wordsmith';
+// Troubadour Class Acts (subclass)
+export type TroubadourClass = 'auteur' | 'duelist' | 'virtuoso';
 
 // =================================================================
 // UNIFIED SUBCLASS TYPE
@@ -178,11 +187,30 @@ export interface PersistentAbility {
   activeSince: number;
 }
 
+// Growing Ferocity tier tracking (Fury)
+export interface GrowingFerocityState {
+  tookDamageThisRound: boolean;
+  becameWindedThisEncounter: boolean;
+  becameDyingThisEncounter: boolean;
+}
+
+// Fury-specific state
+export interface FuryState {
+  aspect: FuryAspect;
+  stormwightKit?: StormwightKit; // Only if aspect is 'stormwight'
+  primordialStorm?: PrimordialStormType; // Derived from kit
+  currentForm: FuryForm; // Stormwight form tracking
+  growingFerocity: GrowingFerocityState;
+  primordialPower: number; // Epic resource (L10)
+}
+
 // Troubadour routines
 export interface Routine {
   id: string;
   name: string;
   effect: string;
+  auraDistance?: number | null;
+  rangedDistance?: number;
 }
 
 // Troubadour scene partners (for negotiation)
@@ -273,7 +301,8 @@ export interface CensorHero extends HeroBase {
 export interface ConduitHero extends HeroBase {
   heroClass: 'conduit';
   heroicResource: HeroicResource<'piety'>;
-  subclass?: ConduitDomain;
+  subclass?: ConduitDomain;      // Primary domain (for display/legacy)
+  domains?: ConduitDomain[];     // Both chosen domains (Conduit selects 2)
   prayState: PrayState;
 }
 
@@ -288,7 +317,7 @@ export interface ElementalistHero extends HeroBase {
 export interface FuryHero extends HeroBase {
   heroClass: 'fury';
   heroicResource: HeroicResource<'ferocity'>;
-  growingFerocityTier: number;
+  furyState: FuryState;
   subclass?: FuryAspect;
 }
 
@@ -373,6 +402,7 @@ export interface TroubadourHero extends HeroBase {
   heroClass: 'troubadour';
   heroicResource: HeroicResource<'drama'>;
   activeRoutine: Routine | null;
+  secondaryRoutine: Routine | null; // For Medley (Virtuoso L5+)
   scenePartners: ScenePartner[];
   heroPartners: string[]; // Hero IDs bonded for Equal Billing
   subclass?: TroubadourClass;

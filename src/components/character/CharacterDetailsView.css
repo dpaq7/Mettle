@@ -200,7 +200,7 @@
 }
 
 /* ============================================
-   CULTURE SECTION - Purple Accent (4-Column Grid)
+   CULTURE SECTION - Purple Accent (3-Column Grid)
    ============================================ */
 
 .culture-section h2 {
@@ -211,45 +211,66 @@
   color: #ba68c8;
 }
 
+/* Main grid container */
 .culture-details {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  background: var(--ds-border-color);
-  margin: 0 1rem 1rem 1rem;
+  background: var(--ds-border-color, #3a3a3a);
+  margin: 1rem;
   padding: 0;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid var(--ds-border-color);
+  border: 1px solid var(--ds-border-color, #3a3a3a);
 }
 
+/* Individual culture aspect cells - matches skills-block pattern */
 .culture-aspect {
+  background: var(--ds-section-bg, #1a1a1a);
   padding: 0.75rem;
-  background: var(--ds-section-bg);
+  min-width: 0; /* Prevent grid blowout from long content */
 }
 
+/* Aspect header */
 .culture-aspect h4 {
   margin: 0 0 0.4rem 0;
   font-size: 0.8rem;
+  font-weight: 600;
+  color: #ba68c8;
+  line-height: 1.3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
+/* Base paragraph styling */
 .culture-aspect p {
   margin: 0;
   color: var(--text-muted, #888);
   font-size: 0.8rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
+/* Description text */
 .culture-aspect .aspect-description {
   color: var(--text-secondary, #b8b8b0);
   font-style: italic;
-  line-height: 1.4;
-  margin-bottom: 0.4rem;
 }
 
+/* Skills list */
 .culture-aspect .aspect-skills {
+  margin-top: 0.4rem;
   color: var(--accent-primary, #4de8b2);
   font-weight: 500;
   font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+/* Empty state - when aspect is missing */
+.culture-aspect--empty {
+  opacity: 0.5;
+  font-style: italic;
 }
 
 /* ============================================
@@ -369,61 +390,99 @@
 .kit-section h4 {
   color: #90caf9;
   font-size: 0.8rem;
+  margin: 0;
 }
 
+/* Stats grid - 4 columns */
 .kit-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: var(--ds-border-color);
-  margin: 0 1rem 1rem 1rem;
-  border-radius: 4px;
+  background: var(--ds-border-color, #3a3a3a);
+  margin: 0 1rem 0 1rem;
+  border-radius: 4px 4px 0 0; /* Rounded top corners only */
   overflow: hidden;
+  border: 1px solid var(--ds-border-color, #3a3a3a);
 }
 
+/* Individual stat cell */
 .kit-stat {
-  background: var(--ds-section-bg);
-  padding: 0.5rem;
+  background: var(--ds-section-bg, #1a1a1a);
+  padding: 0.5rem 0.25rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0; /* Prevent overflow */
 }
 
+/* Stat label */
 .kit-stat strong {
   display: block;
   color: #90caf9;
-  margin-bottom: 0.15rem;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
+/* Stat value */
+.kit-stat .stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #f5f5f0);
+}
+
+/* Equipment container - joins with kit-stats above */
 .kit-equipment {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: var(--ds-border-color);
-  margin: 0 1rem 1rem 1rem;
-  border-radius: 4px;
+  background: var(--ds-border-color, #3a3a3a);
+  margin: -1px 1rem 1rem 1rem; /* Negative top margin overlaps with kit-stats border */
+  border-radius: 0 0 4px 4px; /* Rounded bottom corners only */
   overflow: hidden;
+  border: 1px solid var(--ds-border-color, #3a3a3a);
 }
 
+/* Equipment row */
 .equipment-block {
   padding: 0.6rem 0.75rem;
-  background: var(--ds-section-bg);
+  background: var(--ds-section-bg, #1a1a1a);
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  flex-wrap: wrap; /* Allow wrapping for long lists */
+  min-width: 0;
 }
 
 .equipment-block h4 {
   margin: 0;
   white-space: nowrap;
   font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .equipment-block p {
   margin: 0;
   color: var(--text-secondary, #b8b8b0);
   font-size: 0.85rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Empty equipment block */
+.equipment-block--empty {
+  opacity: 0.5;
+  font-style: italic;
 }
 
 /* ============================================
@@ -628,10 +687,12 @@
     grid-template-columns: 1fr;
   }
 
+  /* Culture: 3 columns → 1 column */
   .culture-details {
     grid-template-columns: 1fr;
   }
 
+  /* Kit stats: 4 columns → 2 columns */
   .kit-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -656,6 +717,40 @@
 
   .career-details {
     flex-direction: column;
+  }
+
+  /* Culture: Reduce padding on mobile */
+  .culture-aspect {
+    padding: 0.5rem;
+  }
+
+  .culture-aspect h4 {
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .culture-aspect p {
+    font-size: 0.75rem;
+  }
+
+  /* Kit: Reduce padding on mobile */
+  .kit-stat {
+    padding: 0.4rem 0.2rem;
+  }
+
+  .kit-stat strong {
+    font-size: 0.55rem;
+  }
+
+  .kit-stat .stat-value {
+    font-size: 0.8rem;
+  }
+
+  /* Equipment: Stack vertically on small screens */
+  .equipment-block {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 }
 

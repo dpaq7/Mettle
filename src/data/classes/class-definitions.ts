@@ -41,6 +41,8 @@ export interface ClassDefinition {
 
   // Subclass info
   subclassName: string;
+  subclassNamePlural?: string; // e.g., "Domains" for Conduit
+  subclassSelectCount: number; // 1 for most, 2 for Conduit
   subclasses: SubclassOption[];
 }
 
@@ -66,10 +68,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Order',
+    subclassNamePlural: 'Orders',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'inquisitor', name: 'Inquisitor', description: 'Hunters of heresy and corruption' },
-      { id: 'templar', name: 'Templar', description: 'Holy warriors defending the faithful' },
-      { id: 'zealot', name: 'Zealot', description: 'Fervent crusaders consumed by righteous fury' },
+      { id: 'exorcist', name: 'Exorcist', description: 'Specialists in banishing supernatural threats and protecting the faithful from demonic corruption' },
+      { id: 'oracle', name: 'Oracle', description: 'Seers who channel divine visions to guide allies and reveal hidden truths' },
+      { id: 'paragon', name: 'Paragon', description: 'Living exemplars of their faith who inspire others through heroic deeds and unwavering conviction' },
     ],
   },
 
@@ -94,18 +98,21 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Domain',
+    subclassNamePlural: 'Domains',
+    subclassSelectCount: 2, // Conduit chooses TWO domains
     subclasses: [
-      { id: 'creation', name: 'Creation', description: 'Domain of making and artifice' },
-      { id: 'death', name: 'Death', description: 'Domain of endings and the beyond' },
-      { id: 'fate', name: 'Fate', description: 'Domain of destiny and prophecy' },
-      { id: 'knowledge', name: 'Knowledge', description: 'Domain of wisdom and secrets' },
-      { id: 'love', name: 'Love', description: 'Domain of devotion and connection' },
-      { id: 'nature', name: 'Nature', description: 'Domain of the wild and growth' },
-      { id: 'protection', name: 'Protection', description: 'Domain of shielding and safety' },
-      { id: 'storm', name: 'Storm', description: 'Domain of tempests and lightning' },
-      { id: 'sun', name: 'Sun', description: 'Domain of light and radiance' },
-      { id: 'trickery', name: 'Trickery', description: 'Domain of deception and cunning' },
-      { id: 'war', name: 'War', description: 'Domain of battle and conquest' },
+      { id: 'creation', name: 'Creation', description: 'Domain of crafting, building, and bringing forth new things' },
+      { id: 'death', name: 'Death', description: 'Domain of endings, transitions, and the peace of the grave' },
+      { id: 'fate', name: 'Fate', description: 'Domain of destiny, prophecy, and the threads that bind all things' },
+      { id: 'knowledge', name: 'Knowledge', description: 'Domain of learning, secrets, and the pursuit of truth' },
+      { id: 'life', name: 'Life', description: 'Domain of healing, growth, and vitality' },
+      { id: 'love', name: 'Love', description: 'Domain of bonds, passion, and connection between beings' },
+      { id: 'nature', name: 'Nature', description: 'Domain of the wild, beasts, and the green world' },
+      { id: 'protection', name: 'Protection', description: 'Domain of defense, guardianship, and warding' },
+      { id: 'storm', name: 'Storm', description: 'Domain of weather, lightning, and the fury of the skies' },
+      { id: 'sun', name: 'Sun', description: 'Domain of light, fire, and righteous flame' },
+      { id: 'trickery', name: 'Trickery', description: 'Domain of deception, luck, and cunning' },
+      { id: 'war', name: 'War', description: 'Domain of battle, strategy, and martial prowess' },
     ],
   },
 
@@ -129,7 +136,9 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     potencyCharacteristic: 'reason',
     fixedSkills: [],
     skillGroupChoices: [],
-    subclassName: 'Element',
+    subclassName: 'Specialization',
+    subclassNamePlural: 'Specializations',
+    subclassSelectCount: 1,
     subclasses: [
       { id: 'earth', name: 'Earth', description: 'Master of stone, metal, and geological forces' },
       { id: 'fire', name: 'Fire', description: 'Wielder of flame and destructive heat' },
@@ -159,10 +168,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Aspect',
+    subclassNamePlural: 'Primordial Aspects',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'berserker', name: 'Berserker', description: 'Reckless warrior who grows stronger when wounded' },
-      { id: 'reaver', name: 'Reaver', description: 'Vicious fighter who drains life from enemies' },
-      { id: 'stormwight', name: 'Stormwight', description: 'Lightning-touched warrior of primal storms' },
+      { id: 'berserker', name: 'Berserker', description: 'Masters of brute force who leverage Might to dominate the battlefield through raw physical power' },
+      { id: 'reaver', name: 'Reaver', description: 'Cunning warriors who use Agility to slide through enemies, ignoring terrain and exploiting openings' },
+      { id: 'stormwight', name: 'Stormwight', description: 'Elemental shapeshifters who channel primordial storms, transforming into beast forms' },
     ],
   },
 
@@ -187,10 +198,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Tradition',
+    subclassNamePlural: 'Traditions',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'chronopath', name: 'Chronopath', description: 'Time-bending warrior who manipulates temporal flow' },
-      { id: 'cloister', name: 'Cloister', description: 'Mental fortress specialist who shields allies' },
-      { id: 'manticore', name: 'Manticore', description: 'Aggressive null who punishes magical enemies' },
+      { id: 'chronokinetic', name: 'Chronokinetic', description: 'Manipulators of time who speed allies, slow enemies, and bend causality' },
+      { id: 'cryokinetic', name: 'Cryokinetic', description: 'Masters of entropy and cold who drain heat and freeze foes in place' },
+      { id: 'metakinetic', name: 'Metakinetic', description: 'Controllers of kinetic energy who redirect force and momentum' },
     ],
   },
 
@@ -215,11 +228,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'College',
+    subclassNamePlural: 'Colleges',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'black-ash', name: 'College of Black Ash', description: 'Masters of fire and smoke who burn from the shadows' },
-      { id: 'caustic-alchemy', name: 'College of Caustic Alchemy', description: 'Poisoners and alchemists who corrode their foes' },
-      { id: 'harlequin-mask', name: "College of the Harlequin's Mask", description: 'Illusionists who deceive and misdirect' },
-      { id: 'woven-darkness', name: 'College of Woven Darkness', description: 'Shadow-weavers who manipulate darkness itself' },
+      { id: 'black-ash', name: 'College of Black Ash', description: 'Teleporting assassins who move through ash and shadow to strike unseen' },
+      { id: 'caustic-alchemy', name: 'College of Caustic Alchemy', description: 'Poisoners and alchemists who coat their weapons with deadly substances' },
+      { id: 'harlequin-mask', name: 'College of the Harlequin Mask', description: 'Deceivers and tricksters who hide in plain sight using charm and misdirection' },
     ],
   },
 
@@ -244,6 +258,8 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: ['Magic', 'Strategy'],
     skillGroupChoices: [{ groups: ['intrigue', 'lore'], count: 2 }],
     subclassName: 'Circle',
+    subclassNamePlural: 'Circles',
+    subclassSelectCount: 1,
     subclasses: [
       { id: 'blight', name: 'Circle of Blight', description: 'Demonologist summoning demons from Abyssal Waste' },
       { id: 'graves', name: 'Circle of Graves', description: 'Necromancer raising undead from Necropolitan Ruin' },
@@ -273,10 +289,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Doctrine',
+    subclassNamePlural: 'Doctrines',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'insurgent', name: 'Insurgent', description: 'Guerrilla leader excelling at ambush and hit-and-run tactics' },
-      { id: 'mastermind', name: 'Mastermind', description: 'Strategic genius who positions allies for maximum effect' },
-      { id: 'vanguard', name: 'Vanguard Commander', description: 'Frontline leader who inspires through direct action' },
+      { id: 'insurgent', name: 'Insurgent', description: 'Guerrilla warfare specialists who excel at hit-and-run tactics and covert operations' },
+      { id: 'mastermind', name: 'Mastermind', description: 'Strategic geniuses who study enemies and exploit weaknesses with precise coordination' },
+      { id: 'vanguard', name: 'Vanguard', description: 'Frontline commanders who lead from the front, inspiring allies through personal valor' },
     ],
   },
 
@@ -301,10 +319,12 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     fixedSkills: [],
     skillGroupChoices: [],
     subclassName: 'Tradition',
+    subclassNamePlural: 'Traditions',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'empath', name: 'Empath', description: 'Mind-reader who manipulates emotions and perceptions' },
-      { id: 'metamorph', name: 'Metamorph', description: 'Shape-shifter who transforms their own body' },
-      { id: 'telekinetic', name: 'Telekinetic', description: 'Force manipulator who moves objects with thought' },
+      { id: 'chronopathy', name: 'Chronopathy', description: 'Seers of time who perceive past and future, accelerating allies and predicting enemy actions' },
+      { id: 'telekinesis', name: 'Telekinesis', description: 'Masters of psychic force who move objects and creatures with the power of their mind' },
+      { id: 'telepathy', name: 'Telepathy', description: 'Mind-readers who communicate silently, sense thoughts, and project psychic attacks' },
     ],
   },
 
@@ -328,11 +348,13 @@ export const classDefinitions: Record<HeroClass, ClassDefinition> = {
     potencyCharacteristic: 'presence',
     fixedSkills: [],
     skillGroupChoices: [],
-    subclassName: 'Class',
+    subclassName: 'Class Act',
+    subclassNamePlural: 'Class Acts',
+    subclassSelectCount: 1,
     subclasses: [
-      { id: 'dancer', name: 'Dancer', description: 'Graceful performer who moves allies and inspires through motion' },
-      { id: 'duelist', name: 'Duelist', description: 'Swashbuckling swordfighter with dramatic flair' },
-      { id: 'wordsmith', name: 'Wordsmith', description: 'Orator and poet who weaponizes language itself' },
+      { id: 'auteur', name: 'Auteur', description: 'Storytellers who manipulate the narrative of battle, controlling the sequence of events' },
+      { id: 'duelist', name: 'Duelist', description: 'Acrobatic swashbucklers who find drama in movement and tandem action' },
+      { id: 'virtuoso', name: 'Virtuoso', description: 'Musical performers who wield magic through song and instrumental performance' },
     ],
   },
 };
@@ -369,4 +391,24 @@ export function getSubclassOptions(heroClass: HeroClass): SubclassOption[] {
 // Get subclass display name (e.g., "Circle", "Domain", "Element")
 export function getSubclassTypeName(heroClass: HeroClass): string {
   return classDefinitions[heroClass].subclassName;
+}
+
+// Get subclass plural name (e.g., "Circles", "Domains", "Elements")
+export function getSubclassTypeNamePlural(heroClass: HeroClass): string {
+  return classDefinitions[heroClass].subclassNamePlural || `${classDefinitions[heroClass].subclassName}s`;
+}
+
+// Get how many subclasses can be selected (1 for most, 2 for Conduit)
+export function getSubclassSelectCount(heroClass: HeroClass): number {
+  return classDefinitions[heroClass].subclassSelectCount;
+}
+
+// Check if class requires multiple subclass selections
+export function requiresMultipleSubclasses(heroClass: HeroClass): boolean {
+  return classDefinitions[heroClass].subclassSelectCount > 1;
+}
+
+// Get a specific subclass option by ID
+export function getSubclassById(heroClass: HeroClass, subclassId: string): SubclassOption | undefined {
+  return classDefinitions[heroClass].subclasses.find(s => s.id === subclassId);
 }

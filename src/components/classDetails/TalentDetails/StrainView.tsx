@@ -7,17 +7,17 @@ import './StrainView.css';
 
 // Tradition descriptions from Draw Steel rules
 const TRADITION_INFO: Record<TalentTradition, { name: string; description: string }> = {
-  empath: {
-    name: 'Empath',
-    description: 'Mind-reader who manipulates emotions and perceptions of others.',
+  chronopathy: {
+    name: 'Chronopathy',
+    description: 'Seer of time who perceives past and future, accelerating allies.',
   },
-  metamorph: {
-    name: 'Metamorph',
-    description: 'Shape-shifter who transforms their own body to adapt to any situation.',
+  telekinesis: {
+    name: 'Telekinesis',
+    description: 'Master of psychic force who moves objects and creatures with thought.',
   },
-  telekinetic: {
-    name: 'Telekinetic',
-    description: 'Force manipulator who moves objects and creatures with thought alone.',
+  telepathy: {
+    name: 'Telepathy',
+    description: 'Mind-reader who communicates silently and projects psychic attacks.',
   },
 };
 

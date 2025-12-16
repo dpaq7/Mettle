@@ -59,6 +59,88 @@
   box-shadow: 0 0 8px var(--accent-dim);
 }
 
+/* ============================================
+   SUBCLASS TAGS - Universal for all classes
+   ============================================ */
+
+/* Default subclass tag */
+.identity .tag.subclass {
+  background: var(--bg-card);
+  border-color: var(--accent-dim);
+  color: var(--accent-primary);
+}
+
+/* Censor - Holy gold */
+.identity .tag.subclass-censor {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+}
+
+/* Conduit - Divine white/gold */
+.identity .tag.subclass-conduit {
+  background: rgba(255, 248, 220, 0.1);
+  border-color: rgba(255, 248, 220, 0.4);
+  color: #fff8dc;
+}
+
+/* Elementalist - Elemental purple */
+.identity .tag.subclass-elementalist {
+  background: rgba(147, 112, 219, 0.1);
+  border-color: rgba(147, 112, 219, 0.4);
+  color: #9370db;
+}
+
+/* Fury - Primal red/orange */
+.identity .tag.subclass-fury {
+  background: rgba(255, 99, 71, 0.1);
+  border-color: rgba(255, 99, 71, 0.4);
+  color: #ff6347;
+}
+
+/* Null - Psionic cyan */
+.identity .tag.subclass-null {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.4);
+  color: #00ffff;
+}
+
+/* Shadow - Dark purple */
+.identity .tag.subclass-shadow {
+  background: rgba(75, 0, 130, 0.15);
+  border-color: rgba(138, 43, 226, 0.4);
+  color: #9932cc;
+}
+
+/* Summoner - Essence gold (matching existing circle style) */
+.identity .tag.subclass-summoner {
+  background: var(--color-xp-dim);
+  border-color: rgba(232, 200, 68, 0.4);
+  color: var(--color-xp);
+}
+
+/* Tactician - Strategic blue */
+.identity .tag.subclass-tactician {
+  background: rgba(70, 130, 180, 0.1);
+  border-color: rgba(70, 130, 180, 0.4);
+  color: #4682b4;
+}
+
+/* Talent - Psychic magenta */
+.identity .tag.subclass-talent {
+  background: rgba(255, 0, 255, 0.1);
+  border-color: rgba(255, 0, 255, 0.4);
+  color: #ff00ff;
+}
+
+/* Troubadour - Dramatic pink/rose */
+.identity .tag.subclass-troubadour {
+  background: rgba(255, 105, 180, 0.1);
+  border-color: rgba(255, 105, 180, 0.4);
+  color: #ff69b4;
+}
+
+/* Legacy circle style - now handled by subclass-summoner */
 .identity .circle {
   background: var(--color-xp-dim);
   border-color: rgba(232, 200, 68, 0.4);
@@ -938,6 +1020,16 @@
   }
 }
 
+@media (max-width: 600px) {
+  /* Truncate long subclass names on small screens */
+  .identity .tag.subclass {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 480px) {
   .char .val {
     min-width: 36px;
@@ -954,5 +1046,10 @@
   .identity .tag {
     font-size: 0.6rem;
     padding: 0.15rem 0.35rem;
+  }
+
+  /* Even more aggressive truncation on very small screens */
+  .identity .tag.subclass {
+    max-width: 70px;
   }
 }

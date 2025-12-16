@@ -1,0 +1,163 @@
+/* ============================================
+   SUBCLASS SELECTOR STYLES
+   ============================================ */
+
+.subclass-selection-step {
+  width: 100%;
+}
+
+/* Selection status for multi-select */
+.selection-status {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Grid layout for subclass cards */
+.subclass-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Classes with exactly 3 subclasses - nice row layout */
+.subclass-grid.three-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Multi-select grid (Conduit with 12 domains) */
+.subclass-grid.multi-select {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 1000px) {
+  .subclass-grid.three-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .subclass-grid,
+  .subclass-grid.three-cols,
+  .subclass-grid.multi-select {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   SUBCLASS CARD STYLES
+   ============================================ */
+
+.subclass-card {
+  position: relative;
+  background: var(--bg-medium);
+  border: 2px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.subclass-card:hover:not(.disabled) {
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.subclass-card.selected {
+  border-color: var(--accent-bright);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 20px rgba(var(--accent-rgb, 255, 193, 7), 0.15);
+}
+
+.subclass-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subclass-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Multi-select cards are more compact */
+.multi-select .subclass-card {
+  padding: 1rem;
+}
+
+/* Header with name */
+.subclass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.subclass-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.multi-select .subclass-name {
+  font-size: 1.1rem;
+}
+
+.subclass-card.selected .subclass-name {
+  color: var(--accent-bright);
+}
+
+/* Description */
+.subclass-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.multi-select .subclass-description {
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   SELECTED STATE
+   ============================================ */
+
+.selected-indicator {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--accent-primary);
+  color: var(--bg-darkest);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Multi-select checkmark is more compact */
+.multi-select .selected-indicator {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.9rem;
+}

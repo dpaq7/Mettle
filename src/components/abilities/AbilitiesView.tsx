@@ -9,6 +9,7 @@ import { ActionType, ActionTag } from '../../types/action';
 import AbilityCard from '../shared/AbilityCard';
 import ActionCard from '../ui/ActionCard';
 import { ClassAbilityWidget } from './classWidgets';
+import LevelProgressionSection from './LevelProgressionSection';
 import './AbilitiesView.css';
 
 type ReferenceSection = 'overview' | 'moves' | 'maneuvers' | 'triggered' | 'commands' | null;
@@ -276,6 +277,9 @@ const AbilitiesView: React.FC = () => {
         </div>
         )}
       </section>
+
+      {/* Level Progression Section */}
+      <LevelProgressionSection hero={hero} />
     </div>
   );
 };

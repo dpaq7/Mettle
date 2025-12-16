@@ -7,17 +7,17 @@ interface TroubadourWidgetProps {
 }
 
 const CLASS_INFO: Record<TroubadourClass, { name: string; description: string }> = {
-  dancer: {
-    name: 'Dancer',
-    description: 'Graceful performer whose movements inspire and protect allies.',
+  auteur: {
+    name: 'Auteur',
+    description: 'Storyteller and director who manipulates battlefield positioning.',
   },
   duelist: {
     name: 'Duelist',
-    description: 'Dramatic fighter who turns combat into a theatrical performance.',
+    description: 'Acrobatic swordfighter with dramatic flair and tandem attacks.',
   },
-  wordsmith: {
-    name: 'Wordsmith',
-    description: 'Silver-tongued orator whose words can heal or wound.',
+  virtuoso: {
+    name: 'Virtuoso',
+    description: 'Musical performer whose songs empower allies and strike enemies.',
   },
 };
 

@@ -130,12 +130,236 @@ const migrateSubclassFields = (hero: Record<string, unknown>): Record<string, un
 };
 
 /**
+ * Migrate Troubadour-specific data
+ * - Converts old subclass values (dancer/wordsmith) to new ones (virtuoso/auteur)
+ * - Adds secondaryRoutine field if missing
+ */
+const migrateTroubadourData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'troubadour') return hero;
+
+  const migrated = { ...hero };
+
+  // Migrate old subclass values to new ones
+  const subclassMapping: Record<string, string> = {
+    'dancer': 'virtuoso',    // Dancer -> Virtuoso (both focus on performance/movement)
+    'wordsmith': 'auteur',   // Wordsmith -> Auteur (both focus on narrative)
+    'duelist': 'duelist',    // Duelist stays the same
+  };
+
+  if (migrated.subclass && typeof migrated.subclass === 'string') {
+    const oldSubclass = migrated.subclass.toLowerCase();
+    if (subclassMapping[oldSubclass]) {
+      migrated.subclass = subclassMapping[oldSubclass];
+    }
+  }
+
+  // Add secondaryRoutine if missing
+  if (!('secondaryRoutine' in migrated)) {
+    migrated.secondaryRoutine = null;
+  }
+
+  return migrated;
+};
+
+/**
+ * Migrate Talent-specific data
+ * - Converts old subclass values to Draw Steel SRD values
+ * - empath -> telepathy
+ * - metamorph -> chronopathy
+ * - telekinetic -> telekinesis
+ */
+const migrateTalentData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'talent') return hero;
+
+  const migrated = { ...hero };
+
+  const subclassMapping: Record<string, string> = {
+    'empath': 'telepathy',
+    'metamorph': 'chronopathy',
+    'telekinetic': 'telekinesis',
+    // Already correct values
+    'chronopathy': 'chronopathy',
+    'telekinesis': 'telekinesis',
+    'telepathy': 'telepathy',
+  };
+
+  if (migrated.subclass && typeof migrated.subclass === 'string') {
+    const oldSubclass = migrated.subclass.toLowerCase();
+    if (subclassMapping[oldSubclass]) {
+      migrated.subclass = subclassMapping[oldSubclass];
+    }
+  }
+
+  return migrated;
+};
+
+/**
+ * Migrate Censor-specific data
+ * - Converts old subclass values to Draw Steel SRD values
+ * - inquisitor -> exorcist
+ * - templar -> paragon
+ * - zealot -> oracle
+ */
+const migrateCensorData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'censor') return hero;
+
+  const migrated = { ...hero };
+
+  const subclassMapping: Record<string, string> = {
+    'inquisitor': 'exorcist',
+    'templar': 'paragon',
+    'zealot': 'oracle',
+    // Already correct values
+    'exorcist': 'exorcist',
+    'oracle': 'oracle',
+    'paragon': 'paragon',
+  };
+
+  if (migrated.subclass && typeof migrated.subclass === 'string') {
+    const oldSubclass = migrated.subclass.toLowerCase();
+    if (subclassMapping[oldSubclass]) {
+      migrated.subclass = subclassMapping[oldSubclass];
+    }
+  }
+
+  return migrated;
+};
+
+/**
+ * Migrate Shadow-specific data
+ * - Converts old subclass values to Draw Steel SRD values
+ * - Removes woven-darkness (was not in final SRD)
+ */
+const migrateShadowData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'shadow') return hero;
+
+  const migrated = { ...hero };
+
+  const subclassMapping: Record<string, string> = {
+    'black-ash': 'black-ash',
+    'caustic-alchemy': 'caustic-alchemy',
+    'harlequin-mask': 'harlequin-mask',
+    // woven-darkness was removed from final SRD - map to black-ash as default
+    'woven-darkness': 'black-ash',
+  };
+
+  if (migrated.subclass && typeof migrated.subclass === 'string') {
+    const oldSubclass = migrated.subclass.toLowerCase();
+    if (subclassMapping[oldSubclass]) {
+      migrated.subclass = subclassMapping[oldSubclass];
+    }
+  }
+
+  return migrated;
+};
+
+/**
+ * Migrate Null-specific data
+ * - Converts old subclass/tradition values to Draw Steel SRD values
+ * - chronopath -> chronokinetic
+ * - cloister -> cryokinetic (closest match)
+ * - manticore -> metakinetic (closest match)
+ */
+const migrateNullData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'null') return hero;
+
+  const migrated = { ...hero };
+
+  const subclassMapping: Record<string, string> = {
+    'chronopath': 'chronokinetic',
+    'cloister': 'cryokinetic',
+    'manticore': 'metakinetic',
+    // Already correct values
+    'chronokinetic': 'chronokinetic',
+    'cryokinetic': 'cryokinetic',
+    'metakinetic': 'metakinetic',
+  };
+
+  if (migrated.subclass && typeof migrated.subclass === 'string') {
+    const oldSubclass = migrated.subclass.toLowerCase();
+    if (subclassMapping[oldSubclass]) {
+      migrated.subclass = subclassMapping[oldSubclass];
+    }
+  }
+
+  return migrated;
+};
+
+/**
+ * Migrate Fury-specific data
+ * - Initializes furyState if missing
+ * - Ensures all furyState fields are present
+ */
+const migrateFuryData = (hero: Record<string, unknown>): Record<string, unknown> => {
+  if (hero.heroClass !== 'fury') return hero;
+
+  const migrated = { ...hero };
+
+  // Get aspect from subclass or existing furyState
+  const existingFuryState = migrated.furyState as Record<string, unknown> | undefined;
+  const aspect = existingFuryState?.aspect || migrated.subclass || 'berserker';
+
+  // Initialize furyState if missing
+  if (!migrated.furyState) {
+    migrated.furyState = {
+      aspect,
+      stormwightKit: undefined,
+      primordialStorm: undefined,
+      currentForm: 'humanoid',
+      growingFerocity: {
+        tookDamageThisRound: false,
+        becameWindedThisEncounter: false,
+        becameDyingThisEncounter: false,
+      },
+      primordialPower: 0,
+    };
+  } else {
+    // Ensure all fields are present in existing furyState
+    const furyState = migrated.furyState as Record<string, unknown>;
+
+    if (!furyState.aspect) {
+      furyState.aspect = aspect;
+    }
+    if (!furyState.currentForm) {
+      furyState.currentForm = 'humanoid';
+    }
+    if (!furyState.growingFerocity) {
+      furyState.growingFerocity = {
+        tookDamageThisRound: false,
+        becameWindedThisEncounter: false,
+        becameDyingThisEncounter: false,
+      };
+    }
+    if (furyState.primordialPower === undefined) {
+      furyState.primordialPower = 0;
+    }
+
+    migrated.furyState = furyState;
+  }
+
+  // Remove legacy growingFerocityTier if present
+  if ('growingFerocityTier' in migrated) {
+    delete migrated.growingFerocityTier;
+  }
+
+  return migrated;
+};
+
+/**
  * Migrate older character data to include new fields and refresh portfolio data
  * This handles both legacy SummonerHero and already-migrated Hero data
  */
 const migrateCharacter = (character: Partial<SummonerHero> | Partial<Hero>): Hero => {
   // First migrate subclass fields to standardized format
   let migrated = migrateSubclassFields(character as Record<string, unknown>);
+
+  // Apply class-specific migrations
+  migrated = migrateTroubadourData(migrated);
+  migrated = migrateTalentData(migrated);
+  migrated = migrateCensorData(migrated);
+  migrated = migrateShadowData(migrated);
+  migrated = migrateNullData(migrated);
+  migrated = migrateFuryData(migrated);
 
   // Check if this is already a new Hero type (has heroClass field)
   if ('heroClass' in migrated && migrated.heroClass) {

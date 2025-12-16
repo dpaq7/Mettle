@@ -2,9 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { getProgressionForLevel, getCircleUpgrades } from '../../data/progression';
 import { summonerAbilitiesByLevel } from '../../data/abilities/summoner-abilities';
+import {
+  getFuryProgressionWithAspect,
+  calculateFuryStamina,
+} from '../../data/fury/progression';
+import { furyAbilities, getAspectAbilitiesByCost } from '../../data/fury/abilities';
 import { LevelFeature, ProgressionChoices, WardType } from '../../types/progression';
 import { Characteristic } from '../../types/common';
-import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
+import { isSummonerHero, isFuryHero, SummonerHeroV2, FuryHero } from '../../types/hero';
 import { Ability } from '../../types';
 import './LevelUp.css';
 
@@ -18,21 +23,51 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
 
   if (!hero) return null;
 
-  // Check if Summoner for circle-specific features
+  // Check hero class for class-specific features
   const isSummoner = isSummonerHero(hero);
+  const isFury = isFuryHero(hero);
   const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
+  const furyHero = isFury ? (hero as FuryHero) : null;
 
   const nextLevel = hero.level + 1;
 
-  // Calculate stamina changes
+  // Calculate stamina changes - CLASS-SPECIFIC
   const currentStamina = hero.stamina.max;
-  const baseStamina = 15;
   const kitStamina = hero.kit?.stamina || 0;
-  const levelBonus = nextLevel >= 2 ? nextLevel * 6 : 0;
-  const newMaxStamina = baseStamina + kitStamina + levelBonus;
 
-  // Get new abilities for this level
-  const newAbilities = summonerAbilitiesByLevel[nextLevel] || [];
+  let newMaxStamina: number;
+  if (isFury) {
+    // Fury: Base 21 + 9 per level after 1
+    newMaxStamina = calculateFuryStamina(nextLevel, kitStamina);
+  } else {
+    // Default (Summoner): Base 15 + 6 per level
+    const baseStamina = 15;
+    const levelBonus = nextLevel >= 2 ? nextLevel * 6 : 0;
+    newMaxStamina = baseStamina + kitStamina + levelBonus;
+  }
+
+  // Get new abilities for this level (class-specific)
+  let newAbilities: Ability[] = [];
+  if (isSummoner) {
+    newAbilities = summonerAbilitiesByLevel[nextLevel] || [];
+  } else if (isFury) {
+    // For Fury, abilities are gained through progression choices, not automatically
+    // But we can show what abilities become available at this level
+    const abilityLevelMap: Record<number, { cost: number; label: string }[]> = {
+      1: [{ cost: 0, label: 'Signature' }, { cost: 3, label: '3-Ferocity' }, { cost: 5, label: '5-Ferocity' }],
+      3: [{ cost: 7, label: '7-Ferocity' }],
+      5: [{ cost: 9, label: '9-Ferocity' }],
+      8: [{ cost: 11, label: '11-Ferocity' }],
+    };
+    // Get abilities that unlock at this level
+    if (abilityLevelMap[nextLevel]) {
+      const costs = abilityLevelMap[nextLevel];
+      costs.forEach(({ cost }) => {
+        const abilities = furyAbilities.filter(a => (a.essenceCost || 0) === cost);
+        newAbilities.push(...abilities);
+      });
+    }
+  }
 
   if (nextLevel > 10) {
     return (
@@ -46,11 +81,24 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
     );
   }
 
-  const progression = getProgressionForLevel(nextLevel);
+  // Get progression based on hero class
+  const progression = useMemo(() => {
+    if (isFury && furyHero?.subclass) {
+      return getFuryProgressionWithAspect(nextLevel, furyHero.subclass);
+    }
+    return getProgressionForLevel(nextLevel);
+  }, [nextLevel, isFury, furyHero?.subclass]);
 
-  // Filter circle-specific upgrades for current circle (Summoner only)
+  // Filter class-specific upgrades for current subclass
   const filteredFeatures = useMemo(() => {
     if (!progression) return [];
+
+    // Fury: already has aspect-specific features from getFuryProgressionWithAspect
+    if (isFury) {
+      return progression.features;
+    }
+
+    // Summoner: filter circle-specific upgrades
     return progression.features.map(feature => {
       if (feature.category === 'circle-upgrade' && summonerHero?.subclass) {
         const circleChoices = getCircleUpgrades(summonerHero.subclass);
@@ -65,7 +113,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
       }
       return feature;
     });
-  }, [progression, summonerHero?.subclass]);
+  }, [progression, summonerHero?.subclass, isFury]);
 
   const automaticFeatures = filteredFeatures.filter(f => f.type === 'automatic');
   const choiceFeatures = filteredFeatures.filter(f => f.type === 'choice');
@@ -96,6 +144,7 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
         const choiceId = choices[feature.id];
 
         switch (feature.category) {
+          // Summoner categories
           case 'ward':
             newProgressionChoices.ward = choiceId as WardType;
             break;
@@ -117,6 +166,25 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
           case 'stat-boost':
             newProgressionChoices.statBoost = choiceId as Characteristic;
             break;
+          // Fury categories
+          case '7-ferocity':
+            newProgressionChoices.sevenFerocityAbility = choiceId;
+            break;
+          case '9-ferocity':
+            newProgressionChoices.nineFerocityAbility = choiceId;
+            break;
+          case '11-ferocity':
+            newProgressionChoices.elevenFerocityAbility = choiceId;
+            break;
+          case 'aspect-5-ferocity':
+            newProgressionChoices.aspectFiveFerocity = choiceId;
+            break;
+          case 'aspect-9-ferocity':
+            newProgressionChoices.aspectNineFerocity = choiceId;
+            break;
+          case 'aspect-11-ferocity':
+            newProgressionChoices.aspectElevenFerocity = choiceId;
+            break;
         }
       }
     });
@@ -130,33 +198,58 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
     if (progression?.statChanges) {
       const sc = progression.statChanges;
 
-      // Update characteristics
-      if (sc.reason !== undefined) {
-        updates.characteristics = {
-          ...hero.characteristics,
-          reason: sc.reason,
-        };
-      }
+      // Handle Fury-specific stat changes
+      if (isFury) {
+        // Level 4 and 10: Set Might and Agility to specific values
+        if (sc.might !== undefined && sc.agility !== undefined) {
+          updates.characteristics = {
+            ...hero.characteristics,
+            might: sc.might,
+            agility: sc.agility,
+          };
+        }
 
-      if (sc.allStats !== undefined) {
-        updates.characteristics = {
-          ...hero.characteristics,
-          ...(updates.characteristics || {}),
-          might: Math.min(4, hero.characteristics.might + sc.allStats),
-          agility: Math.min(4, hero.characteristics.agility + sc.allStats),
-          reason: Math.min(4, (updates.characteristics?.reason || hero.characteristics.reason) + sc.allStats),
-          intuition: Math.min(4, hero.characteristics.intuition + sc.allStats),
-          presence: Math.min(4, hero.characteristics.presence + sc.allStats),
-        };
-      }
+        // Level 7: All stats +1 (max 4)
+        if (sc.allStats !== undefined) {
+          const baseChars = updates.characteristics || hero.characteristics;
+          updates.characteristics = {
+            ...baseChars,
+            might: Math.min(4, baseChars.might + sc.allStats),
+            agility: Math.min(4, baseChars.agility + sc.allStats),
+            reason: Math.min(4, baseChars.reason + sc.allStats),
+            intuition: Math.min(4, baseChars.intuition + sc.allStats),
+            presence: Math.min(4, baseChars.presence + sc.allStats),
+          };
+        }
+      } else {
+        // Summoner stat changes
+        if (sc.reason !== undefined) {
+          updates.characteristics = {
+            ...hero.characteristics,
+            reason: sc.reason,
+          };
+        }
 
-      // Apply stat boost choice
-      if (newProgressionChoices.statBoost && nextLevel === 4) {
-        const stat = newProgressionChoices.statBoost;
-        updates.characteristics = {
-          ...(updates.characteristics || hero.characteristics),
-          [stat]: Math.min(4, (updates.characteristics?.[stat] || hero.characteristics[stat]) + 1),
-        };
+        if (sc.allStats !== undefined) {
+          updates.characteristics = {
+            ...hero.characteristics,
+            ...(updates.characteristics || {}),
+            might: Math.min(4, hero.characteristics.might + sc.allStats),
+            agility: Math.min(4, hero.characteristics.agility + sc.allStats),
+            reason: Math.min(4, (updates.characteristics?.reason || hero.characteristics.reason) + sc.allStats),
+            intuition: Math.min(4, hero.characteristics.intuition + sc.allStats),
+            presence: Math.min(4, hero.characteristics.presence + sc.allStats),
+          };
+        }
+
+        // Apply stat boost choice (Summoner Level 4)
+        if (newProgressionChoices.statBoost && nextLevel === 4) {
+          const stat = newProgressionChoices.statBoost;
+          updates.characteristics = {
+            ...(updates.characteristics || hero.characteristics),
+            [stat]: Math.min(4, (updates.characteristics?.[stat] || hero.characteristics[stat]) + 1),
+          };
+        }
       }
     }
 
@@ -177,9 +270,22 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
     const sc = progression.statChanges;
     const changes: string[] = [];
 
+    // Fury-specific stat previews
+    if (isFury) {
+      if (sc.might !== undefined && sc.might !== hero.characteristics.might) {
+        changes.push(`Might: ${hero.characteristics.might} → ${sc.might}`);
+      }
+      if (sc.agility !== undefined && sc.agility !== hero.characteristics.agility) {
+        changes.push(`Agility: ${hero.characteristics.agility} → ${sc.agility}`);
+      }
+    }
+
+    // Summoner-specific stat previews
     if (sc.reason !== undefined && sc.reason !== hero.characteristics.reason) {
       changes.push(`Reason: ${hero.characteristics.reason} → ${sc.reason}`);
     }
+
+    // Shared stat changes
     if (sc.allStats !== undefined) {
       changes.push(`All Stats: +${sc.allStats}`);
     }

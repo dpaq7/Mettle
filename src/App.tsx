@@ -18,6 +18,8 @@ import CollapsibleHeader from './components/ui/CollapsibleHeader';
 import { ThemeSelector } from './components/theme';
 import { StrainView } from './components/classDetails/TalentDetails/StrainView';
 import { NullFieldView } from './components/classDetails/NullDetails/NullFieldView';
+import { RoutinesView } from './components/classDetails/TroubadourDetails';
+import { FerocityTrackerView } from './components/classDetails/FuryDetails';
 import { getTabsForClass, ViewType } from './data/class-tabs';
 import { HeroClass } from './types/hero';
 import './App.css';
@@ -240,8 +242,14 @@ function App() {
         {/* Null Field View */}
         {activeView === 'nullfield' && <NullFieldView />}
 
+        {/* Troubadour Routines View */}
+        {activeView === 'routines' && <RoutinesView />}
+
+        {/* Fury Ferocity View */}
+        {activeView === 'ferocity' && <FerocityTrackerView />}
+
         {/* Placeholder for other class-specific views */}
-        {['judgment', 'domain', 'persistent', 'ferocity', 'college', 'tactics', 'routines'].includes(activeView) && (
+        {['judgment', 'domain', 'persistent', 'college', 'tactics'].includes(activeView) && (
           <div className="placeholder-view">
             <h2>{tabs.find(t => t.id === activeView)?.label || 'Class Feature'}</h2>
             <p className="coming-soon">This class-specific feature is coming soon.</p>

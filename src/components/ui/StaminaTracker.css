@@ -180,11 +180,47 @@
   box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
 }
 
+/* Dead indicator - skull/death state */
+.status-diamond.dead {
+  cursor: default; /* Not clickable */
+}
+
+.status-diamond.dead.active {
+  background: #1a1a1a;
+  border-color: #666;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), inset 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
 .status-label {
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-muted);
+}
+
+/* Death warning banner */
+.death-warning {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
+  border: 2px solid #660000;
+  border-radius: 4px;
+  color: #ff4444;
+  font-weight: bold;
+  font-size: 0.75rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  animation: death-pulse 2s ease-in-out infinite;
+}
+
+@keyframes death-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(102, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(102, 0, 0, 0.8), 0 0 25px rgba(102, 0, 0, 0.4);
+  }
 }
 
 /* === RESPONSIVE === */

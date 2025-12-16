@@ -33,6 +33,7 @@ interface ResourcePanelProps {
   onUseRecovery?: () => void;
   onEssenceChange?: (current: number) => void;
   onSurgesChange?: (current: number) => void;
+  onDyingTriggered?: () => void; // Called when hero becomes dying (for bleeding condition)
   hideSurges?: boolean;
   hideEssence?: boolean;
   className?: string;
@@ -53,6 +54,7 @@ const ResourcePanel: React.FC<ResourcePanelProps> = ({
   onUseRecovery,
   onEssenceChange,
   onSurgesChange,
+  onDyingTriggered,
   hideSurges = false,
   hideEssence = false,
   className = '',
@@ -73,6 +75,7 @@ const ResourcePanel: React.FC<ResourcePanelProps> = ({
           onTemporaryChange={(v) => onStaminaChange({ temporary: v })}
           onWindedChange={(v) => onStaminaChange({ winded: v })}
           onDyingChange={(v) => onStaminaChange({ dying: v })}
+          onDyingTriggered={onDyingTriggered}
         />
       </div>
 

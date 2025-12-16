@@ -12,8 +12,12 @@ import { NULL_TRADITIONS, TraditionData } from '../../data/null/traditions';
 import { PSIONIC_AUGMENTATIONS, AugmentationData, getAugmentationBonuses } from '../../data/null/augmentations';
 import { NullTradition, PsionicAugmentation } from '../../types/hero';
 import { skills, getSkillsByGroup, SkillGroup, Skill, isSkillGroup, findSkillByName } from '../../data/skills';
-import { classDefinitions, getClassRoleColor, getSubclassTypeName } from '../../data/classes/class-definitions';
+import { classDefinitions, getClassRoleColor, getSubclassTypeName, requiresMultipleSubclasses, getSubclassSelectCount } from '../../data/classes/class-definitions';
 import ClassSelector from './ClassSelector';
+import SubclassSelector from './SubclassSelector';
+import FuryAspectSelector from './FuryAspectSelector';
+import { TroubadourClass, FuryAspect, StormwightKit, ConduitDomain } from '../../types/hero';
+import { getPrimordialStormForKit } from '../../data/fury/stormwight-kits';
 import {
   generateId,
   calculateMaxStamina,
@@ -25,7 +29,7 @@ import {
   calculateEssencePerTurn,
 } from '../../utils/calculations';
 
-type Step = 'name' | 'class' | 'subclass' | 'ancestry' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'nullTradition' | 'psionicAugmentation' | 'kit' | 'characteristics';
+type Step = 'name' | 'class' | 'subclass' | 'furyAspect' | 'stormwightKit' | 'ancestry' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'nullTradition' | 'psionicAugmentation' | 'kit' | 'characteristics';
 
 // Base steps that all classes share
 const BASE_STEPS: Step[] = ['name', 'class', 'ancestry', 'culture', 'cultureSkills', 'career', 'careerSkills', 'languages', 'kit', 'characteristics'];
@@ -36,28 +40,45 @@ const SUMMONER_STEPS: Step[] = ['circle', 'signatureMinions', 'formation'];
 // Null-specific steps (inserted after languages)
 const NULL_STEPS: Step[] = ['nullTradition', 'psionicAugmentation'];
 
+// Fury-specific steps (aspect and optional kit after class selection)
+const FURY_STEPS: Step[] = ['furyAspect'];
+
+// Generic subclass step (used by most classes)
+const SUBCLASS_STEPS: Step[] = ['subclass'];
+
 // Get steps for a specific class
 function getStepsForClass(heroClass: HeroClass | null): Step[] {
   if (!heroClass) return ['name', 'class'];
 
+  // Start with base steps
+  const steps = [...BASE_STEPS];
+
   if (heroClass === 'summoner') {
-    // Insert summoner steps after languages, before kit
-    const steps = [...BASE_STEPS];
+    // Summoner uses 'circle' instead of 'subclass' - insert after languages
     const langIndex = steps.indexOf('languages');
     steps.splice(langIndex + 1, 0, ...SUMMONER_STEPS);
     return steps;
   }
 
   if (heroClass === 'null') {
-    // Insert null steps after languages, before kit
-    const steps = [...BASE_STEPS];
+    // Null uses 'nullTradition' step (which IS its subclass) after languages
     const langIndex = steps.indexOf('languages');
     steps.splice(langIndex + 1, 0, ...NULL_STEPS);
     return steps;
   }
 
-  // For other classes, use base steps (subclass can be added later)
-  return BASE_STEPS;
+  if (heroClass === 'fury') {
+    // Fury uses 'furyAspect' instead of generic 'subclass'
+    const classIndex = steps.indexOf('class');
+    steps.splice(classIndex + 1, 0, ...FURY_STEPS);
+    return steps;
+  }
+
+  // All other classes: add subclass step after class selection
+  // This includes: Censor, Conduit, Elementalist, Shadow, Tactician, Talent, Troubadour
+  const classIndex = steps.indexOf('class');
+  steps.splice(classIndex + 1, 0, ...SUBCLASS_STEPS);
+  return steps;
 }
 
 // Legacy constant for backward compatibility
@@ -97,6 +118,15 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
   // Null-specific state
   const [selectedNullTradition, setSelectedNullTradition] = useState<NullTradition | null>(null);
   const [selectedPsionicAugmentation, setSelectedPsionicAugmentation] = useState<PsionicAugmentation | null>(null);
+
+  // Fury-specific state
+  const [selectedFuryAspect, setSelectedFuryAspect] = useState<FuryAspect | null>(null);
+  const [selectedStormwightKit, setSelectedStormwightKit] = useState<StormwightKit | null>(null);
+
+  // Generic subclass state (used by most classes)
+  const [selectedSubclass, setSelectedSubclass] = useState<string | null>(null);
+  // Multi-subclass state for Conduit (2 domains)
+  const [selectedSubclasses, setSelectedSubclasses] = useState<string[]>([]);
 
   // Get the steps for the current class selection
   const currentSteps = useMemo(() => getStepsForClass(selectedClass), [selectedClass]);
@@ -261,6 +291,27 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
     }
   }, [selectedClass]);
 
+  // Reset Fury-specific selections when class changes away from Fury
+  useEffect(() => {
+    if (selectedClass !== 'fury') {
+      setSelectedFuryAspect(null);
+      setSelectedStormwightKit(null);
+    }
+  }, [selectedClass]);
+
+  // Reset subclass selections when class changes
+  useEffect(() => {
+    setSelectedSubclass(null);
+    setSelectedSubclasses([]);
+  }, [selectedClass]);
+
+  // Reset Stormwight kit when aspect changes away from Stormwight
+  useEffect(() => {
+    if (selectedFuryAspect !== 'stormwight') {
+      setSelectedStormwightKit(null);
+    }
+  }, [selectedFuryAspect]);
+
   // Toggle language selection
   const toggleLanguage = (languageId: string) => {
     const required = getRequiredLanguageCount();
@@ -374,7 +425,17 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
       case 'class':
         return selectedClass !== null;
       case 'subclass':
-        // Subclass selection - for now, optional
+        // Subclass selection required for classes that have this step
+        if (!selectedClass) return false;
+        // Conduit requires 2 domains (multi-select)
+        if (requiresMultipleSubclasses(selectedClass)) {
+          return selectedSubclasses.length === getSubclassSelectCount(selectedClass);
+        }
+        return selectedSubclass !== null;
+      case 'furyAspect':
+        // Fury aspect required, and if Stormwight is selected, kit is also required
+        if (!selectedFuryAspect) return false;
+        if (selectedFuryAspect === 'stormwight' && !selectedStormwightKit) return false;
         return true;
       case 'ancestry':
         return selectedAncestry !== null;
@@ -567,7 +628,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
               minimum: -(1 + reasonScore), // Can go negative
             },
             isStrained: false,
-            subclass: undefined,
+            subclass: selectedSubclass as TalentHero['subclass'] || undefined,
           } as TalentHero;
           break;
 
@@ -577,16 +638,19 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             heroClass: 'censor',
             heroicResource: { type: 'wrath', current: 0 },
             judgment: { targetId: null, targetName: null },
-            subclass: undefined,
+            subclass: selectedSubclass as CensorHero['subclass'] || undefined,
           } as CensorHero;
           break;
 
         case 'conduit':
+          // Conduit selects 2 domains
+          const conduitDomains = selectedSubclasses as ConduitDomain[];
           newHero = {
             ...baseHeroData,
             heroClass: 'conduit',
             heroicResource: { type: 'piety', current: 0 },
-            subclass: 'protection', // Default domain
+            subclass: conduitDomains[0] || undefined, // Primary domain
+            domains: conduitDomains, // Both chosen domains
             prayState: { hasPrayedThisTurn: false, lastPrayResult: null },
           } as ConduitHero;
           break;
@@ -596,7 +660,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'elementalist',
             heroicResource: { type: 'essence', current: 0, persistent: 0 },
-            subclass: 'fire', // Default element
+            subclass: selectedSubclass as ElementalistHero['subclass'] || undefined,
             mantleActive: false,
             persistentAbilities: [],
           } as ElementalistHero;
@@ -607,8 +671,21 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'fury',
             heroicResource: { type: 'ferocity', current: 0 },
-            growingFerocityTier: 0,
-            subclass: undefined,
+            subclass: selectedFuryAspect || undefined,
+            furyState: {
+              aspect: selectedFuryAspect || 'berserker',
+              stormwightKit: selectedFuryAspect === 'stormwight' ? selectedStormwightKit || undefined : undefined,
+              primordialStorm: selectedFuryAspect === 'stormwight' && selectedStormwightKit
+                ? getPrimordialStormForKit(selectedStormwightKit)
+                : undefined,
+              currentForm: 'humanoid',
+              growingFerocity: {
+                tookDamageThisRound: false,
+                becameWindedThisEncounter: false,
+                becameDyingThisEncounter: false,
+              },
+              primordialPower: 0,
+            },
           } as FuryHero;
           break;
 
@@ -659,7 +736,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             ...baseHeroData,
             heroClass: 'shadow',
             heroicResource: { type: 'insight', current: 0 },
-            subclass: 'black-ash', // Default college
+            subclass: selectedSubclass as ShadowHero['subclass'] || undefined,
             isHidden: false,
           } as ShadowHero;
           break;
@@ -671,7 +748,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             heroicResource: { type: 'focus', current: 0 },
             markedTargets: [],
             secondaryKit: null,
-            subclass: undefined,
+            subclass: selectedSubclass as TacticianHero['subclass'] || undefined,
           } as TacticianHero;
           break;
 
@@ -681,9 +758,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
             heroClass: 'troubadour',
             heroicResource: { type: 'drama', current: 0 },
             activeRoutine: null,
+            secondaryRoutine: null,
             scenePartners: [],
             heroPartners: [],
-            subclass: undefined,
+            subclass: selectedSubclass as TroubadourClass || undefined,
           } as TroubadourHero;
           break;
 
@@ -874,8 +952,46 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
         return (
           <ClassSelector
             selectedClass={selectedClass}
-            onSelect={setSelectedClass}
+            onSelect={(heroClass) => {
+              setSelectedClass(heroClass);
+              // Reset subclass when class changes
+              setSelectedSubclass(null);
+            }}
           />
+        );
+
+      case 'subclass':
+        if (!selectedClass) return null;
+        // Check if this class requires multi-select (Conduit)
+        if (requiresMultipleSubclasses(selectedClass)) {
+          return (
+            <SubclassSelector
+              heroClass={selectedClass}
+              selectedSubclass={null}
+              selectedSubclasses={selectedSubclasses}
+              onSelect={() => {}}
+              onMultiSelect={setSelectedSubclasses}
+            />
+          );
+        }
+        return (
+          <SubclassSelector
+            heroClass={selectedClass}
+            selectedSubclass={selectedSubclass}
+            onSelect={setSelectedSubclass}
+          />
+        );
+
+      case 'furyAspect':
+        return (
+          <div className="creation-step fury-aspect-step">
+            <FuryAspectSelector
+              selectedAspect={selectedFuryAspect}
+              onSelectAspect={setSelectedFuryAspect}
+              selectedKit={selectedStormwightKit}
+              onSelectKit={setSelectedStormwightKit}
+            />
+          </div>
         );
 
       case 'ancestry':

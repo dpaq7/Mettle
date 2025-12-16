@@ -1,0 +1,297 @@
+/* ============================================
+   LEVEL PROGRESSION SECTION
+   ============================================ */
+
+.level-progression-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.progression-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.progression-header h3 {
+  margin: 0;
+  color: var(--accent-primary);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progression-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.control-btn {
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   LEVEL ACCORDIONS
+   ============================================ */
+
+.progression-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.level-accordion {
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.level-accordion.current {
+  border-color: var(--accent-dim);
+}
+
+.level-accordion.expanded {
+  border-color: var(--accent-primary);
+}
+
+.level-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.level-accordion-header:hover {
+  background: var(--bg-medium);
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent-primary);
+}
+
+.level-accordion.current .level-badge {
+  background: var(--accent-dim);
+  border-color: var(--accent-primary);
+}
+
+.level-summary {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.accordion-toggle-icon {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: center;
+}
+
+.level-accordion.expanded .accordion-toggle-icon {
+  color: var(--accent-bright);
+}
+
+/* ============================================
+   ACCORDION CONTENT
+   ============================================ */
+
+.level-accordion-content {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-dark);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   PROGRESSION ITEMS
+   ============================================ */
+
+.progression-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  border-left: 3px solid var(--accent-dim);
+}
+
+.progression-item.type-feature {
+  border-left-color: var(--accent-primary);
+}
+
+.progression-item.type-perk {
+  border-left-color: #ffb74d;
+}
+
+.progression-item.type-skill {
+  border-left-color: #64b5f6;
+}
+
+.progression-item.type-ability-unlock,
+.progression-item.type-ability-choice {
+  border-left-color: #ce93d8;
+}
+
+.progression-item.type-stat-increase {
+  border-left-color: #81c784;
+}
+
+.progression-item.type-resource-upgrade {
+  border-left-color: var(--accent-bright);
+}
+
+.progression-item.type-subclass-feature {
+  border-left-color: #4dd0e1;
+}
+
+.progression-item.type-kit-upgrade {
+  border-left-color: var(--text-bone, #d4c8b0);
+}
+
+.progression-item.type-epic-resource {
+  border-left-color: #ffd700;
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 215, 0, 0.05) 100%);
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.item-icon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.item-type-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.4rem;
+  background: var(--bg-darkest);
+  border-radius: 2px;
+  color: var(--text-muted);
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.item-description {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Choice indicator */
+.item-choice {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-darkest);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.choice-label {
+  color: var(--text-muted);
+}
+
+.choice-value {
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+/* Subclass badge */
+.subclass-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 600px) {
+  .level-progression-section {
+    padding: 1rem;
+  }
+
+  .progression-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .level-accordion-header {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .level-badge {
+    min-width: 40px;
+    font-size: 0.75rem;
+  }
+}

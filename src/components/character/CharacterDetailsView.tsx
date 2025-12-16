@@ -258,33 +258,39 @@ const CharacterDetailsView: React.FC = () => {
 
         <div className="kit-stats">
           <div className="kit-stat">
-            <strong>Stamina Bonus:</strong> +{hero.kit.stamina}
+            <strong>Stamina</strong>
+            <span className="stat-value">+{hero.kit.stamina}</span>
           </div>
           <div className="kit-stat">
-            <strong>Speed:</strong> {hero.kit.speed}
+            <strong>Speed</strong>
+            <span className="stat-value">{hero.kit.speed}</span>
           </div>
           <div className="kit-stat">
-            <strong>Stability:</strong> {hero.kit.stability}
+            <strong>Stability</strong>
+            <span className="stat-value">{hero.kit.stability}</span>
           </div>
           <div className="kit-stat">
-            <strong>Armor:</strong> {hero.kit.armor}
+            <strong>Armor</strong>
+            <span className="stat-value">{hero.kit.armor || 'None'}</span>
           </div>
         </div>
 
         <div className="kit-equipment">
-          <div className="equipment-block">
-            <h4>Weapons</h4>
-            <p>{hero.kit.weapons.join(', ')}</p>
-          </div>
+          {hero.kit.weapons && hero.kit.weapons.length > 0 && (
+            <div className="equipment-block">
+              <h4>Weapons:</h4>
+              <p>{hero.kit.weapons.join(', ')}</p>
+            </div>
+          )}
           {hero.kit.implements && hero.kit.implements.length > 0 && (
             <div className="equipment-block">
-              <h4>Implements</h4>
+              <h4>Implements:</h4>
               <p>{hero.kit.implements.join(', ')}</p>
             </div>
           )}
           {hero.kit.items && hero.kit.items.length > 0 && (
             <div className="equipment-block">
-              <h4>Starting Items</h4>
+              <h4>Starting Items:</h4>
               <p>{hero.kit.items.join(', ')}</p>
             </div>
           )}

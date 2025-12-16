@@ -11,6 +11,7 @@ const DOMAIN_INFO: Record<ConduitDomain, { name: string; description: string }> 
   death: { name: 'Death', description: 'Command the transition between life and death.' },
   fate: { name: 'Fate', description: 'Read and manipulate the threads of destiny.' },
   knowledge: { name: 'Knowledge', description: 'Unlock secrets and grant understanding.' },
+  life: { name: 'Life', description: 'Channel vital energy to heal and restore allies.' },
   love: { name: 'Love', description: 'Inspire devotion and forge bonds between hearts.' },
   nature: { name: 'Nature', description: 'Commune with beasts and command the wild.' },
   protection: { name: 'Protection', description: 'Ward allies and shield them from harm.' },

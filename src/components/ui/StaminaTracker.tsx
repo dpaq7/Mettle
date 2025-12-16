@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import './StaminaTracker.css';
 
 interface StaminaTrackerProps {
@@ -7,19 +7,25 @@ interface StaminaTrackerProps {
   temporary: number;
   winded: boolean;
   dying: boolean;
-  dyingThreshold: number;
+  dyingThreshold: number; // Kept for API compatibility but ignored - dying is at 0 HP
   onCurrentChange: (value: number) => void;
   onMaxChange?: (value: number) => void;
   onTemporaryChange: (value: number) => void;
   onWindedChange: (value: boolean) => void;
   onDyingChange: (value: boolean) => void;
+  onDyingTriggered?: () => void; // Called when hero becomes dying (for bleeding)
   className?: string;
 }
 
 /**
  * Stamina Tracker component matching Draw Steel character sheet.
  * Shows current stamina with adjustment arrows, temporary/max boxes,
- * and Winded/Dying indicators below.
+ * and Winded/Dying/Dead indicators below.
+ *
+ * Draw Steel rules:
+ * - Winded: current <= max/2
+ * - Dying: current <= 0 (causes bleeding condition)
+ * - Dead: current <= -max/2
  */
 const StaminaTracker: React.FC<StaminaTrackerProps> = ({
   current,
@@ -27,17 +33,41 @@ const StaminaTracker: React.FC<StaminaTrackerProps> = ({
   temporary,
   winded,
   dying,
-  dyingThreshold,
+  dyingThreshold: _dyingThreshold, // Ignored - dying is at 0 HP per Draw Steel rules
   onCurrentChange,
   onMaxChange,
   onTemporaryChange,
   onWindedChange,
   onDyingChange,
+  onDyingTriggered,
   className = '',
 }) => {
+  // Auto-calculate status thresholds per Draw Steel rules
+  const windedThreshold = Math.floor(max / 2);
+  const deathThreshold = -Math.floor(max / 2);
+
   // Auto-calculate winded status: current <= max/2
-  const isAutoWinded = current <= Math.floor(max / 2);
-  const isAutoDying = current <= dyingThreshold;
+  const isAutoWinded = current <= windedThreshold;
+  // Dying: current <= 0
+  const isAutoDying = current <= 0;
+  // Dead: current <= -max/2
+  const isAutoDead = current <= deathThreshold;
+
+  // Track previous dying state to detect when hero becomes dying
+  const prevDyingRef = useRef(isAutoDying || dying);
+
+  // Trigger bleeding when hero becomes dying
+  useEffect(() => {
+    const wasDying = prevDyingRef.current;
+    const nowDying = isAutoDying || dying;
+
+    // Only trigger when transitioning to dying state
+    if (!wasDying && nowDying && onDyingTriggered) {
+      onDyingTriggered();
+    }
+
+    prevDyingRef.current = nowDying;
+  }, [isAutoDying, dying, onDyingTriggered]);
 
   const handleCurrentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -149,6 +179,7 @@ const StaminaTracker: React.FC<StaminaTrackerProps> = ({
             className={`status-diamond ${winded || isAutoWinded ? 'active' : ''}`}
             onClick={() => onWindedChange(!winded)}
             aria-label={`Winded: ${winded || isAutoWinded ? 'active' : 'inactive'}`}
+            title={`Winded at ${windedThreshold} HP or less`}
             type="button"
           />
           <span className="status-label">Winded</span>
@@ -159,11 +190,28 @@ const StaminaTracker: React.FC<StaminaTrackerProps> = ({
             className={`status-diamond dying ${dying || isAutoDying ? 'active' : ''}`}
             onClick={() => onDyingChange(!dying)}
             aria-label={`Dying: ${dying || isAutoDying ? 'active' : 'inactive'}`}
+            title="Dying at 0 HP or less (causes Bleeding)"
             type="button"
           />
           <span className="status-label">Dying</span>
         </div>
+
+        <div className="status-indicator">
+          <div
+            className={`status-diamond dead ${isAutoDead ? 'active' : ''}`}
+            aria-label={`Dead: ${isAutoDead ? 'active' : 'inactive'}`}
+            title={`Dead at ${deathThreshold} HP or less`}
+          />
+          <span className="status-label">Dead</span>
+        </div>
       </div>
+
+      {/* Death warning message */}
+      {isAutoDead && (
+        <div className="death-warning">
+          💀 CHARACTER IS DEAD
+        </div>
+      )}
     </div>
   );
 };

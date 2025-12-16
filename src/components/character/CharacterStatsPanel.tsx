@@ -6,8 +6,13 @@ import { useEquipment } from '../../hooks/useEquipment';
 import { ALL_CONDITIONS, ConditionDefinition } from '../../data/conditions';
 import { EdgeBaneState } from '../../utils/dice';
 import { Characteristic, ConditionId, HeroClass } from '../../types';
-import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
-import { classDefinitions } from '../../data/classes/class-definitions';
+import { isSummonerHero, SummonerHeroV2, isConduitHero, ConduitHero, Hero } from '../../types/hero';
+import {
+  classDefinitions,
+  getSubclassTypeName,
+  getSubclassTypeNamePlural,
+  getSubclassById,
+} from '../../data/classes/class-definitions';
 import PentagonStatBox from '../ui/PentagonStatBox';
 import StatBox from '../shared/StatBox';
 import ProgressionTracker from '../ui/ProgressionTracker';
@@ -29,6 +34,52 @@ const XP_THRESHOLDS: Record<number, number> = {
   9: 128,
   10: 144,
 };
+
+// Helper to get subclass display info for any hero class
+interface SubclassDisplayInfo {
+  label: string;      // "Order", "Domain", "Aspect", etc.
+  value: string;      // "Exorcist", "Life / Protection", "Berserker"
+  colorClass: string; // CSS class for styling
+}
+
+function getSubclassDisplay(hero: Hero): SubclassDisplayInfo | null {
+  // Handle Conduit's dual domains
+  if (hero.heroClass === 'conduit' && isConduitHero(hero)) {
+    const conduitHero = hero as ConduitHero;
+    if (conduitHero.domains && conduitHero.domains.length > 0) {
+      const domainNames = conduitHero.domains
+        .map(d => getSubclassById('conduit', d)?.name || d)
+        .join(' / ');
+      return {
+        label: getSubclassTypeNamePlural('conduit'),
+        value: domainNames,
+        colorClass: 'subclass-conduit',
+      };
+    }
+    // Fallback to single subclass field if domains array is empty
+    if (conduitHero.subclass) {
+      const option = getSubclassById('conduit', conduitHero.subclass);
+      return {
+        label: getSubclassTypeName('conduit'),
+        value: option?.name || conduitHero.subclass,
+        colorClass: 'subclass-conduit',
+      };
+    }
+    return null;
+  }
+
+  // Handle single subclass for other classes
+  if (!hero.subclass) return null;
+
+  const option = getSubclassById(hero.heroClass, hero.subclass);
+  if (!option) return null;
+
+  return {
+    label: getSubclassTypeName(hero.heroClass),
+    value: option.name,
+    colorClass: `subclass-${hero.heroClass}`,
+  };
+}
 
 interface CharacterStatsPanelProps {
   onLevelUp: () => void;
@@ -142,9 +193,8 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
   const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
   const classDef = classDefinitions[heroClass];
 
-  const circleShort: Record<string, string> = {
-    blight: 'Blight', graves: 'Graves', spring: 'Spring', storms: 'Storms',
-  };
+  // Get subclass display info for the current hero
+  const subclassInfo = getSubclassDisplay(hero);
 
   const chars = hero.characteristics;
 
@@ -206,13 +256,21 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
         <div className="identity">
           <span className="name">{hero.name}</span>
           <span className="tag level">Lv {hero.level}</span>
-          <span className="tag class">{classDef?.name || 'Summoner'}</span>
-          {/* Only show Circle and Formation for Summoners */}
-          {isSummoner && summonerHero && (
-            <>
-              <span className="tag circle">{summonerHero.subclass ? circleShort[summonerHero.subclass] : ''}</span>
-              <span className="tag formation">{summonerHero.formation}</span>
-            </>
+          <span className="tag class">{classDef?.name || 'Unknown'}</span>
+          {/* Universal Subclass Tag - shows for all classes when subclass is selected */}
+          {subclassInfo && (
+            <span
+              className={`tag subclass ${subclassInfo.colorClass}`}
+              title={`${subclassInfo.label}: ${subclassInfo.value}`}
+            >
+              {subclassInfo.value}
+            </span>
+          )}
+          {/* Summoner-specific: Formation tag (kept separate from subclass) */}
+          {isSummoner && summonerHero?.formation && (
+            <span className="tag formation">
+              {summonerHero.formation.charAt(0).toUpperCase() + summonerHero.formation.slice(1)}
+            </span>
           )}
         </div>
         <div className="identity-actions">
@@ -289,7 +347,7 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
             temporary: 0,
             winded: windedOverride,
             dying: dyingOverride,
-            dyingThreshold: Math.floor(hero.stamina.winded / 2),
+            dyingThreshold: 0, // Dying occurs at 0 HP per Draw Steel rules
           }}
           recoveries={{
             stamina: hero.recoveries.value,
@@ -322,6 +380,12 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
               gainEssence(diff);
             } else if (diff < 0) {
               spendEssence(-diff);
+            }
+          }}
+          onDyingTriggered={() => {
+            // Per Draw Steel rules: when you become dying, you gain the Bleeding condition
+            if (!hasCondition('bleeding')) {
+              addCondition('bleeding');
             }
           }}
           hideSurges

@@ -23,14 +23,21 @@ export interface LevelFeature {
 }
 
 export interface StatChanges {
+  // Shared stat changes
+  allStats?: number; // Add to all characteristics (max 4)
+
+  // Summoner-specific
   reason?: number; // Set Reason to this value
   minionCap?: number; // Add to minion cap
-  allStats?: number; // Add to all characteristics
   essencePerTurn?: number; // Set essence per turn to this value
   freeSummonCount?: number; // Add to free summon count per turn
   signatureStaminaBonus?: number; // Add to signature minion stamina
   threeEssenceStaminaBonus?: number; // Add to 3-cost minion stamina
   fiveEssenceStaminaBonus?: number; // Add to 5-cost minion stamina
+
+  // Fury-specific
+  might?: number; // Set Might to this value
+  agility?: number; // Set Agility to this value
 }
 
 export interface LevelProgression {
@@ -80,8 +87,30 @@ export interface CircleUpgrade {
   description: string;
 }
 
+// Feature categories for organizing level-up choices
+export type FeatureCategory =
+  // Summoner categories
+  | 'ward'
+  | 'second-ward'
+  | '7-essence'
+  | '9-essence'
+  | '11-essence'
+  | 'circle-upgrade'
+  | 'stat-boost'
+  // Fury categories
+  | 'aspect-feature'
+  | '7-ferocity'
+  | '9-ferocity'
+  | '11-ferocity'
+  | 'aspect-5-ferocity'
+  | 'aspect-9-ferocity'
+  | 'aspect-11-ferocity';
+
 // Stored character progression choices
 export interface ProgressionChoices {
+  // ===================
+  // Summoner choices
+  // ===================
   // Level 3 choices
   ward?: WardType;
   sevenEssenceAbility?: string;
@@ -98,4 +127,25 @@ export interface ProgressionChoices {
   // Level 9 choices
   secondWard?: WardType;
   elevenEssenceAbility?: string;
+
+  // ===================
+  // Fury choices
+  // ===================
+  // Level 3: 7-Ferocity ability
+  sevenFerocityAbility?: string;
+
+  // Level 5: 9-Ferocity ability
+  nineFerocityAbility?: string;
+
+  // Level 8: 11-Ferocity ability
+  elevenFerocityAbility?: string;
+
+  // Level 2: Aspect-specific 5-Ferocity ability
+  aspectFiveFerocity?: string;
+
+  // Level 6: Aspect-specific 9-Ferocity ability
+  aspectNineFerocity?: string;
+
+  // Level 9: Aspect-specific 11-Ferocity ability
+  aspectElevenFerocity?: string;
 }

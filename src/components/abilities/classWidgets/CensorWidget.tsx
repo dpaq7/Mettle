@@ -7,17 +7,17 @@ interface CensorWidgetProps {
 }
 
 const ORDER_INFO: Record<CensorOrder, { name: string; description: string }> = {
-  inquisitor: {
-    name: 'Inquisitor',
-    description: 'Hunter of heretics who roots out enemies of the faith.',
+  exorcist: {
+    name: 'Exorcist',
+    description: 'Specialist in banishing supernatural threats and protecting the faithful.',
   },
-  templar: {
-    name: 'Templar',
-    description: 'Holy warrior who protects allies with divine power.',
+  oracle: {
+    name: 'Oracle',
+    description: 'Seer who channels divine visions to guide allies and reveal hidden truths.',
   },
-  zealot: {
-    name: 'Zealot',
-    description: 'Fanatical champion who channels righteous fury.',
+  paragon: {
+    name: 'Paragon',
+    description: 'Living exemplar of their faith who inspires through heroic deeds.',
   },
 };
 

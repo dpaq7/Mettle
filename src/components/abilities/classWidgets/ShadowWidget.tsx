@@ -9,23 +9,18 @@ interface ShadowWidgetProps {
 const COLLEGE_INFO: Record<ShadowCollege, { name: string; description: string; icon: string }> = {
   'black-ash': {
     name: 'Black Ash',
-    description: 'Masters of fire and smoke who leave devastation in their wake.',
+    description: 'Teleporting assassins who move through ash and shadow to strike unseen.',
     icon: '🔥',
   },
   'caustic-alchemy': {
     name: 'Caustic Alchemy',
-    description: 'Poisoners who brew deadly concoctions and corrode their foes.',
+    description: 'Poisoners and alchemists who coat their weapons with deadly substances.',
     icon: '🧪',
   },
   'harlequin-mask': {
     name: 'Harlequin Mask',
-    description: 'Illusionists who deceive and misdirect with magical disguises.',
+    description: 'Deceivers and tricksters who hide in plain sight using charm and misdirection.',
     icon: '🎭',
-  },
-  'woven-darkness': {
-    name: 'Woven Darkness',
-    description: 'Shadow manipulators who become one with the darkness.',
-    icon: '🌑',
   },
 };
 
