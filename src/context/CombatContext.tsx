@@ -194,9 +194,13 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       // SRD: Start of Combat - Summon up to 2 signature minions for free
       const freeSquads = summonFreeSignatureMinions(FREE_SUMMONS_COMBAT_START, []);
 
-      // Update hero with the new squads
+      // Update hero with the new squads AND sync heroicResource
       updateHero({
         activeSquads: freeSquads,
+        heroicResource: {
+          ...hero.heroicResource,
+          current: startingEssence,
+        },
       });
 
       setEssenceState({
@@ -206,6 +210,9 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
         minionDeathEssenceGainedThisRound: false,
       });
+    } else if (genericHero) {
+      // Non-Summoner classes: reset their heroic resource at combat start if needed
+      // (Most classes keep their resource, but some may have combat-start effects)
     } else {
       // Non-Summoner: Reset essence state to defaults
       setEssenceState({
@@ -239,6 +246,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     if (!hero) return;
 
     const newTurnNumber = turnState.roundNumber + 1;
+    const currentEssence = hero.heroicResource?.current ?? essenceState.currentEssence;
 
     setHasSacrificedThisTurn(false);
     setTurnState({
@@ -249,9 +257,11 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
 
     // SRD: Start of Turn - Gain +2 Essence (flat, not level-based)
     // Essence carries over between turns (no reset to 0)
+    const newEssence = currentEssence + ESSENCE_PER_TURN;
+
     setEssenceState(prev => ({
       ...prev,
-      currentEssence: prev.currentEssence + ESSENCE_PER_TURN,
+      currentEssence: newEssence,
       essenceGainedThisTurn: ESSENCE_PER_TURN,
       turnNumber: newTurnNumber,
       signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
@@ -269,7 +279,14 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     // Add 3 free signature minion squads
     const squadsWithFreeMinions = summonFreeSignatureMinions(FREE_SUMMONS_TURN_START, resetSquads);
 
-    updateHero({ activeSquads: squadsWithFreeMinions });
+    // Sync heroicResource with the new essence value
+    updateHero({
+      activeSquads: squadsWithFreeMinions,
+      heroicResource: {
+        ...hero.heroicResource,
+        current: newEssence,
+      },
+    });
   };
 
   const advancePhase = () => {
@@ -287,11 +304,22 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
   };
 
   const spendEssence = (amount: number): boolean => {
-    if (essenceState.currentEssence >= amount) {
+    const currentEssence = hero?.heroicResource?.current ?? essenceState.currentEssence;
+    if (currentEssence >= amount) {
+      // Update both local state and hero.heroicResource for sync
       setEssenceState(prev => ({
         ...prev,
         currentEssence: prev.currentEssence - amount,
       }));
+      // Also update hero.heroicResource as the source of truth
+      if (genericHero && genericHero.heroicResource) {
+        // Type assertion needed due to discriminated union heroicResource types
+        const updatedResource = {
+          ...genericHero.heroicResource,
+          current: (genericHero.heroicResource.current ?? 0) - amount,
+        };
+        updateHero({ heroicResource: updatedResource } as Partial<typeof genericHero>);
+      }
       return true;
     }
     return false;
@@ -303,15 +331,23 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       currentEssence: prev.currentEssence + amount,
       essenceGainedThisTurn: prev.essenceGainedThisTurn + amount,
     }));
+    // Also update hero.heroicResource as the source of truth
+    if (genericHero && genericHero.heroicResource) {
+      // Type assertion needed due to discriminated union heroicResource types
+      const updatedResource = {
+        ...genericHero.heroicResource,
+        current: (genericHero.heroicResource.current ?? 0) + amount,
+      };
+      updateHero({ heroicResource: updatedResource } as Partial<typeof genericHero>);
+    }
   };
 
   // SRD: Gain +1 Essence when any minion dies in range (limit 1/round)
   const onMinionDeath = () => {
     if (!essenceState.minionDeathEssenceGainedThisRound) {
+      gainEssence(MINION_DEATH_ESSENCE);
       setEssenceState(prev => ({
         ...prev,
-        currentEssence: prev.currentEssence + MINION_DEATH_ESSENCE,
-        essenceGainedThisTurn: prev.essenceGainedThisTurn + MINION_DEATH_ESSENCE,
         minionDeathEssenceGainedThisRound: true,
       }));
     }
@@ -323,11 +359,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       return false; // Already sacrificed this turn
     }
     setHasSacrificedThisTurn(true);
-    setEssenceState(prev => ({
-      ...prev,
-      currentEssence: prev.currentEssence + 1,
-      essenceGainedThisTurn: prev.essenceGainedThisTurn + 1,
-    }));
+    gainEssence(1);
     return true;
   };
 

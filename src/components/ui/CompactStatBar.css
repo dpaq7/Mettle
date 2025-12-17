@@ -158,10 +158,23 @@
   50% { opacity: 0.6; }
 }
 
-/* Essence */
-.compact-stat.essence .stat-icon,
-.compact-stat.essence .stat-value {
-  color: var(--color-essence);
+/* Heroic Resource (class-specific: Essence, Ferocity, Clarity, etc.) */
+.compact-stat.heroic-resource {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.compact-stat.heroic-resource .stat-icon,
+.compact-stat.heroic-resource .stat-label,
+.compact-stat.heroic-resource .stat-value {
+  color: var(--resource-color, var(--color-essence));
+}
+
+.compact-stat.heroic-resource .stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 /* Recoveries */

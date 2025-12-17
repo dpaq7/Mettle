@@ -9,7 +9,14 @@ interface CompactStatBarProps {
   level: number;
   portraitUrl: string | null;
   stamina: { current: number; max: number };
-  essence: number;
+  // Generic heroic resource (replaces essence)
+  heroicResource: {
+    current: number;
+    name: string;
+    abbreviation: string;
+    color: string;
+    minValue: number;
+  };
   recoveries: { current: number; max: number };
   recoveryValue: number;
   surges: number;
@@ -29,7 +36,7 @@ interface CompactStatBarProps {
   onEndCombat?: () => void;
   onRespite?: () => void;
   onExpand: () => void;
-  onEssenceChange?: (newEssence: number) => void;
+  onResourceChange?: (newValue: number) => void;
   onCatchBreath?: (healAmount: number) => void;
   onVictoriesChange?: (newVictories: number) => void;
 }
@@ -55,7 +62,7 @@ export const CompactStatBar = ({
   level,
   portraitUrl,
   stamina,
-  essence,
+  heroicResource,
   recoveries,
   recoveryValue,
   surges,
@@ -69,7 +76,7 @@ export const CompactStatBar = ({
   onEndCombat,
   onRespite,
   onExpand,
-  onEssenceChange,
+  onResourceChange,
   onCatchBreath,
   onVictoriesChange,
 }: CompactStatBarProps) => {
@@ -256,18 +263,18 @@ export const CompactStatBar = ({
     }
   }, [isDying, isBleeding, hasRecoveries, recoveryValue, onCatchBreath, addRoll]);
 
-  // Handle essence change
-  const handleEssenceUp = useCallback(() => {
-    if (onEssenceChange) {
-      onEssenceChange(essence + 1);
+  // Handle heroic resource change
+  const handleResourceUp = useCallback(() => {
+    if (onResourceChange) {
+      onResourceChange(heroicResource.current + 1);
     }
-  }, [essence, onEssenceChange]);
+  }, [heroicResource.current, onResourceChange]);
 
-  const handleEssenceDown = useCallback(() => {
-    if (onEssenceChange && essence > 0) {
-      onEssenceChange(essence - 1);
+  const handleResourceDown = useCallback(() => {
+    if (onResourceChange && heroicResource.current > heroicResource.minValue) {
+      onResourceChange(heroicResource.current - 1);
     }
-  }, [essence, onEssenceChange]);
+  }, [heroicResource.current, heroicResource.minValue, onResourceChange]);
 
   // Handle victories change
   const handleVictoriesUp = useCallback(() => {
@@ -320,25 +327,30 @@ export const CompactStatBar = ({
 
       <span className="compact-divider">|</span>
 
-      {/* Essence with +/- controls */}
+      {/* Heroic Resource with +/- controls */}
       <div className="compact-stat-group">
-        <span className="compact-stat essence" title="Essence">
+        <span
+          className="compact-stat heroic-resource"
+          title={heroicResource.name}
+          style={{ '--resource-color': heroicResource.color } as React.CSSProperties}
+        >
           <span className="stat-icon">&#10022;</span>
-          <span className="stat-value">{essence}</span>
+          <span className="stat-label">{heroicResource.abbreviation}</span>
+          <span className="stat-value">{heroicResource.current}</span>
         </span>
         <div className="mini-arrows">
           <button
             className="mini-arrow-btn"
-            onClick={handleEssenceUp}
-            title="Add Essence"
+            onClick={handleResourceUp}
+            title={`Add ${heroicResource.name}`}
           >
             ▲
           </button>
           <button
             className="mini-arrow-btn"
-            onClick={handleEssenceDown}
-            disabled={essence <= 0}
-            title="Remove Essence"
+            onClick={handleResourceDown}
+            disabled={heroicResource.current <= heroicResource.minValue}
+            title={`Remove ${heroicResource.name}`}
           >
             ▼
           </button>

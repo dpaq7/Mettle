@@ -21,6 +21,7 @@ import { NullFieldView } from './components/classDetails/NullDetails/NullFieldVi
 import { RoutinesView } from './components/classDetails/TroubadourDetails';
 import { FerocityTrackerView } from './components/classDetails/FuryDetails';
 import { getTabsForClass, ViewType } from './data/class-tabs';
+import { getResourceConfig } from './data/class-resources';
 import { HeroClass } from './types/hero';
 import {
   AlertDialog,
@@ -43,7 +44,7 @@ type View = ViewType;
 
 function App() {
   const { hero, setHero, updateHero } = useHeroContext();
-  const { isInCombat, startCombat, endCombat, setOnCombatStartCallback, essenceState, gainEssence, spendEssence } = useCombatContext();
+  const { isInCombat, startCombat, endCombat, setOnCombatStartCallback } = useCombatContext();
   const { applyThemeForHero, applyCreatorTheme } = useTheme();
   const [activeView, setActiveView] = useState<View>('character');
   const [showCharacterManager, setShowCharacterManager] = useState(false);
@@ -176,51 +177,62 @@ function App() {
 
       {/* Collapsible Character Stats Panel */}
       <CollapsibleHeader
-        compactData={{
-          name: hero.name,
-          level: hero.level,
-          portraitUrl: hero.portraitUrl || null,
-          stamina: {
-            current: hero.stamina.current,
-            max: hero.stamina.max,
-          },
-          essence: essenceState.currentEssence,
-          recoveries: {
-            current: hero.recoveries.current,
-            max: hero.recoveries.max,
-          },
-          recoveryValue: hero.recoveries.value,
-          surges: hero.surges,
-          victories: hero.victories,
-          maxVictories: 12,
-          characteristics: hero.characteristics,
-          speed: hero.speed,
-          stability: hero.stability,
-          isInCombat,
-          onStartCombat: startCombat,
-          onEndCombat: endCombat,
-          onRespite: () => setShowRespiteConfirm(true),
-          onEssenceChange: (newEssence: number) => {
-            const diff = newEssence - essenceState.currentEssence;
-            if (diff > 0) {
-              gainEssence(diff);
-            } else if (diff < 0) {
-              spendEssence(Math.abs(diff));
-            }
-          },
-          onCatchBreath: (healAmount: number) => {
-            if (hero.recoveries.current > 0) {
-              const newStamina = Math.min(hero.stamina.current + healAmount, hero.stamina.max);
-              updateHero({
-                stamina: { ...hero.stamina, current: newStamina },
-                recoveries: { ...hero.recoveries, current: hero.recoveries.current - 1 },
-              });
-            }
-          },
-          onVictoriesChange: (newVictories: number) => {
-            updateHero({ victories: newVictories });
-          },
-        }}
+        compactData={(() => {
+          const resourceConfig = getResourceConfig(hero.heroClass);
+          return {
+            name: hero.name,
+            level: hero.level,
+            portraitUrl: hero.portraitUrl || null,
+            stamina: {
+              current: hero.stamina.current,
+              max: hero.stamina.max,
+            },
+            // Use hero.heroicResource as single source of truth
+            heroicResource: {
+              current: hero.heroicResource?.current ?? 0,
+              name: resourceConfig.name,
+              abbreviation: resourceConfig.abbreviation,
+              color: resourceConfig.color,
+              minValue: resourceConfig.minValue,
+            },
+            recoveries: {
+              current: hero.recoveries.current,
+              max: hero.recoveries.max,
+            },
+            recoveryValue: hero.recoveries.value,
+            surges: hero.surges,
+            victories: hero.victories,
+            maxVictories: 12,
+            characteristics: hero.characteristics,
+            speed: hero.speed,
+            stability: hero.stability,
+            isInCombat,
+            onStartCombat: startCombat,
+            onEndCombat: endCombat,
+            onRespite: () => setShowRespiteConfirm(true),
+            // Update hero.heroicResource directly (single source of truth)
+            onResourceChange: (newValue: number) => {
+              // Type assertion needed due to discriminated union heroicResource types
+              const updatedResource = {
+                ...hero.heroicResource,
+                current: Math.max(resourceConfig.minValue, newValue),
+              };
+              updateHero({ heroicResource: updatedResource } as Partial<typeof hero>);
+            },
+            onCatchBreath: (healAmount: number) => {
+              if (hero.recoveries.current > 0) {
+                const newStamina = Math.min(hero.stamina.current + healAmount, hero.stamina.max);
+                updateHero({
+                  stamina: { ...hero.stamina, current: newStamina },
+                  recoveries: { ...hero.recoveries, current: hero.recoveries.current - 1 },
+                });
+              }
+            },
+            onVictoriesChange: (newVictories: number) => {
+              updateHero({ victories: newVictories });
+            },
+          };
+        })()}
       >
         <CharacterStatsPanel onLevelUp={() => setShowLevelUp(true)} />
       </CollapsibleHeader>

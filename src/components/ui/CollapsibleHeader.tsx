@@ -7,7 +7,14 @@ interface CompactStatBarData {
   level: number;
   portraitUrl: string | null;
   stamina: { current: number; max: number };
-  essence: number;
+  // Generic heroic resource (replaces essence)
+  heroicResource: {
+    current: number;
+    name: string;
+    abbreviation: string;
+    color: string;
+    minValue: number;
+  };
   recoveries: { current: number; max: number };
   recoveryValue: number;
   surges: number;
@@ -26,7 +33,7 @@ interface CompactStatBarData {
   onStartCombat?: () => void;
   onEndCombat?: () => void;
   onRespite?: () => void;
-  onEssenceChange?: (newEssence: number) => void;
+  onResourceChange?: (newValue: number) => void;
   onCatchBreath?: (healAmount: number) => void;
   onVictoriesChange?: (newVictories: number) => void;
 }
