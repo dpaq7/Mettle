@@ -23,8 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Tauri build artifacts
+# Tauri build artifacts (target.nosync excluded from iCloud sync)
 src-tauri/target/
+src-tauri/target.nosync/
 
 # Claude Code plans
 .claude/plans/
