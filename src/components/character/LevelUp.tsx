@@ -11,6 +11,17 @@ import { LevelFeature, ProgressionChoices, WardType } from '../../types/progress
 import { Characteristic } from '../../types/common';
 import { isSummonerHero, isFuryHero, SummonerHeroV2, FuryHero } from '../../types/hero';
 import { Ability } from '../../types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Button,
+  ScrollArea,
+} from '@/components/ui/shadcn';
+import { Sparkles, Check } from 'lucide-react';
 import './LevelUp.css';
 
 interface LevelUpProps {
@@ -18,6 +29,10 @@ interface LevelUpProps {
 }
 
 const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
+  // Wrap onClose for Dialog's onOpenChange pattern
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
   const { hero, updateHero } = useSummonerContext();
   const [choices, setChoices] = useState<Record<string, string>>({});
 
@@ -71,13 +86,21 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
 
   if (nextLevel > 10) {
     return (
-      <div className="level-up-overlay" onClick={onClose}>
-        <div className="level-up-modal" onClick={(e) => e.stopPropagation()}>
-          <h2>Maximum Level Reached</h2>
-          <p>Your character is already at level 10, the maximum level.</p>
-          <button onClick={onClose} className="close-btn">Close</button>
-        </div>
-      </div>
+      <Dialog open={true} onOpenChange={handleOpenChange}>
+        <DialogContent variant="compact" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Maximum Level Reached</DialogTitle>
+            <DialogDescription>
+              Your character is already at level 10, the maximum level.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="chamfered" onClick={onClose}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
   }
 
@@ -296,19 +319,26 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
   const charPreview = getCharPreview();
 
   return (
-    <div className="level-up-overlay" onClick={onClose}>
-      <div className="level-up-modal enhanced" onClick={(e) => e.stopPropagation()}>
+    <Dialog open={true} onOpenChange={handleOpenChange}>
+      <DialogContent variant="scroll" className="level-up-dialog max-w-2xl">
         {/* Header */}
-        <div className="level-up-header">
+        <DialogHeader className="level-up-header-new">
           <div className="level-badge-container">
             <span className="level-badge old">Lv {hero.level}</span>
             <span className="level-arrow">→</span>
             <span className="level-badge new">Lv {nextLevel}</span>
           </div>
-          <button className="close-modal" onClick={onClose}>×</button>
-        </div>
+          <DialogTitle className="flex items-center gap-2 mt-2">
+            <Sparkles className="h-5 w-5 text-[var(--accent-primary)]" />
+            Level Up!
+          </DialogTitle>
+          <DialogDescription>
+            {hero.name} is advancing to level {nextLevel}
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="level-up-content">
+        <ScrollArea className="level-up-scroll max-h-[55vh] pr-4">
+          <div className="level-up-content">
           {/* Stats Summary */}
           <div className="stats-summary">
             <h3>Stats Changes</h3>
@@ -436,21 +466,25 @@ const LevelUp: React.FC<LevelUpProps> = ({ onClose }) => {
               <p>No special features at this level. Your stats will still increase!</p>
             </div>
           )}
-        </div>
+          </div>
+        </ScrollArea>
 
         {/* Actions */}
-        <div className="level-up-actions">
-          <button onClick={onClose} className="cancel-btn">Cancel</button>
-          <button
+        <DialogFooter>
+          <Button variant="chamfered" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="success"
             onClick={handleLevelUp}
-            className="confirm-btn"
             disabled={choiceFeatures.length > 0 && !hasAllRequiredChoices()}
           >
+            <Check className="h-4 w-4 mr-2" />
             Confirm Level Up
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

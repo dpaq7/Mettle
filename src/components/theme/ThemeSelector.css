@@ -1,217 +1,12 @@
-/* Theme Selector Component Styles */
+/* ============================================
+   THEME SELECTOR - shadcn DropdownMenu Overrides
+   ============================================ */
 
-.theme-selector {
-  position: relative;
-  display: inline-block;
-}
-
-.theme-selector__button {
-  padding: 0.375rem 0.75rem;
-  background: var(--accent-bright);
-  color: var(--bg-darkest);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all var(--transition-fast);
-}
-
-.theme-selector__button:hover {
-  background: var(--accent-glow);
-  box-shadow: var(--shadow-glow);
-}
-
-.theme-selector__button:focus-visible {
-  outline: 2px solid var(--accent-bright);
-  outline-offset: 2px;
-}
-
-/* Dropdown */
-.theme-selector__dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  min-width: 280px;
-  background: var(--bg-medium);
-  border: 1px solid var(--border-solid);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card), var(--shadow-glow);
-  z-index: 1000;
-  overflow: hidden;
-
-  /* Animation */
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.theme-selector__dropdown--open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.theme-selector__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-solid);
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-}
-
-.theme-selector__reset-btn {
-  padding: 0.2rem 0.5rem;
-  background: transparent;
-  border: 1px solid var(--border-solid);
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.theme-selector__reset-btn:hover {
-  border-color: var(--accent-bright);
-  color: var(--accent-bright);
-}
-
-.theme-selector__hint {
-  padding: 0.5rem 1rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-solid);
-}
-
-.theme-selector__hint strong {
-  color: var(--accent-bright);
-}
-
-.theme-selector__list {
-  list-style: none;
-  margin: 0;
-  padding: 0.5rem;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-/* Custom scrollbar for theme list */
-.theme-selector__list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.theme-selector__list::-webkit-scrollbar-track {
-  background: var(--bg-dark);
-  border-radius: 3px;
-}
-
-.theme-selector__list::-webkit-scrollbar-thumb {
-  background: var(--border-solid);
-  border-radius: 3px;
-}
-
-.theme-selector__list::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-dim);
-}
-
-/* Theme Option */
-.theme-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background-color 150ms ease;
-}
-
-.theme-option:hover {
-  background: var(--bg-hover);
-}
-
-.theme-option:focus-visible {
-  outline: 2px solid var(--accent-bright);
-  outline-offset: -2px;
-}
-
-.theme-option--selected {
-  background: rgba(var(--accent-dim), 0.15);
-  background: var(--accent-dim);
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-}
-
-/* Radio Button */
-.theme-option__radio {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--border-solid);
-  border-radius: 50%;
-  position: relative;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color var(--transition-fast);
-}
-
-.theme-option--selected .theme-option__radio {
-  border-color: var(--accent-bright);
-}
-
-.theme-option__radio-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--accent-bright);
-  border-radius: 50%;
-  animation: radioFadeIn 150ms ease;
-  box-shadow: 0 0 6px var(--accent-bright);
-}
-
-@keyframes radioFadeIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Content */
-.theme-option__content {
-  flex: 1;
-  min-width: 0;
-}
-
-.theme-option__name {
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 0.125rem;
-  font-size: 0.9rem;
-}
-
-.theme-option--selected .theme-option__name {
-  color: var(--accent-bright);
-  text-shadow: var(--text-glow);
-}
-
+/* Default Badge - shown next to theme that matches hero's class */
 .theme-option__default-badge {
   display: inline-block;
-  margin-left: 0.5rem;
   padding: 0.1rem 0.4rem;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -221,44 +16,13 @@
   vertical-align: middle;
 }
 
-.theme-option--default {
-  position: relative;
-}
-
-.theme-option--default::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 70%;
-  background: var(--accent-bright);
-  border-radius: 2px;
-  opacity: 0.5;
-}
-
-.theme-option__description {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* Color Swatches */
-.theme-option__swatches {
-  display: flex;
-  gap: 4px;
-}
-
+/* Color Swatches - preview of theme colors */
 .theme-option__swatch {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform var(--transition-fast);
-}
-
-.theme-option:hover .theme-option__swatch {
-  transform: scale(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
 }
 
 /* Theme transition for main app */
@@ -283,3 +47,65 @@ select,
 textarea {
   transition: var(--theme-transition);
 }
+
+/* ============================================
+   DEPRECATED STYLES (migrated to shadcn)
+   Kept for reference, can be removed later
+   ============================================
+
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-selector__button {
+  padding: 0.375rem 0.75rem;
+  background: var(--accent-bright);
+  color: var(--bg-darkest);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.theme-selector__dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  min-width: 280px;
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+  z-index: 1000;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.theme-selector__dropdown--open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.theme-selector__header { ... }
+.theme-selector__reset-btn { ... }
+.theme-selector__hint { ... }
+.theme-selector__list { ... }
+.theme-option { ... }
+.theme-option--selected { ... }
+.theme-option__radio { ... }
+.theme-option__radio-dot { ... }
+.theme-option__content { ... }
+.theme-option__name { ... }
+.theme-option--default { ... }
+.theme-option__description { ... }
+.theme-option__swatches { ... }
+
+============================================ */

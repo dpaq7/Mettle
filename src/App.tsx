@@ -31,6 +31,11 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
+  Button,
+  RadixTabs,
+  RadixTabsList,
+  RadixTabsTrigger,
+  RadixTabsContent,
 } from '@/components/ui/shadcn';
 import './App.css';
 
@@ -105,17 +110,18 @@ function App() {
         <header className="app-header">
           <h1>Mettle</h1>
           <div className="header-actions">
-            <button onClick={() => setShowCharacterManager(true)} className="manage-chars-btn">
+            <Button variant="ghost" size="sm" onClick={() => setShowCharacterManager(true)}>
               Manage Characters
-            </button>
+            </Button>
             <ThemeSelector />
-            <button
-              className="about-button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setShowLegalModal(true)}
               aria-label="About Mettle"
             >
               About
-            </button>
+            </Button>
           </div>
         </header>
         <main className="app-main">
@@ -153,17 +159,18 @@ function App() {
       <header className="app-header compact">
         <h1>Mettle</h1>
         <div className="header-actions">
-          <button onClick={() => setShowCharacterManager(true)} className="manage-chars-btn">
+          <Button variant="ghost" size="sm" onClick={() => setShowCharacterManager(true)}>
             Characters
-          </button>
+          </Button>
           <ThemeSelector />
-          <button
-            className="about-button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setShowLegalModal(true)}
             aria-label="About Mettle"
           >
             About
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -219,53 +226,103 @@ function App() {
       </CollapsibleHeader>
 
       {/* Navigation Tabs - Dynamic based on hero class */}
-      <nav className="view-tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={activeView === tab.id ? 'active' : ''}
-            onClick={() => setActiveView(tab.id as View)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      <RadixTabs
+        value={activeView}
+        onValueChange={(value) => setActiveView(value as View)}
+        className="view-tabs-container"
+      >
+        <RadixTabsList variant="fantasy" className="view-tabs">
+          {tabs.map((tab) => (
+            <RadixTabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </RadixTabsTrigger>
+          ))}
+        </RadixTabsList>
 
-      {/* Main Content */}
-      <main className="app-main">
-        {activeView === 'character' && <CharacterDetailsView />}
+        {/* Main Content */}
+        <main className="app-main">
+          <RadixTabsContent value="character">
+            <CharacterDetailsView />
+          </RadixTabsContent>
 
-        {activeView === 'abilities' && <AbilitiesView />}
+          <RadixTabsContent value="abilities">
+            <AbilitiesView />
+          </RadixTabsContent>
 
-        {/* Summoner-specific: Minions tab */}
-        {activeView === 'minions' && <CombatView />}
+          {/* Summoner-specific: Minions tab */}
+          <RadixTabsContent value="minions">
+            <CombatView />
+          </RadixTabsContent>
 
-        {activeView === 'projects' && <ProjectsView />}
+          <RadixTabsContent value="projects">
+            <ProjectsView />
+          </RadixTabsContent>
 
-        {activeView === 'items' && <MagicItemsView />}
+          <RadixTabsContent value="items">
+            <MagicItemsView />
+          </RadixTabsContent>
 
-        {activeView === 'inventory' && <InventoryView />}
+          <RadixTabsContent value="inventory">
+            <InventoryView />
+          </RadixTabsContent>
 
-        {/* Talent Strain View */}
-        {activeView === 'strain' && <StrainView />}
+          {/* Talent Strain View */}
+          <RadixTabsContent value="strain">
+            <StrainView />
+          </RadixTabsContent>
 
-        {/* Null Field View */}
-        {activeView === 'nullfield' && <NullFieldView />}
+          {/* Null Field View */}
+          <RadixTabsContent value="nullfield">
+            <NullFieldView />
+          </RadixTabsContent>
 
-        {/* Troubadour Routines View */}
-        {activeView === 'routines' && <RoutinesView />}
+          {/* Troubadour Routines View */}
+          <RadixTabsContent value="routines">
+            <RoutinesView />
+          </RadixTabsContent>
 
-        {/* Fury Ferocity View */}
-        {activeView === 'ferocity' && <FerocityTrackerView />}
+          {/* Fury Ferocity View */}
+          <RadixTabsContent value="ferocity">
+            <FerocityTrackerView />
+          </RadixTabsContent>
 
-        {/* Placeholder for other class-specific views */}
-        {['judgment', 'domain', 'persistent', 'college', 'tactics'].includes(activeView) && (
-          <div className="placeholder-view">
-            <h2>{tabs.find(t => t.id === activeView)?.label || 'Class Feature'}</h2>
-            <p className="coming-soon">This class-specific feature is coming soon.</p>
-          </div>
-        )}
-      </main>
+          {/* Placeholder for other class-specific views */}
+          <RadixTabsContent value="judgment">
+            <div className="placeholder-view">
+              <h2>Judgment</h2>
+              <p className="coming-soon">This class-specific feature is coming soon.</p>
+            </div>
+          </RadixTabsContent>
+
+          <RadixTabsContent value="domain">
+            <div className="placeholder-view">
+              <h2>Domain</h2>
+              <p className="coming-soon">This class-specific feature is coming soon.</p>
+            </div>
+          </RadixTabsContent>
+
+          <RadixTabsContent value="persistent">
+            <div className="placeholder-view">
+              <h2>Persistent</h2>
+              <p className="coming-soon">This class-specific feature is coming soon.</p>
+            </div>
+          </RadixTabsContent>
+
+          <RadixTabsContent value="college">
+            <div className="placeholder-view">
+              <h2>College</h2>
+              <p className="coming-soon">This class-specific feature is coming soon.</p>
+            </div>
+          </RadixTabsContent>
+
+          <RadixTabsContent value="tactics">
+            <div className="placeholder-view">
+              <h2>Tactics</h2>
+              <p className="coming-soon">This class-specific feature is coming soon.</p>
+            </div>
+          </RadixTabsContent>
+        </main>
+      </RadixTabs>
 
       {/* Modals */}
       {showCharacterManager && (

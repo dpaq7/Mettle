@@ -1,3 +1,109 @@
+/* ============================================
+   CHARACTER MANAGER - shadcn Dialog Enhancement
+   ============================================ */
+
+/* Dialog-specific overrides */
+.character-manager-dialog {
+  /* Additional dialog customizations if needed */
+}
+
+/* Action buttons row */
+.manager-actions-new {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .manager-actions-new {
+    flex-direction: column;
+  }
+}
+
+/* Character list scroll area */
+.character-list-scroll {
+  padding-right: 0.5rem;
+}
+
+/* Empty state */
+.no-characters-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+/* Character card styles */
+.character-card-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-darkest, #0a1212);
+  border: 1px solid var(--border-dark, #2a3a3a);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.character-card-new:hover {
+  border-color: var(--accent-dim, #3d8b7a);
+  background: var(--bg-dark, #101818);
+}
+
+.character-card-new.active {
+  border-color: var(--accent-primary, #4de8b2);
+  background: rgba(77, 232, 178, 0.08);
+  box-shadow: 0 0 15px rgba(77, 232, 178, 0.15);
+}
+
+.character-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.character-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Active badge */
+.active-badge-new {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-dim, #3d8b7a);
+  color: var(--accent-bright, #00ff9f);
+  border-radius: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .character-card-new {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .character-card-actions {
+    justify-content: flex-end;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-dark, #2a3a3a);
+    margin-top: 0.75rem;
+  }
+}
+
+/* ============================================
+   DEPRECATED STYLES (migrated to shadcn Dialog)
+   Kept for reference, can be removed later
+   ============================================
+
 .character-manager-overlay {
   position: fixed;
   top: 0;
@@ -13,12 +119,13 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .character-manager {
@@ -33,17 +140,6 @@
   flex-direction: column;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .manager-header {
@@ -132,14 +228,8 @@
   color: #888;
 }
 
-.no-characters p {
-  margin: 0.5rem 0;
-}
-
-.no-characters .hint {
-  color: #666;
-  font-size: 0.9rem;
-}
+.no-characters p { margin: 0.5rem 0; }
+.no-characters .hint { color: #666; font-size: 0.9rem; }
 
 .character-item {
   background: #1a1a1a;
@@ -154,18 +244,13 @@
   transition: all 0.2s;
 }
 
-.character-item:hover {
-  border-color: #4fc3f7;
-}
-
+.character-item:hover { border-color: #4fc3f7; }
 .character-item.active {
   border-color: #4fc3f7;
   background: rgba(79, 195, 247, 0.1);
 }
 
-.character-info {
-  flex: 1;
-}
+.character-info { flex: 1; }
 
 .character-name-row {
   display: flex;
@@ -235,24 +320,11 @@
   transition: all 0.2s;
 }
 
-.load-btn {
-  background: #4fc3f7;
-  color: #1a1a1a;
-}
+.load-btn { background: #4fc3f7; color: #1a1a1a; }
+.load-btn:hover { background: #29b6f6; }
 
-.load-btn:hover {
-  background: #29b6f6;
-}
-
-.export-btn {
-  background: #ff9800;
-  color: white;
-  font-size: 0.9rem;
-}
-
-.export-btn:hover {
-  background: #f57c00;
-}
+.export-btn { background: #ff9800; color: white; font-size: 0.9rem; }
+.export-btn:hover { background: #f57c00; }
 
 .delete-btn {
   background: #f44336;
@@ -261,9 +333,7 @@
   font-size: 1.2rem;
 }
 
-.delete-btn:hover {
-  background: #d32f2f;
-}
+.delete-btn:hover { background: #d32f2f; }
 
 .delete-confirm {
   display: flex;
@@ -290,23 +360,10 @@
   font-size: 0.85rem;
 }
 
-.confirm-delete-btn {
-  background: #f44336;
-  color: white;
-}
-
-.confirm-delete-btn:hover {
-  background: #d32f2f;
-}
-
-.cancel-delete-btn {
-  background: #666;
-  color: white;
-}
-
-.cancel-delete-btn:hover {
-  background: #888;
-}
+.confirm-delete-btn { background: #f44336; color: white; }
+.confirm-delete-btn:hover { background: #d32f2f; }
+.cancel-delete-btn { background: #666; color: white; }
+.cancel-delete-btn:hover { background: #888; }
 
 .manager-footer {
   padding: 1rem 1.5rem;
@@ -321,25 +378,11 @@
 }
 
 @media (max-width: 768px) {
-  .character-manager {
-    width: 95%;
-    max-height: 95vh;
-  }
-
-  .manager-actions {
-    flex-direction: column;
-  }
-
-  .character-item {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .character-actions {
-    justify-content: stretch;
-  }
-
-  .character-actions button {
-    flex: 1;
-  }
+  .character-manager { width: 95%; max-height: 95vh; }
+  .manager-actions { flex-direction: column; }
+  .character-item { flex-direction: column; align-items: stretch; }
+  .character-actions { justify-content: stretch; }
+  .character-actions button { flex: 1; }
 }
+
+============================================ */

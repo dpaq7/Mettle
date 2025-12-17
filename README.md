@@ -3,7 +3,7 @@
 > A comprehensive character manager for [Draw Steel](https://mcdm.gg/DrawSteel) TTRPG by MCDM Productions.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-0.3.5-green.svg)]()
+[![Version](https://img.shields.io/badge/version-0.4.0-green.svg)]()
 
 ## Features
 
@@ -27,12 +27,21 @@
 | [TypeScript](https://www.typescriptlang.org/) | 5.9 | Type-safe JavaScript |
 | [Vite](https://vitejs.dev/) | 7.2 | Build tool & dev server |
 
+### UI Components
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| [shadcn/ui](https://ui.shadcn.com/) | - | Component library |
+| [Radix UI](https://www.radix-ui.com/) | 1.x | Accessible primitives |
+| [Tailwind CSS](https://tailwindcss.com/) | 4.1 | Utility-first CSS |
+| [Lucide React](https://lucide.dev/) | 0.513 | Icon library |
+
 ### Styling
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | [Sass/SCSS](https://sass-lang.com/) | 1.94 | CSS preprocessor |
 | CSS Custom Properties | - | Design tokens & theming |
 | [Google Fonts](https://fonts.google.com/) | - | Typography (Cinzel, Source Sans 3) |
+| [class-variance-authority](https://cva.style/) | 0.7 | Component variant styling |
 
 ### Desktop Application
 | Technology | Version | Purpose |
@@ -55,11 +64,29 @@
 ### Architecture Highlights
 
 - **Component-Based**: Modular React components organized by feature
+- **shadcn/ui Integration**: Accessible, customizable UI components with fantasy theming
 - **Context API**: State management via React Context (HeroContext, CombatContext, ThemeContext)
 - **Custom Hooks**: Reusable logic (useSquads, useEssence, useConditions, etc.)
 - **CSS Architecture**: BEM-inspired naming with CSS custom properties for theming
 - **Offline-First**: Full functionality without internet after initial load
 - **Type Safety**: Strict TypeScript with comprehensive interface definitions
+
+### shadcn/ui Components
+
+Custom fantasy-themed variants built on Radix UI primitives:
+
+| Component | Variants | Usage |
+|-----------|----------|-------|
+| Button | `heroic`, `combat`, `chamfered`, `diamond`, `hexagon` | Actions throughout app |
+| Dialog | `fantasy`, `scroll` | Modals (LevelUp, CharacterManager, ItemSelector) |
+| Select | `fantasy` | Dropdowns (theme, equipment slots) |
+| Input/Textarea | `fantasy` | Form fields |
+| Tabs | `line`, `enclosed`, `soft` | Navigation (abilities, inventory) |
+| Badge | `tier1`, `tier2`, `tier3`, `keyword` | Status indicators |
+| DropdownMenu | `fantasy` | Context menus (theme selector) |
+| AlertDialog | `fantasy` | Confirmations (respite, delete) |
+| Tooltip | - | Help text |
+| ScrollArea | - | Scrollable containers |
 
 ### Project Structure
 
@@ -73,10 +100,12 @@ src/
 │   ├── creation/        # Character creator
 │   ├── inventory/       # Equipment & items
 │   ├── shared/          # Reusable UI components
-│   └── ui/              # Base UI elements
+│   └── ui/
+│       └── shadcn/      # shadcn/ui components (Button, Dialog, etc.)
 ├── context/             # React Context providers
 ├── data/                # Static game data & class definitions
 ├── hooks/               # Custom React hooks
+├── styles/              # Global styles & theme variables
 ├── types/               # TypeScript type definitions
 └── utils/               # Utility functions
 ```
@@ -136,6 +165,7 @@ npm run tauri build -- --target universal-apple-darwin
 
 ## Version History
 
+- **v0.4.0** - Complete shadcn/ui migration with fantasy theming, accessible components
 - **v0.3.5** - Class progression system, stamina/dying fixes, UI improvements
 - **v0.3.4** - Class ability widgets, legal attribution modal, theme fixes
 - **v0.3.3** - Standardize hero class system, rename context to HeroContext

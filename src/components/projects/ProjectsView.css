@@ -382,7 +382,90 @@
   cursor: default;
 }
 
-/* New Project Modal */
+/* ============================================
+   NEW PROJECT MODAL - shadcn Dialog Enhancement
+   ============================================ */
+
+.new-project-dialog {
+  /* Additional dialog customizations if needed */
+}
+
+/* Template sections in new dialog */
+.template-sections-new {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.template-section-new {
+  /* Section spacing handled by parent gap */
+}
+
+/* Template option cards */
+.template-option-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--bg-darkest, #0a1212);
+  border: 1px solid var(--border-dark, #2a3a3a);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.template-option-new:hover {
+  border-color: var(--accent-dim, #3d8b7a);
+  background: var(--bg-dark, #101818);
+}
+
+.template-option-new.selected {
+  border-color: var(--accent-primary, #4de8b2);
+  background: rgba(77, 232, 178, 0.1);
+  box-shadow: 0 0 10px rgba(77, 232, 178, 0.15);
+}
+
+.template-name-new {
+  color: var(--text-primary, #e4ebe9);
+  font-weight: 500;
+}
+
+/* Project config panel */
+.project-config-new {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-dark, #2a3a3a);
+}
+
+/* Template details panel */
+.template-details-new {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-darkest, #0a1212);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-dim, #3d8b7a);
+}
+
+.template-details-new p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b3c2bf);
+  line-height: 1.4;
+}
+
+.template-details-new p:first-child {
+  margin-top: 0;
+}
+
+.template-details-new p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   DEPRECATED STYLES (migrated to shadcn Dialog)
+   Kept for reference, can be removed later
+   ============================================
+
 .projects-view .modal-overlay {
   position: fixed;
   inset: 0;
@@ -459,7 +542,6 @@
   font-size: 0.75rem;
 }
 
-/* Project Config */
 .project-config {
   background: var(--bg-darkest);
   border: 1px solid var(--border-solid);
@@ -507,7 +589,6 @@
   color: var(--text-muted);
 }
 
-/* Modal Actions */
 .modal-actions {
   display: flex;
   gap: 0.75rem;
@@ -547,6 +628,8 @@
   border-color: var(--text-muted);
   color: var(--text-secondary);
 }
+
+============================================ */
 
 /* Responsive */
 @media (max-width: 800px) {

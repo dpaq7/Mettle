@@ -2,6 +2,20 @@ import React, { useState } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { ActiveProject, ProjectTemplate, ProjectRoll } from '../../types/projects';
 import { PROJECT_TEMPLATES, BREAKTHROUGH_THRESHOLD, PROJECT_MODIFIERS, getProjectsByType } from '../../data/projects';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Button,
+  Input,
+  Label,
+  ScrollArea,
+  Badge,
+} from '@/components/ui/shadcn';
+import { Plus, Beaker, Hammer, Sparkles, Play, X, ChevronDown, ChevronRight, Trash2, Dice6 } from 'lucide-react';
 import './ProjectsView.css';
 
 const ProjectsView: React.FC = () => {
@@ -261,84 +275,111 @@ const ProjectsView: React.FC = () => {
       )}
 
       {/* New Project Modal */}
-      {showNewProject && (
-        <div className="modal-overlay" onClick={() => setShowNewProject(false)}>
-          <div className="new-project-modal" onClick={e => e.stopPropagation()}>
-            <h3>Start New Project</h3>
+      <Dialog open={showNewProject} onOpenChange={setShowNewProject}>
+        <DialogContent variant="fantasy" className="new-project-dialog max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5 text-[var(--accent-primary)]" />
+              Start New Project
+            </DialogTitle>
+            <DialogDescription>
+              Select a project template to begin
+            </DialogDescription>
+          </DialogHeader>
 
-            <div className="template-sections">
-              {(['research', 'crafting', 'other'] as const).map(type => (
-                <div key={type} className="template-section">
-                  <h4>{type.charAt(0).toUpperCase() + type.slice(1)} Projects</h4>
-                  <div className="template-list">
-                    {getProjectsByType(type).map(template => (
-                      <div
-                        key={template.id}
-                        className={`template-option ${selectedTemplate?.id === template.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedTemplate(template)}
-                      >
-                        <div className="template-name">{template.name}</div>
-                        <div className="template-goal">
-                          Goal: {template.fixedGoal || `${template.goalRange?.min}-${template.goalRange?.max}`} PP
+          <ScrollArea className="h-[350px] pr-2">
+            <div className="template-sections-new">
+              {(['research', 'crafting', 'other'] as const).map(type => {
+                const TypeIcon = type === 'research' ? Beaker : type === 'crafting' ? Hammer : Sparkles;
+                return (
+                  <div key={type} className="template-section-new">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TypeIcon className="h-4 w-4 text-[var(--accent-primary)]" />
+                      <span className="text-sm font-medium uppercase tracking-wider text-[var(--text-muted)]">
+                        {type} Projects
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {getProjectsByType(type).map(template => (
+                        <div
+                          key={template.id}
+                          className={`template-option-new ${selectedTemplate?.id === template.id ? 'selected' : ''}`}
+                          onClick={() => setSelectedTemplate(template)}
+                        >
+                          <span className="template-name-new">{template.name}</span>
+                          <Badge variant="outline" size="sm">
+                            {template.fixedGoal || `${template.goalRange?.min}-${template.goalRange?.max}`} PP
+                          </Badge>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {selectedTemplate && (
-              <div className="project-config">
-                <div className="config-field">
-                  <label>Project Name</label>
-                  <input
-                    type="text"
-                    value={projectName}
-                    onChange={e => setProjectName(e.target.value)}
-                    placeholder={selectedTemplate.name}
-                  />
-                </div>
-
-                {selectedTemplate.goalRange && (
-                  <div className="config-field">
-                    <label>Project Goal (PP)</label>
-                    <input
-                      type="number"
-                      value={customGoal}
-                      onChange={e => setCustomGoal(parseInt(e.target.value) || 100)}
-                      min={selectedTemplate.goalRange.min}
-                      max={selectedTemplate.goalRange.max}
+              <div className="project-config-new">
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="project-name" className="text-sm font-medium">
+                      Project Name
+                    </Label>
+                    <Input
+                      id="project-name"
+                      variant="fantasy"
+                      type="text"
+                      value={projectName}
+                      onChange={e => setProjectName(e.target.value)}
+                      placeholder={selectedTemplate.name}
                     />
                   </div>
-                )}
 
-                <div className="template-details">
-                  <p><strong>Description:</strong> {selectedTemplate.description}</p>
-                  <p><strong>Prerequisites:</strong> {selectedTemplate.prerequisites}</p>
-                  <p><strong>Outcome:</strong> {selectedTemplate.outcome}</p>
-                  {selectedTemplate.applicableSkills.length > 0 && (
-                    <p><strong>Applicable Skills:</strong> {selectedTemplate.applicableSkills.join(', ')}</p>
+                  {selectedTemplate.goalRange && (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="project-goal" className="text-sm font-medium">
+                        Project Goal (PP)
+                      </Label>
+                      <Input
+                        id="project-goal"
+                        variant="fantasy"
+                        type="number"
+                        value={customGoal}
+                        onChange={e => setCustomGoal(parseInt(e.target.value) || 100)}
+                        min={selectedTemplate.goalRange.min}
+                        max={selectedTemplate.goalRange.max}
+                      />
+                    </div>
                   )}
+
+                  <div className="template-details-new">
+                    <p><strong className="text-[var(--text-primary)]">Description:</strong> {selectedTemplate.description}</p>
+                    <p><strong className="text-[var(--text-primary)]">Prerequisites:</strong> {selectedTemplate.prerequisites}</p>
+                    <p><strong className="text-[var(--text-primary)]">Outcome:</strong> {selectedTemplate.outcome}</p>
+                    {selectedTemplate.applicableSkills.length > 0 && (
+                      <p><strong className="text-[var(--text-primary)]">Applicable Skills:</strong> {selectedTemplate.applicableSkills.join(', ')}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
+          </ScrollArea>
 
-            <div className="modal-actions">
-              <button
-                className="confirm-btn"
-                onClick={startNewProject}
-                disabled={!selectedTemplate}
-              >
-                Start Project
-              </button>
-              <button className="cancel-btn" onClick={() => setShowNewProject(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="chamfered" onClick={() => setShowNewProject(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="heroic"
+              onClick={startNewProject}
+              disabled={!selectedTemplate}
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Start Project
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

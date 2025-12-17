@@ -2,6 +2,16 @@ import React, { useState, useRef, useCallback } from 'react';
 import { PortraitSettings, DEFAULT_PORTRAIT_SETTINGS } from '../../types/portrait';
 import { processPortraitImage, isValidImageUrl, getBase64SizeKB } from '../../utils/imageProcessing';
 import PortraitControls from './PortraitControls';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  Button,
+  Input,
+} from '@/components/ui/shadcn';
+import { X, Upload, Link, RefreshCcw, Loader2, ImageOff } from 'lucide-react';
 
 interface PortraitUploaderProps {
   isOpen: boolean;
@@ -163,20 +173,23 @@ const PortraitUploader: React.FC<PortraitUploaderProps> = ({
     setPreviewSettings((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  if (!isOpen) return null;
+  // Handler for Dialog's onOpenChange
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
 
   const hasPortrait = previewSettings.source !== 'default' && previewSettings.imageData !== null;
   const displayError = localError || error;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="portrait-uploader" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>Character Portrait</h3>
-          <button className="close-btn" onClick={onClose}>
-            ×
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent variant="fantasy" className="portrait-uploader-dialog max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Upload className="h-5 w-5 text-[var(--accent-primary)]" />
+            Character Portrait
+          </DialogTitle>
+        </DialogHeader>
 
         <div className="portrait-uploader__content">
           {/* Preview Area */}
@@ -209,29 +222,24 @@ const PortraitUploader: React.FC<PortraitUploaderProps> = ({
               />
             ) : (
               <div className="portrait-uploader__dropzone">
-                <div className="dropzone-icon">
-                  <svg viewBox="0 0 24 24" width="48" height="48">
-                    <path
-                      fill="currentColor"
-                      d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"
-                    />
-                  </svg>
-                </div>
-                <p>Drag & drop an image here</p>
-                <p className="hint">or use the buttons below</p>
+                <ImageOff className="h-12 w-12 text-[var(--text-dim)] mb-2" />
+                <p className="text-[var(--text-primary)]">Drag & drop an image here</p>
+                <p className="text-sm text-[var(--text-muted)]">or use the buttons below</p>
               </div>
             )}
           </div>
 
           {/* Action Buttons */}
           <div className="portrait-uploader__actions">
-            <button
-              className="action-btn upload-btn"
+            <Button
+              variant="chamfered"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
+              className="w-full"
             >
+              <Upload className="h-4 w-4 mr-2" />
               Upload Image
-            </button>
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -245,20 +253,22 @@ const PortraitUploader: React.FC<PortraitUploaderProps> = ({
             />
 
             <div className="url-input-group">
-              <input
+              <Input
+                variant="fantasy"
                 type="text"
                 placeholder="Or paste image URL..."
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
               />
-              <button
-                className="action-btn url-btn"
+              <Button
+                variant="outline"
                 onClick={handleUrlSubmit}
                 disabled={isLoading || !urlInput.trim()}
               >
+                <Link className="h-4 w-4 mr-2" />
                 Use URL
-              </button>
+              </Button>
             </div>
 
             {urlError && <p className="error-text">{urlError}</p>}
@@ -266,14 +276,15 @@ const PortraitUploader: React.FC<PortraitUploaderProps> = ({
 
           {/* Quick Options */}
           <div className="portrait-uploader__quick-options">
-            <button className="quick-option" onClick={handleRemove}>
+            <Button variant="ghost" size="sm" onClick={handleRemove}>
+              <RefreshCcw className="h-4 w-4 mr-2" />
               Use Default Silhouette
-            </button>
+            </Button>
           </div>
 
           {/* Adjustments */}
           <div className="portrait-uploader__adjustments">
-            <h4>Adjustments</h4>
+            <h4 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2">Adjustments</h4>
             <PortraitControls settings={previewSettings} onChange={handleSettingsChange} />
           </div>
 
@@ -287,23 +298,22 @@ const PortraitUploader: React.FC<PortraitUploaderProps> = ({
           {/* Loading Indicator */}
           {isLoading && (
             <div className="portrait-uploader__loading">
-              <span className="spinner"></span>
+              <Loader2 className="h-6 w-6 animate-spin text-[var(--accent-primary)]" />
               <p>Processing image...</p>
             </div>
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="portrait-uploader__footer">
-          <button className="btn-secondary" onClick={onClose}>
+        <DialogFooter>
+          <Button variant="chamfered" onClick={onClose}>
             Cancel
-          </button>
-          <button className="btn-primary" onClick={handleApply} disabled={isLoading}>
+          </Button>
+          <Button variant="heroic" onClick={handleApply} disabled={isLoading}>
             Apply Portrait
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
