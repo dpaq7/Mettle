@@ -75,8 +75,9 @@ jobs:
         run: |
           echo "Cleaning Tauri target directories..."
           rm -rf src-tauri/target/universal-apple-darwin || true
-          rm -rf src-tauri/target/aarch64-apple-darwin/release/bundle || true
-          rm -rf src-tauri/target/x86_64-apple-darwin/release/bundle || true
+          rm -rf src-tauri/target/aarch64-apple-darwin/release || true
+          rm -rf src-tauri/target/x86_64-apple-darwin/release || true
+          ls -la src-tauri/target/ 2>/dev/null || echo "Target directory is clean"
           echo "Clean complete"
 
       - name: Build Tauri app

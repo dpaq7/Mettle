@@ -202,7 +202,6 @@ export function resetAllThemePreferences(): void {
     localStorage.removeItem(THEME_STORAGE_KEY);
     localStorage.removeItem(THEME_OVERRIDE_KEY);
     applyCreatorTheme();
-    console.log('Theme preferences reset successfully');
   } catch (error) {
     console.error('Failed to reset theme preferences:', error);
   }

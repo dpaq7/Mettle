@@ -400,7 +400,6 @@ const migrateLegacyStorage = (): void => {
       localStorage.setItem(ACTIVE_CHARACTER_KEY, legacyActiveId);
     }
 
-    console.log(`Migrated ${migratedCharacters.length} characters from legacy storage`);
   } catch (error) {
     console.error('Error migrating legacy storage:', error);
   }

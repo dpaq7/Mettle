@@ -116,11 +116,6 @@ const CharacterManager: React.FC<CharacterManagerProps> = ({ onClose, onCreateNe
         loadHero(result.hero.id);
         refreshCharacters();
 
-        // Show warnings if any
-        if (result.warnings.length > 0) {
-          console.log('Import warnings:', result.warnings);
-        }
-
         // Use onCharacterLoaded if provided (exits creation mode), otherwise just close
         if (onCharacterLoaded) {
           onCharacterLoaded();
