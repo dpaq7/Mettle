@@ -13,6 +13,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
+import { APP_VERSION_FULL } from '@/constants/version';
+
 import { Button } from '@/components/ui/shadcn/button';
 import { Badge } from '@/components/ui/shadcn/badge';
 import {
@@ -84,13 +86,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     <header className="dashboard-header">
       {/* Left: Logo + Character */}
       <div className="dashboard-header-left">
-        <motion.h1
-          className="dashboard-logo"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Mettle
-        </motion.h1>
+        {/* Logo with Version */}
+        <div className="dashboard-branding">
+          <motion.h1
+            className="dashboard-logo"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Mettle
+          </motion.h1>
+          <span className="dashboard-version">{APP_VERSION_FULL}</span>
+        </div>
 
         {hero && (
           <>

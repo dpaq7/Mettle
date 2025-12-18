@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
+import { APP_VERSION_DISPLAY } from '@/constants/version';
 import './LegalModal.css';
 
 interface LegalModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const APP_VERSION = '0.3.4';
 
 export const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose }) => {
   // Open URL in system browser
@@ -52,7 +51,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose }) => {
         <div className="legal-modal-content">
           <section className="legal-section">
             <h3>Version</h3>
-            <p>Mettle v{APP_VERSION}</p>
+            <p>Mettle {APP_VERSION_DISPLAY}</p>
             <p className="legal-tagline">A character manager for Draw Steel</p>
           </section>
 
@@ -105,7 +104,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 className="legal-link"
-                onClick={() => handleOpenUrl('https://github.com/dpaq7/forge-steel-summoner')}
+                onClick={() => handleOpenUrl('https://github.com/dpaq7/Mettle')}
               >
                 View Source on GitHub
               </button>
