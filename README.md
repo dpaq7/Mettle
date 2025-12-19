@@ -3,7 +3,12 @@
 > A comprehensive character manager for [Draw Steel](https://mcdm.gg/DrawSteel) TTRPG by MCDM Productions.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-0.4.4-green.svg)]()
+[![Version](https://img.shields.io/badge/version-0.4.9-green.svg)]()
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-2.9-FFC131?logo=tauri&logoColor=white)](https://tauri.app/)
+[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 ## Features
 
@@ -166,6 +171,11 @@ npm run tauri build -- --target universal-apple-darwin
 
 ## Version History
 
+- **v0.4.9** - Fix skills display in Character tab (use actual selected skills, not skill categories)
+- **v0.4.8** - Character creator UX improvements: dual navigation buttons, scroll-to-top, unified skill selection styling
+- **v0.4.7** - Summoner combat improvements, Crimson Veil theme color update
+- **v0.4.6** - Summoner fixture mechanics, minion card UI/UX improvements
+- **v0.4.5** - Combat tracker enhancements, condition management improvements
 - **v0.4.4** - Condition end type toggles (EoT/Roll/Manual), 5 color theme system, unified pinnable stats dashboard
 - **v0.4.1** - iCloud sync fix for Tauri build artifacts
 - **v0.4.0** - Complete shadcn/ui migration with fantasy theming, accessible components
