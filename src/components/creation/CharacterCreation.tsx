@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand } from '../../types';
 import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
@@ -15,6 +15,8 @@ import { classDefinitions, getClassRoleColor, getSubclassTypeName, requiresMulti
 import ClassSelector from './ClassSelector';
 import SubclassSelector from './SubclassSelector';
 import FuryAspectSelector from './FuryAspectSelector';
+import CreationNavigation from './CreationNavigation';
+import { useSkillAvailability, getSourceLabel, SkillAvailabilityProvider } from '../../context/SkillAvailabilityContext';
 import { TroubadourClass, FuryAspect, StormwightKit, ConduitDomain } from '../../types/hero';
 import { getPrimordialStormForKit } from '../../data/fury/stormwight-kits';
 import {
@@ -94,8 +96,23 @@ interface SkillSelection {
   isFixed: boolean; // true if this is a specific skill, not a choice
 }
 
-const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => {
+const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete }) => {
   const { createNewHero } = useSummonerContext();
+  const skillAvailability = useSkillAvailability();
+
+  // Ref for scroll-to-top behavior
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top of the creation container
+  const scrollToTop = useCallback(() => {
+    // Scroll the creation container
+    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    // Also scroll the app-main container if it exists
+    const appMain = document.querySelector('.app-main');
+    if (appMain) {
+      appMain.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
 
   const [step, setStep] = useState<Step>('name');
   const [name, setName] = useState('');
@@ -275,6 +292,16 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
   useEffect(() => {
     setSelectedLanguages([]);
   }, [selectedCareer]);
+
+  // Clear skill availability when culture changes
+  useEffect(() => {
+    skillAvailability.clearSourceGrants('culture');
+  }, [selectedCulture]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Clear skill availability when career changes
+  useEffect(() => {
+    skillAvailability.clearSourceGrants('career');
+  }, [selectedCareer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset Null-specific selections when class changes away from Null
   useEffect(() => {
@@ -468,6 +495,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
     const currentIndex = currentSteps.indexOf(step);
     if (currentIndex < currentSteps.length - 1) {
       setStep(currentSteps[currentIndex + 1]);
+      // Scroll to top after a brief delay to allow render
+      requestAnimationFrame(() => {
+        scrollToTop();
+      });
     } else {
       createCharacter();
     }
@@ -477,6 +508,10 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
     const currentIndex = currentSteps.indexOf(step);
     if (currentIndex > 0) {
       setStep(currentSteps[currentIndex - 1]);
+      // Scroll to top after a brief delay to allow render
+      requestAnimationFrame(() => {
+        scrollToTop();
+      });
     }
   };
 
@@ -832,16 +867,53 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
         <div className="skill-selection" key={selection.source}>
           <h4>{sourceLabel} ({selection.skillGroup.charAt(0).toUpperCase() + selection.skillGroup.slice(1)} Skill)</h4>
           <div className="skill-options">
-            {availableSkills.map(skill => (
-              <button
-                key={skill.id}
-                className={`skill-option ${selection.selectedSkillId === skill.id ? 'selected' : ''}`}
-                onClick={() => onSelect(skill.id)}
-              >
-                <span className="skill-name">{skill.name}</span>
-                <span className="skill-desc">{skill.description}</span>
-              </button>
-            ))}
+            {availableSkills.map(skill => {
+              const isSelected = selection.selectedSkillId === skill.id;
+              // Check if skill is available (not selected elsewhere)
+              const isAvailable = skillAvailability.isSkillAvailable(skill.id);
+              // If skill is selected in this slot, it's available for this slot
+              const canSelect = isSelected || isAvailable;
+              const source = !isAvailable ? skillAvailability.getSkillSource(skill.id) : null;
+
+              const getDisabledReason = (): string | null => {
+                if (!isAvailable && source) {
+                  return `From ${getSourceLabel(source)}`;
+                }
+                return null;
+              };
+
+              const handleClick = () => {
+                if (!canSelect) return;
+
+                // If there was a previous selection, unregister it
+                if (selection.selectedSkillId && selection.selectedSkillId !== skill.id) {
+                  skillAvailability.unregisterSelectedSkill(selection.selectedSkillId, selection.source);
+                }
+
+                // Register the new selection (unless deselecting)
+                if (!isSelected) {
+                  skillAvailability.registerSelectedSkill(skill.id, selection.source);
+                }
+
+                onSelect(skill.id);
+              };
+
+              return (
+                <button
+                  key={skill.id}
+                  className={`skill-option ${isSelected ? 'selected' : ''} ${!canSelect ? 'disabled' : ''}`}
+                  onClick={handleClick}
+                  disabled={!canSelect}
+                  aria-disabled={!canSelect}
+                >
+                  <span className="skill-name">{skill.name}</span>
+                  <span className="skill-desc">{skill.description}</span>
+                  {!canSelect && (
+                    <span className="skill-source-badge">{getDisabledReason()}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       );
@@ -1517,8 +1589,12 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
     }
   };
 
+  const isFirstStep = step === 'name';
+  const isFinalStep = step === 'characteristics';
+  const nextLabel = isFinalStep ? 'Create Character' : 'Next';
+
   return (
-    <div className="character-creation">
+    <div className="character-creation" ref={containerRef}>
       <div className="creation-progress">
         <div className="progress-bar">
           <div
@@ -1533,15 +1609,37 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onComplete }) => 
         </span>
       </div>
 
+      {/* Top Navigation */}
+      <CreationNavigation
+        position="top"
+        onBack={handleBack}
+        onNext={handleNext}
+        nextLabel={nextLabel}
+        nextDisabled={!canProceed()}
+        showBack={!isFirstStep}
+      />
+
       {renderStep()}
 
-      <div className="creation-actions">
-        {step !== 'name' && <button onClick={handleBack}>Back</button>}
-        <button onClick={handleNext} disabled={!canProceed()}>
-          {step === 'characteristics' ? 'Create Character' : 'Next'}
-        </button>
-      </div>
+      {/* Bottom Navigation */}
+      <CreationNavigation
+        position="bottom"
+        onBack={handleBack}
+        onNext={handleNext}
+        nextLabel={nextLabel}
+        nextDisabled={!canProceed()}
+        showBack={!isFirstStep}
+      />
     </div>
+  );
+};
+
+// Wrapper component that provides the SkillAvailabilityProvider
+const CharacterCreation: React.FC<CharacterCreationProps> = (props) => {
+  return (
+    <SkillAvailabilityProvider>
+      <CharacterCreationInner {...props} />
+    </SkillAvailabilityProvider>
   );
 };
 

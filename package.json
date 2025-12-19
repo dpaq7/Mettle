@@ -1,7 +1,7 @@
 {
   "name": "mettle",
   "private": true,
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Mettle - A Draw Steel TTRPG Character Manager",
   "author": "Dan Paquin",
   "license": "GPL-3.0",

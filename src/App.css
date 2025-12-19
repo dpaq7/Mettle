@@ -1082,6 +1082,44 @@ html, body {
   line-height: 1.3;
 }
 
+/* Skill disabled - already selected/granted elsewhere */
+.skill-option.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.skill-option.disabled:hover {
+  border-color: var(--border-solid);
+  background: var(--bg-light);
+  transform: none;
+}
+
+/* Skill disabled - max selections reached in section */
+.skill-option.max-reached {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.skill-option.max-reached:hover {
+  border-color: var(--border-solid);
+  background: var(--bg-light);
+  transform: none;
+}
+
+/* Source indicator badge for disabled skills */
+.skill-source-badge {
+  display: none;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.skill-option.disabled .skill-source-badge,
+.skill-option.max-reached .skill-source-badge {
+  display: block;
+}
+
 /* ============================================
    CREATION ACTIONS
    ============================================ */

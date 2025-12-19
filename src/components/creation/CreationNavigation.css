@@ -1,0 +1,75 @@
+/* ============================================
+   CREATION NAVIGATION COMPONENT
+   Shared navigation for top and bottom of creation steps
+   ============================================ */
+
+.creation-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.creation-nav--top {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.creation-nav--bottom {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-solid);
+}
+
+.creation-nav__btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.creation-nav__btn--back {
+  background: var(--bg-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-solid);
+}
+
+.creation-nav__btn--back:hover {
+  background: var(--bg-hover);
+}
+
+.creation-nav__btn--next {
+  background: var(--accent-bright);
+  color: var(--bg-darkest);
+}
+
+.creation-nav__btn--next:hover:not(:disabled) {
+  background: var(--accent-glow);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.creation-nav__btn:disabled {
+  background: var(--bg-light);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.creation-nav__btn:disabled:hover {
+  background: var(--bg-light);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .creation-nav__btn {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+  }
+}
