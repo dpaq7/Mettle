@@ -73,18 +73,24 @@ jobs:
       - name: Clean Tauri build directories (macOS)
         if: matrix.platform == 'macos-latest'
         run: |
-          echo "Cleaning Tauri target directories..."
-          rm -rf src-tauri/target/universal-apple-darwin || true
-          rm -rf src-tauri/target/aarch64-apple-darwin/release || true
-          rm -rf src-tauri/target/x86_64-apple-darwin/release || true
-          ls -la src-tauri/target/ 2>/dev/null || echo "Target directory is clean"
-          echo "Clean complete"
+          echo "Aggressively cleaning Tauri target directories..."
+          rm -rf src-tauri/target/universal-apple-darwin
+          rm -rf src-tauri/target/aarch64-apple-darwin
+          rm -rf src-tauri/target/x86_64-apple-darwin
+          # Verify cleanup
+          if [ -d "src-tauri/target/universal-apple-darwin" ]; then
+            echo "ERROR: universal-apple-darwin still exists!"
+            ls -la src-tauri/target/universal-apple-darwin
+            exit 1
+          fi
+          echo "Target directories cleaned successfully"
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tauriScript: npx tauri
           tagName: ${{ github.ref_name }}
           releaseName: 'Mettle ${{ github.ref_name }}'
           releaseBody: |
