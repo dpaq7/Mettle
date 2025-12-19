@@ -29,6 +29,11 @@ import { StrainView } from './components/classDetails/TalentDetails/StrainView';
 import { NullFieldView } from './components/classDetails/NullDetails/NullFieldView';
 import { RoutinesView } from './components/classDetails/TroubadourDetails';
 import { FerocityTrackerView } from './components/classDetails/FuryDetails';
+import { InsightView } from './components/classDetails/ShadowDetails';
+import { JudgmentView } from './components/classDetails/CensorDetails';
+import { TacticsView } from './components/classDetails/TacticianDetails';
+import { PersistentMagicView } from './components/classDetails/ElementalistDetails';
+import { DomainView } from './components/classDetails/ConduitDetails';
 import { getTabsForClass, ViewType } from './data/class-tabs';
 import { getResourceConfig } from './data/class-resources';
 import { HeroClass } from './types/hero';
@@ -541,40 +546,25 @@ function App() {
             <FerocityTrackerView />
           </RadixTabsContent>
 
-          {/* Placeholder for other class-specific views */}
+          {/* Class-specific views */}
           <RadixTabsContent value="judgment">
-            <div className="placeholder-view">
-              <h2>Judgment</h2>
-              <p className="coming-soon">This class-specific feature is coming soon.</p>
-            </div>
+            <JudgmentView />
           </RadixTabsContent>
 
           <RadixTabsContent value="domain">
-            <div className="placeholder-view">
-              <h2>Domain</h2>
-              <p className="coming-soon">This class-specific feature is coming soon.</p>
-            </div>
+            <DomainView />
           </RadixTabsContent>
 
           <RadixTabsContent value="persistent">
-            <div className="placeholder-view">
-              <h2>Persistent</h2>
-              <p className="coming-soon">This class-specific feature is coming soon.</p>
-            </div>
+            <PersistentMagicView />
           </RadixTabsContent>
 
           <RadixTabsContent value="college">
-            <div className="placeholder-view">
-              <h2>College</h2>
-              <p className="coming-soon">This class-specific feature is coming soon.</p>
-            </div>
+            <InsightView />
           </RadixTabsContent>
 
           <RadixTabsContent value="tactics">
-            <div className="placeholder-view">
-              <h2>Tactics</h2>
-              <p className="coming-soon">This class-specific feature is coming soon.</p>
-            </div>
+            <TacticsView />
           </RadixTabsContent>
         </main>
       </RadixTabs>

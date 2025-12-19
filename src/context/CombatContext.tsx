@@ -367,7 +367,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     return true;
   };
 
-  // Generic end-of-turn handler for all classes (used by TurnTracker)
+  // Generic end-of-turn handler for all classes (used by TurnCard in StatsDashboard)
   const onEndTurn = useCallback(() => {
     setCombatTurnNumber((prev) => prev + 1);
   }, []);

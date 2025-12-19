@@ -1,0 +1,667 @@
+/* ============================================
+   TACTICS VIEW STYLES (Tactician)
+   Displays Focus tracking and Mark mechanics
+   ============================================ */
+
+/* === TACTICIAN-SPECIFIC CSS VARIABLES === */
+.tactics-view {
+  --tactician-primary: #0ea5e9;
+  --tactician-accent: #38bdf8;
+  --tactician-dim: rgba(14, 165, 233, 0.15);
+  --tactician-glow: rgba(56, 189, 248, 0.3);
+}
+
+/* === MAIN VIEW CONTAINER === */
+.tactics-view {
+  padding: var(--space-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tactics-view--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-muted);
+}
+
+/* === HEADER === */
+.tactics-view__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.tactics-view__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tactician-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.tactics-view__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* === CONTENT SECTIONS === */
+.tactics-view__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.tactics-view__section {
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.tactics-view__section-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-bone);
+  margin: 0 0 var(--space-md) 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* === IDENTITY SECTION (Doctrine) === */
+.tactics-view__identity-card {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--tactician-primary);
+}
+
+.tactics-view__identity-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.tactics-view__identity-name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tactician-accent);
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.tactics-view__identity-name--none {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tactics-view__identity-theme {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+  font-style: italic;
+}
+
+.tactics-view__identity-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === RESOURCE SECTION (Focus) === */
+.tactics-view__section--resource {
+  border-color: var(--tactician-primary);
+}
+
+.tactics-view__resource-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.tactics-view__resource-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-solid);
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tactics-view__resource-btn:hover:not(:disabled) {
+  border-color: var(--tactician-primary);
+  color: var(--tactician-accent);
+  box-shadow: 0 0 15px var(--tactician-glow);
+}
+
+.tactics-view__resource-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.tactics-view__resource-value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tactician-accent);
+  min-width: 80px;
+  text-align: center;
+}
+
+/* === MECHANICS GRID === */
+.tactics-view__mechanics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+.tactics-view__mechanic {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+}
+
+.tactics-view__mechanic-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.tactics-view__mechanic-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tactics-view__mechanic-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--tactician-accent);
+}
+
+.tactics-view__trigger-btn {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--tactician-dim);
+  border: 1px solid var(--tactician-primary);
+  border-radius: var(--radius-sm);
+  color: var(--tactician-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__trigger-btn:hover {
+  background: var(--tactician-primary);
+  color: white;
+  box-shadow: 0 0 10px var(--tactician-glow);
+}
+
+/* === MARK SECTION === */
+.tactics-view__section--mark {
+  border-color: var(--tactician-accent);
+}
+
+.tactics-view__mark-input-container {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.tactics-view__mark-input {
+  flex: 1;
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border: 2px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+}
+
+.tactics-view__mark-input:focus {
+  outline: none;
+  border-color: var(--tactician-primary);
+}
+
+.tactics-view__mark-input::placeholder {
+  color: var(--text-muted);
+}
+
+.tactics-view__mark-btn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--tactician-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__mark-btn:hover:not(:disabled) {
+  background: var(--tactician-accent);
+  box-shadow: 0 0 20px var(--tactician-glow);
+}
+
+.tactics-view__mark-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Marked Targets List */
+.tactics-view__marked-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.tactics-view__marked-target {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--tactician-dim);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--tactician-primary);
+}
+
+.tactics-view__target-name {
+  flex: 1;
+  font-weight: var(--font-weight-semibold);
+  color: var(--tactician-accent);
+}
+
+.tactics-view__target-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--tactician-primary);
+  background: var(--bg-dark);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.tactics-view__remove-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__remove-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.tactics-view__clear-all-btn {
+  align-self: flex-end;
+  padding: var(--space-xs) var(--space-sm);
+  background: transparent;
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__clear-all-btn:hover {
+  border-color: var(--tactician-accent);
+  color: var(--tactician-accent);
+}
+
+.tactics-view__no-marks {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 var(--space-md) 0;
+}
+
+/* Mark Effect */
+.tactics-view__mark-effect {
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.tactics-view__doctrine-bonus {
+  margin: var(--space-sm) 0 0 0;
+  padding: var(--space-sm);
+  background: var(--tactician-dim);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--tactician-primary);
+  color: var(--tactician-accent);
+}
+
+/* Focus Triggers */
+.tactics-view__focus-triggers {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-solid);
+}
+
+.tactics-view__triggers-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.tactics-view__triggers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.tactics-view__trigger-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border: 2px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__trigger-card:hover:not(:disabled) {
+  border-color: var(--tactician-accent);
+  background: var(--tactician-dim);
+}
+
+.tactics-view__trigger-card:disabled {
+  cursor: not-allowed;
+}
+
+.tactics-view__trigger-card.used {
+  border-color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.tactics-view__trigger-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.tactics-view__trigger-card.used .tactics-view__trigger-label {
+  color: var(--success);
+}
+
+.tactics-view__trigger-gain {
+  font-weight: var(--font-weight-bold);
+  color: var(--tactician-accent);
+}
+
+.tactics-view__trigger-card.used .tactics-view__trigger-gain {
+  color: var(--success);
+}
+
+.tactics-view__trigger-card.used .tactics-view__trigger-gain::after {
+  content: ' ✓';
+}
+
+/* === FIELD ARSENAL === */
+.tactics-view__arsenal-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.tactics-view__kits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.tactics-view__kit-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-solid);
+}
+
+.tactics-view__kit-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  margin-bottom: var(--space-xs);
+}
+
+.tactics-view__kit-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* === DOCTRINE FEATURE === */
+.tactics-view__section--doctrine-feature {
+  border-color: var(--tactician-accent);
+  background: linear-gradient(135deg, var(--bg-medium), var(--tactician-dim));
+}
+
+.tactics-view__doctrine-feature-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === SEIZE THE INITIATIVE === */
+.tactics-view__initiative-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.tactics-view__initiative-cost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+}
+
+.tactics-view__initiative-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.tactics-view__initiative-value {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+.tactics-view__initiative-value.affordable {
+  color: var(--success);
+}
+
+.tactics-view__initiative-value.unaffordable {
+  color: var(--danger);
+}
+
+/* === TRIUMPH (L10) === */
+.tactics-view__section--triumph {
+  border-color: gold;
+  background: linear-gradient(135deg, var(--bg-medium), rgba(255, 215, 0, 0.05));
+}
+
+.tactics-view__triumph-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.tactics-view__triumph-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.tactics-view__triumph-abilities {
+  padding: var(--space-md);
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: var(--radius-md);
+  border-left: 3px solid gold;
+}
+
+.tactics-view__triumph-abilities h3 {
+  font-size: var(--font-size-md);
+  color: gold;
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.tactics-view__triumph-abilities p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* === LEVEL FEATURES === */
+.tactics-view__features-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tactics-view__feature {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--border-solid);
+  transition: all var(--transition-fast);
+}
+
+.tactics-view__feature.unlocked {
+  border-left-color: var(--tactician-primary);
+}
+
+.tactics-view__feature.locked {
+  opacity: 0.5;
+}
+
+.tactics-view__feature-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.tactics-view__feature-level {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.tactics-view__feature.unlocked .tactics-view__feature-level {
+  color: var(--tactician-accent);
+  background: var(--tactician-dim);
+}
+
+.tactics-view__feature-level.epic {
+  color: gold;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.tactics-view__feature-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.tactics-view__feature.unlocked .tactics-view__feature-name {
+  color: var(--tactician-accent);
+}
+
+.tactics-view__feature-locked-badge {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: auto;
+}
+
+.tactics-view__feature-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .tactics-view {
+    padding: var(--space-md);
+  }
+
+  .tactics-view__triggers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tactics-view__kits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .tactics-view__resource-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tactics-view__resource-value {
+    font-size: var(--font-size-2xl);
+    min-width: 60px;
+  }
+
+  .tactics-view__mark-input-container {
+    flex-direction: column;
+  }
+
+  .tactics-view__mark-btn {
+    width: 100%;
+  }
+}

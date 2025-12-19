@@ -24,10 +24,6 @@ const DOMAIN_INFO: Record<string, { name: string; description: string }> = {
 export const ConduitView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isConduitHero(hero)) {
@@ -60,10 +56,6 @@ export const ConduitView: React.FC<BaseClassViewProps> = ({
       heroClass="conduit"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Piety Tracker */}

@@ -24,10 +24,6 @@ const DOCTRINE_INFO: Record<TacticianDoctrine, { name: string; description: stri
 export const TacticianView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isTacticianHero(hero)) {
@@ -63,10 +59,6 @@ export const TacticianView: React.FC<BaseClassViewProps> = ({
       heroClass="tactician"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Focus Tracker */}

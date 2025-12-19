@@ -16,10 +16,6 @@ const ELEMENT_INFO: Record<ElementalistElement, { name: string; icon: string; co
 export const ElementalistView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isElementalistHero(hero)) {
@@ -63,10 +59,6 @@ export const ElementalistView: React.FC<BaseClassViewProps> = ({
       heroClass="elementalist"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Essence Tracker */}

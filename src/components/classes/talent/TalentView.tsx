@@ -24,10 +24,6 @@ const TRADITION_INFO: Record<TalentTradition, { name: string; description: strin
 export const TalentView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isTalentHero(hero)) {
@@ -66,10 +62,6 @@ export const TalentView: React.FC<BaseClassViewProps> = ({
       heroClass="talent"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Clarity Tracker */}

@@ -15,10 +15,6 @@ import './FuryView.css';
 export const FuryView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isFuryHero(hero)) {
@@ -91,10 +87,6 @@ export const FuryView: React.FC<BaseClassViewProps> = ({
       heroClass="fury"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Ferocity Tracker */}

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { TurnTracker } from '@/components/combat/TurnTracker';
 import { CLASS_INFO } from './types';
 import type { BaseClassViewProps } from './types';
 import type { HeroClass } from '@/types/hero';
@@ -14,10 +13,6 @@ export const BaseClassView: React.FC<BaseClassViewWrapperProps> = ({
   heroClass,
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   children,
 }) => {
   const classInfo = CLASS_INFO[heroClass];
@@ -27,15 +22,6 @@ export const BaseClassView: React.FC<BaseClassViewWrapperProps> = ({
       className={`class-view class-view-${heroClass}`}
       style={{ '--class-color': classInfo.primaryColor } as React.CSSProperties}
     >
-      {/* Turn Tracker - Only visible during combat */}
-      <TurnTracker
-        isInCombat={isInCombat}
-        turnNumber={turnNumber}
-        conditions={conditions}
-        onEndTurn={onEndTurn}
-        onRemoveCondition={onRemoveCondition}
-      />
-
       {/* Class Header - Shows class icon and resource name */}
       <div className="class-view-header">
         <span className="class-icon">{classInfo.icon}</span>

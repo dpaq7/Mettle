@@ -1,0 +1,637 @@
+/* ============================================
+   DOMAIN VIEW STYLES (Conduit)
+   Displays Piety tracking and Prayer mechanics
+   ============================================ */
+
+/* === CONDUIT-SPECIFIC CSS VARIABLES === */
+.domain-view {
+  --conduit-primary: #fbbf24;
+  --conduit-accent: #fcd34d;
+  --conduit-dim: rgba(251, 191, 36, 0.15);
+  --conduit-glow: rgba(252, 211, 77, 0.3);
+}
+
+/* === MAIN VIEW CONTAINER === */
+.domain-view {
+  padding: var(--space-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.domain-view--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-muted);
+}
+
+/* === HEADER === */
+.domain-view__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.domain-view__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--conduit-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.domain-view__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* === CONTENT SECTIONS === */
+.domain-view__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.domain-view__section {
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.domain-view__section-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-bone);
+  margin: 0 0 var(--space-md) 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* === DOMAINS SECTION === */
+.domain-view__domains-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.domain-view__domain-card {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--conduit-primary);
+}
+
+.domain-view__domain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.domain-view__domain-number {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.domain-view__domain-name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--conduit-accent);
+}
+
+.domain-view__domain-theme {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+  font-style: italic;
+}
+
+.domain-view__domain-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-md) 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.domain-view__domain-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-solid);
+}
+
+.domain-view__domain-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.domain-view__detail-label {
+  font-size: var(--font-size-xs);
+  color: var(--conduit-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.domain-view__detail-value {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.domain-view__no-domains {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-lg);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+}
+
+.domain-view__no-domains p {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* === RESOURCE SECTION (Piety) === */
+.domain-view__section--resource {
+  border-color: var(--conduit-primary);
+}
+
+.domain-view__resource-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.domain-view__resource-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-solid);
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.domain-view__resource-btn:hover:not(:disabled) {
+  border-color: var(--conduit-primary);
+  color: var(--conduit-accent);
+  box-shadow: 0 0 15px var(--conduit-glow);
+}
+
+.domain-view__resource-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.domain-view__resource-value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--conduit-accent);
+  min-width: 80px;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.domain-view__resource-value.rolling {
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* === MECHANICS GRID === */
+.domain-view__mechanics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+.domain-view__mechanic {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+}
+
+.domain-view__mechanic-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.domain-view__mechanic-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.domain-view__mechanic-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--conduit-accent);
+}
+
+.domain-view__roll-btn {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--conduit-dim);
+  border: 1px solid var(--conduit-primary);
+  border-radius: var(--radius-sm);
+  color: var(--conduit-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.domain-view__roll-btn:hover:not(:disabled) {
+  background: var(--conduit-primary);
+  color: var(--bg-dark);
+}
+
+.domain-view__roll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.domain-view__roll-btn.rolling {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* === PRAYER SECTION === */
+.domain-view__section--prayer {
+  border-color: var(--conduit-accent);
+}
+
+.domain-view__prayer-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.domain-view__prayer-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.domain-view__prayer-outcomes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.domain-view__outcome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--border-solid);
+}
+
+.domain-view__outcome.damage {
+  border-left-color: var(--danger);
+}
+
+.domain-view__outcome.domain {
+  border-left-color: var(--conduit-primary);
+}
+
+.domain-view__outcome.piety {
+  border-left-color: var(--success);
+}
+
+.domain-view__outcome-range {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  min-width: 30px;
+}
+
+.domain-view__outcome-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.domain-view__pray-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--conduit-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.domain-view__pray-btn:hover:not(:disabled) {
+  background: var(--conduit-accent);
+  box-shadow: 0 0 20px var(--conduit-glow);
+}
+
+.domain-view__pray-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.domain-view__pray-btn.rolling {
+  animation: pulse 0.5s ease-in-out;
+}
+
+.domain-view__pray-btn-text {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--bg-dark);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.domain-view__pray-btn-cost {
+  font-size: var(--font-size-sm);
+  color: var(--bg-medium);
+}
+
+.domain-view__prayer-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-solid);
+}
+
+.domain-view__prayer-result.piety {
+  border-color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.domain-view__prayer-result.domain {
+  border-color: var(--conduit-primary);
+  background: var(--conduit-dim);
+}
+
+.domain-view__prayer-result.damage {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.domain-view__result-roll {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.domain-view__result-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.domain-view__prayer-result.piety .domain-view__result-text {
+  color: var(--success);
+}
+
+.domain-view__prayer-result.domain .domain-view__result-text {
+  color: var(--conduit-accent);
+}
+
+.domain-view__prayer-result.damage .domain-view__result-text {
+  color: var(--danger);
+}
+
+.domain-view__new-turn-btn {
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.domain-view__new-turn-btn:hover {
+  border-color: var(--conduit-accent);
+  color: var(--conduit-accent);
+}
+
+/* === HEALING GRACE === */
+.domain-view__healing-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.domain-view__healing-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--conduit-primary);
+  margin-bottom: var(--space-md);
+}
+
+.domain-view__healing-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.domain-view__healing-value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--conduit-accent);
+}
+
+.domain-view__healing-options {
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+}
+
+.domain-view__healing-options p {
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.domain-view__healing-options ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+.domain-view__healing-options li {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+/* === LISTS OF HEAVEN === */
+.domain-view__lists-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === MIRACLE (L10) === */
+.domain-view__section--miracle {
+  border-color: gold;
+  background: linear-gradient(135deg, var(--bg-medium), rgba(255, 215, 0, 0.05));
+}
+
+.domain-view__miracle-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.domain-view__miracle-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.domain-view__miracle-abilities {
+  padding: var(--space-md);
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: var(--radius-md);
+  border-left: 3px solid gold;
+}
+
+.domain-view__miracle-abilities h3 {
+  font-size: var(--font-size-md);
+  color: gold;
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.domain-view__miracle-abilities p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* === LEVEL FEATURES === */
+.domain-view__features-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.domain-view__feature {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--border-solid);
+  transition: all var(--transition-fast);
+}
+
+.domain-view__feature.unlocked {
+  border-left-color: var(--conduit-primary);
+}
+
+.domain-view__feature.locked {
+  opacity: 0.5;
+}
+
+.domain-view__feature-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.domain-view__feature-level {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.domain-view__feature.unlocked .domain-view__feature-level {
+  color: var(--conduit-accent);
+  background: var(--conduit-dim);
+}
+
+.domain-view__feature-level.epic {
+  color: gold;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.domain-view__feature-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.domain-view__feature.unlocked .domain-view__feature-name {
+  color: var(--conduit-accent);
+}
+
+.domain-view__feature-locked-badge {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: auto;
+}
+
+.domain-view__feature-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .domain-view {
+    padding: var(--space-md);
+  }
+
+  .domain-view__domains-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .domain-view__resource-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .domain-view__resource-value {
+    font-size: var(--font-size-2xl);
+    min-width: 60px;
+  }
+}

@@ -8,10 +8,6 @@ import './CensorView.css';
 export const CensorView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isCensorHero(hero)) {
@@ -44,10 +40,6 @@ export const CensorView: React.FC<BaseClassViewProps> = ({
       heroClass="censor"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Wrath Tracker */}

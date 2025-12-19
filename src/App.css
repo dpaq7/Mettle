@@ -988,6 +988,7 @@ html, body {
   color: var(--text-muted);
 }
 
+/* Note: "fixed" in .fixed-skill means "pre-determined/locked" skill, NOT CSS position: fixed */
 .fixed-skill {
   display: flex;
   align-items: center;
@@ -996,6 +997,16 @@ html, body {
   background: var(--bg-light);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-solid);
+  position: static; /* Ensure no floating behavior */
+}
+
+/* Ensure all skill elements scroll normally (no sticky/fixed positioning) */
+.skill-selection,
+.skill-selection.fixed,
+.skill-option,
+.skill-category,
+.skills-step {
+  position: static;
 }
 
 .fixed-skill .skill-name {

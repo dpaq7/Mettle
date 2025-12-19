@@ -24,10 +24,6 @@ const COLLEGE_INFO: Record<ShadowCollege, { name: string; description: string }>
 export const ShadowView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isShadowHero(hero)) {
@@ -69,10 +65,6 @@ export const ShadowView: React.FC<BaseClassViewProps> = ({
       heroClass="shadow"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Insight Tracker */}

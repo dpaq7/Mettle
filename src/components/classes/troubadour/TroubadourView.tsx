@@ -24,10 +24,6 @@ const CLASS_ACT_INFO: Record<TroubadourClass, { name: string; description: strin
 export const TroubadourView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isTroubadourHero(hero)) {
@@ -64,10 +60,6 @@ export const TroubadourView: React.FC<BaseClassViewProps> = ({
       heroClass="troubadour"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Drama Tracker */}

@@ -31,10 +31,6 @@ const AUGMENTATION_INFO: Record<PsionicAugmentation, { name: string; effect: str
 export const NullView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isNullHero(hero)) {
@@ -83,10 +79,6 @@ export const NullView: React.FC<BaseClassViewProps> = ({
       heroClass="null"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Discipline Tracker */}

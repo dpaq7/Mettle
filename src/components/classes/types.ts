@@ -1,6 +1,5 @@
 // Shared types for all class views
 import type { Hero, HeroClass, HeroBase } from '@/types/hero';
-import type { ActiveCondition, ConditionId } from '@/types/common';
 import type { DiceType } from '@/components/ui/StatsDashboard/types';
 
 // All heroic classes
@@ -114,14 +113,6 @@ export const CLASS_INFO: Record<HeroClass, ClassInfo> = {
 export interface BaseClassViewProps {
   hero: Hero;
   isInCombat: boolean;
-
-  // Turn tracking
-  turnNumber: number;
-  onEndTurn: () => void;
-
-  // Conditions
-  conditions: ActiveCondition[];
-  onRemoveCondition: (conditionId: ConditionId) => void;
 
   // Dice rolling
   onRoll?: (type: DiceType, label?: string) => void;

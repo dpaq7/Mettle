@@ -1,0 +1,551 @@
+/* ============================================
+   INSIGHT VIEW STYLES (Shadow)
+   Displays Insight tracking and College mechanics
+   ============================================ */
+
+/* === SHADOW-SPECIFIC CSS VARIABLES === */
+.insight-view {
+  --shadow-primary: #6b21a8;
+  --shadow-accent: #a855f7;
+  --shadow-dim: rgba(107, 33, 168, 0.15);
+  --shadow-glow: rgba(168, 85, 247, 0.3);
+}
+
+/* === MAIN VIEW CONTAINER === */
+.insight-view {
+  padding: var(--space-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.insight-view--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-muted);
+}
+
+/* === HEADER === */
+.insight-view__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.insight-view__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--shadow-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.insight-view__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* === CONTENT SECTIONS === */
+.insight-view__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.insight-view__section {
+  background: var(--bg-medium);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.insight-view__section-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-bone);
+  margin: 0 0 var(--space-md) 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* === IDENTITY SECTION (College) === */
+.insight-view__identity-card {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--shadow-primary);
+}
+
+.insight-view__identity-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.insight-view__identity-name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--shadow-accent);
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.insight-view__identity-name--none {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.insight-view__identity-theme {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+  font-style: italic;
+}
+
+.insight-view__identity-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === RESOURCE SECTION (Insight) === */
+.insight-view__section--resource {
+  border-color: var(--shadow-primary);
+}
+
+.insight-view__resource-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.insight-view__resource-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-solid);
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insight-view__resource-btn:hover:not(:disabled) {
+  border-color: var(--shadow-primary);
+  color: var(--shadow-accent);
+  box-shadow: 0 0 15px var(--shadow-glow);
+}
+
+.insight-view__resource-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.insight-view__resource-value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--shadow-accent);
+  min-width: 80px;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.insight-view__resource-value.rolling {
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* === MECHANICS GRID === */
+.insight-view__mechanics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.insight-view__mechanic {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--bg-dark);
+  border-radius: var(--radius-sm);
+}
+
+.insight-view__mechanic-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.insight-view__mechanic-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.insight-view__mechanic-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--shadow-accent);
+}
+
+.insight-view__roll-btn,
+.insight-view__trigger-btn {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--shadow-dim);
+  border: 1px solid var(--shadow-primary);
+  border-radius: var(--radius-sm);
+  color: var(--shadow-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.insight-view__roll-btn:hover:not(:disabled),
+.insight-view__trigger-btn:hover {
+  background: var(--shadow-primary);
+  color: white;
+  box-shadow: 0 0 10px var(--shadow-glow);
+}
+
+.insight-view__roll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.insight-view__roll-btn.rolling {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* === HIDDEN STATE === */
+.insight-view__hidden-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.insight-view__hidden-toggle {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-solid);
+  background: var(--bg-dark);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.insight-view__hidden-toggle:hover {
+  border-color: var(--shadow-primary);
+  color: var(--shadow-accent);
+}
+
+.insight-view__hidden-toggle.active {
+  background: var(--shadow-primary);
+  border-color: var(--shadow-primary);
+  color: white;
+  box-shadow: 0 0 15px var(--shadow-glow);
+}
+
+.insight-view__hidden-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.insight-view__hidden-vanish {
+  padding: var(--space-sm);
+  background: var(--shadow-dim);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--shadow-primary);
+  color: var(--shadow-accent) !important;
+}
+
+/* === HESITATION IS WEAKNESS === */
+.insight-view__section--hesitation {
+  border-color: var(--shadow-accent);
+}
+
+.insight-view__hesitation-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.insight-view__hesitation-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.insight-view__hesitation-note {
+  font-style: italic;
+  color: var(--text-muted) !important;
+}
+
+.insight-view__hesitation-anticipation {
+  padding: var(--space-sm);
+  background: var(--shadow-dim);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--shadow-accent);
+  color: var(--shadow-accent) !important;
+}
+
+.insight-view__hesitation-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border: 2px solid var(--shadow-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.insight-view__hesitation-btn:hover:not(:disabled) {
+  background: var(--shadow-primary);
+  box-shadow: 0 0 20px var(--shadow-glow);
+}
+
+.insight-view__hesitation-btn:hover:not(:disabled) .insight-view__hesitation-btn-text,
+.insight-view__hesitation-btn:hover:not(:disabled) .insight-view__hesitation-btn-cost {
+  color: white;
+}
+
+.insight-view__hesitation-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border-solid);
+}
+
+.insight-view__hesitation-btn-text {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--shadow-accent);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.insight-view__hesitation-btn-cost {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* === EDGE DISCOUNT === */
+.insight-view__edge-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.insight-view__edge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.insight-view__edge-tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-solid);
+}
+
+.insight-view__edge-type {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.insight-view__edge-discount {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--shadow-accent);
+}
+
+/* === COLLEGE FEATURE === */
+.insight-view__section--college-feature {
+  border-color: var(--shadow-accent);
+  background: linear-gradient(135deg, var(--bg-medium), var(--shadow-dim));
+}
+
+.insight-view__college-feature-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* === VISION (L10) === */
+.insight-view__section--vision {
+  border-color: gold;
+  background: linear-gradient(135deg, var(--bg-medium), rgba(255, 215, 0, 0.05));
+}
+
+.insight-view__vision-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.insight-view__vision-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.insight-view__vision-abilities {
+  padding: var(--space-md);
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: var(--radius-md);
+  border-left: 3px solid gold;
+}
+
+.insight-view__vision-abilities h3 {
+  font-size: var(--font-size-md);
+  color: gold;
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.insight-view__vision-abilities p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* === LEVEL FEATURES === */
+.insight-view__features-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.insight-view__feature {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  border-left: 3px solid var(--border-solid);
+  transition: all var(--transition-fast);
+}
+
+.insight-view__feature.unlocked {
+  border-left-color: var(--shadow-primary);
+}
+
+.insight-view__feature.locked {
+  opacity: 0.5;
+}
+
+.insight-view__feature-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.insight-view__feature-level {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.insight-view__feature.unlocked .insight-view__feature-level {
+  color: var(--shadow-accent);
+  background: var(--shadow-dim);
+}
+
+.insight-view__feature-level.epic {
+  color: gold;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.insight-view__feature-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.insight-view__feature.unlocked .insight-view__feature-name {
+  color: var(--shadow-accent);
+}
+
+.insight-view__feature-locked-badge {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  background: var(--bg-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-left: auto;
+}
+
+.insight-view__feature-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .insight-view {
+    padding: var(--space-md);
+  }
+
+  .insight-view__mechanics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-view__edge-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .insight-view__resource-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .insight-view__resource-value {
+    font-size: var(--font-size-2xl);
+    min-width: 60px;
+  }
+
+  .insight-view__mechanic-action {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

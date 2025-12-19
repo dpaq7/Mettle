@@ -40,10 +40,6 @@ const FORMATION_INFO: Record<Formation, { name: string; bonus: string }> = {
 export const SummonerView: React.FC<BaseClassViewProps> = ({
   hero,
   isInCombat,
-  turnNumber,
-  onEndTurn,
-  conditions,
-  onRemoveCondition,
   onUpdateHero,
 }) => {
   if (!isSummonerHero(hero)) {
@@ -88,10 +84,6 @@ export const SummonerView: React.FC<BaseClassViewProps> = ({
       heroClass="summoner"
       hero={hero}
       isInCombat={isInCombat}
-      turnNumber={turnNumber}
-      onEndTurn={onEndTurn}
-      conditions={conditions}
-      onRemoveCondition={onRemoveCondition}
       onUpdateHero={onUpdateHero}
     >
       {/* Essence Tracker */}
