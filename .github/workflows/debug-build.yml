@@ -1,0 +1,85 @@
+name: Debug macOS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: "DEBUG 1: State after checkout"
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "STEP 1: After checkout"
+          echo "═══════════════════════════════════════════════════════"
+          echo "src-tauri/target exists?"
+          ls -la src-tauri/target/ 2>/dev/null || echo "target/ does not exist (GOOD)"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: "DEBUG 2: State after Rust setup (NO CACHE)"
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "STEP 2: After Rust setup - NO RUST CACHE"
+          echo "═══════════════════════════════════════════════════════"
+          echo "target/ exists?"
+          ls -la src-tauri/target/ 2>/dev/null || echo "target/ does not exist (GOOD)"
+          echo ""
+          echo "universal-apple-darwin exists?"
+          ls -la src-tauri/target/universal-apple-darwin/ 2>/dev/null || echo "Does not exist (GOOD)"
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: "DEBUG 3: State after npm ci"
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "STEP 3: After npm ci"
+          echo "═══════════════════════════════════════════════════════"
+          echo "universal-apple-darwin exists?"
+          ls -la src-tauri/target/universal-apple-darwin/ 2>/dev/null || echo "Does not exist (GOOD)"
+
+      - name: "BUILD: Frontend"
+        run: npm run build
+
+      - name: "DEBUG 4: After frontend build"
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "STEP 4: After frontend build"
+          echo "═══════════════════════════════════════════════════════"
+          echo "dist/ created?"
+          ls -la dist/ | head -5
+          echo ""
+          echo "universal-apple-darwin exists?"
+          ls -la src-tauri/target/universal-apple-darwin/ 2>/dev/null || echo "Does not exist (GOOD)"
+
+      - name: "BUILD: Tauri (direct npx)"
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "ATTEMPTING TAURI BUILD - NO ACTION, DIRECT NPX"
+          echo "═══════════════════════════════════════════════════════"
+          echo "Final pre-build check:"
+          ls -la src-tauri/target/ 2>/dev/null || echo "No target dir (GOOD)"
+          echo ""
+          npx tauri build --target universal-apple-darwin
+
+      - name: "DEBUG 5: Final state"
+        if: always()
+        run: |
+          echo "═══════════════════════════════════════════════════════"
+          echo "FINAL STATE"
+          echo "═══════════════════════════════════════════════════════"
+          ls -la src-tauri/target/universal-apple-darwin/release/bundle/dmg/ 2>/dev/null || echo "No DMG bundle"
