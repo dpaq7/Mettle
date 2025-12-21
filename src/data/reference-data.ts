@@ -736,18 +736,6 @@ export const kits: Kit[] = [
     implements: [],
     items: [],
   },
-  // Caster kits (good for Summoner)
-  {
-    id: 'bloodpact',
-    name: 'Bloodpact',
-    stamina: 6,
-    speed: 5,
-    stability: 0,
-    armor: 'None',
-    weapons: [],
-    implements: ['Implement'],
-    items: [],
-  },
   {
     id: 'meditant',
     name: 'Meditant',
