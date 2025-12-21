@@ -671,6 +671,17 @@ export const kits: Kit[] = [
     items: [],
   },
   {
+    id: 'rapid-fire',
+    name: 'Rapid-Fire',
+    stamina: 3,
+    speed: 6,
+    stability: 0,
+    armor: 'Light Armor',
+    weapons: ['Bow'],
+    implements: [],
+    items: [],
+  },
+  {
     id: 'martial-artist',
     name: 'Martial Artist',
     stamina: 3,
