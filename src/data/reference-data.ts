@@ -781,29 +781,7 @@ export const kits: Kit[] = [
     implements: ['Implement'],
     items: [],
   },
-  {
-    id: 'missile',
-    name: 'Missile',
-    stamina: 3,
-    speed: 5,
-    stability: 0,
-    armor: 'None',
-    weapons: [],
-    implements: ['Implement'],
-    items: [],
-  },
-  {
-    id: 'nature-speaker',
-    name: 'Nature Speaker',
-    stamina: 6,
-    speed: 5,
-    stability: 0,
-    armor: 'None',
-    weapons: [],
-    implements: ['Implement'],
-    items: [],
-  },
-  // Missing martial kits from Draw Steel Compendium
+  // Additional kits from Draw Steel Compendium
   {
     id: 'arcane-archer',
     name: 'Arcane Archer',
