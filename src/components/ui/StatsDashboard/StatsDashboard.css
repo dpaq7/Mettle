@@ -2642,11 +2642,11 @@
   margin-left: auto;
 }
 
-/* Z-INDEX FIX FOR SELECT */
+/* Z-INDEX FIX FOR SELECT - must be higher than dialog (10000) */
 [data-radix-select-content],
 [data-radix-select-viewport],
 [data-radix-popper-content-wrapper] {
-  z-index: 9999 !important;
+  z-index: 10001 !important;
 }
 
 /* ============================================

@@ -16,6 +16,7 @@ import RollHistoryPanel from './components/shared/RollHistoryPanel';
 import LegalModal from './components/shared/LegalModal';
 import { ImportCharacterDialog } from './components/shared/ImportCharacterDialog';
 import { DeleteCharacterDialog } from './components/shared/DeleteCharacterDialog';
+import { RespecConfirmDialog } from './components/shared/RespecConfirmDialog';
 import ErrorBoundary from './components/shared/ErrorBoundary';
 import {
   downloadCharacterJSON,
@@ -71,6 +72,8 @@ function App() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Hero | null>(null);
+  const [showRespecDialog, setShowRespecDialog] = useState(false);
+  const [respecXpToPreserve, setRespecXpToPreserve] = useState<number>(0);
   const [rollHistory, setRollHistory] = useState<DiceRoll[]>([]);
 
   // Turn tracking state
@@ -166,7 +169,32 @@ function App() {
     setCharacterToDelete(null);
   }, [characterToDelete, setHero]);
 
+  // Re-spec character - opens confirmation dialog
+  const handleRespecCharacterClick = useCallback(() => {
+    if (hero) {
+      setShowRespecDialog(true);
+    }
+  }, [hero]);
+
+  // Confirm re-spec - preserve XP and enter creation wizard
+  const handleConfirmRespec = useCallback(() => {
+    if (!hero) return;
+
+    // Calculate total XP to preserve (current XP + pending victories)
+    const totalXp = (hero.xp || 0) + (hero.victories || 0);
+    setRespecXpToPreserve(totalXp);
+
+    // Close dialog and enter character creation mode
+    setShowRespecDialog(false);
+    setHero(null);
+    setShowCharacterCreation(true);
+  }, [hero, setHero]);
+
   const handleCreationComplete = () => {
+    // Clear the re-spec XP state (XP was already applied during character creation)
+    if (respecXpToPreserve > 0) {
+      setRespecXpToPreserve(0);
+    }
     setShowCharacterCreation(false);
   };
 
@@ -386,7 +414,10 @@ function App() {
         />
         <main className="app-main">
           <ErrorBoundary componentName="CharacterCreation">
-            <CharacterCreation onComplete={handleCreationComplete} />
+            <CharacterCreation
+              onComplete={handleCreationComplete}
+              respecXp={respecXpToPreserve}
+            />
           </ErrorBoundary>
         </main>
         {showCharacterManager && (
@@ -486,6 +517,7 @@ function App() {
         onExportCharacter={handleExportCharacter}
         onImportCharacter={handleImportCharacter}
         onDuplicateCharacter={handleDuplicateCharacter}
+        onRespecCharacter={handleRespecCharacterClick}
       />
 
       {/* Navigation Tabs - Dynamic based on hero class */}
@@ -649,6 +681,14 @@ function App() {
         character={characterToDelete}
         onConfirm={handleConfirmDelete}
         isCurrentCharacter={characterToDelete?.id === hero?.id}
+      />
+
+      {/* Re-spec Character Confirmation Dialog */}
+      <RespecConfirmDialog
+        open={showRespecDialog}
+        onOpenChange={setShowRespecDialog}
+        character={hero}
+        onConfirm={handleConfirmRespec}
       />
     </div>
   );

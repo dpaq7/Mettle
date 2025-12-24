@@ -38,6 +38,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
     onImportCharacter,
     onExportCharacter,
     onDuplicateCharacter,
+    onRespecCharacter,
     onShowAbout,
     onLevelUp,
     rollHistory = [],
@@ -166,6 +167,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
           onImportCharacter={onImportCharacter}
           onExportCharacter={onExportCharacter}
           onDuplicateCharacter={onDuplicateCharacter}
+          onRespecCharacter={onRespecCharacter}
           onShowAbout={onShowAbout}
           onPortraitChange={onPortraitChange}
         />

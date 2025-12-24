@@ -23,6 +23,15 @@ export interface UseDerivedStatsResult {
   speed: number;
   stability: number;
 
+  // Effective characteristics (base + equipment bonuses)
+  effectiveCharacteristics: {
+    might: number;
+    agility: number;
+    reason: number;
+    intuition: number;
+    presence: number;
+  };
+
   // Equipment bonus breakdown (for UI indicators)
   hasEquipmentBonuses: boolean;
   equipmentStamina: number;
@@ -57,6 +66,13 @@ export function useDerivedStats(): UseDerivedStatsResult {
         maxRecoveries: 0,
         speed: 5,
         stability: 0,
+        effectiveCharacteristics: {
+          might: 0,
+          agility: 0,
+          reason: 0,
+          intuition: 0,
+          presence: 0,
+        },
         hasEquipmentBonuses: false,
         equipmentStamina: 0,
         equipmentSpeed: 0,
@@ -86,6 +102,7 @@ export function useDerivedStats(): UseDerivedStatsResult {
       maxRecoveries: derivedStats.maxRecoveries,
       speed: derivedStats.speed,
       stability: derivedStats.stability,
+      effectiveCharacteristics: derivedStats.effectiveCharacteristics,
       hasEquipmentBonuses,
       equipmentStamina: equipBonus.stamina,
       equipmentSpeed: equipBonus.speed,

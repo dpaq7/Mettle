@@ -892,6 +892,35 @@
 }
 
 /* ============================================
+   ANCESTRY SECTION - Full Width with Inline Trait Selector
+   ============================================ */
+
+.ancestry-section--full-width {
+  grid-column: 1 / -1; /* Span full width of grid */
+}
+
+.ancestry-trait-selector-wrapper {
+  margin: 0 1rem 1rem 1rem;
+}
+
+/* Combat locked state */
+.ancestry-combat-locked {
+  margin: 0 1rem 1rem 1rem;
+}
+
+.combat-locked-message {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 100, 100, 0.1);
+  border: 1px solid rgba(255, 100, 100, 0.2);
+  border-radius: 4px;
+  color: #ff9999;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 

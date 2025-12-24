@@ -11,6 +11,7 @@ import {
   FolderOpen,
   Copy,
   ChevronDown,
+  RefreshCcw,
 } from 'lucide-react';
 
 import { APP_VERSION_FULL } from '@/constants/version';
@@ -48,6 +49,7 @@ interface DashboardHeaderProps {
   onImportCharacter?: () => void;
   onExportCharacter?: () => void;
   onDuplicateCharacter?: () => void;
+  onRespecCharacter?: () => void;
   // Portrait upload
   onPortraitChange?: (portraitUrl: string | null) => void;
 }
@@ -72,6 +74,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onImportCharacter,
   onExportCharacter,
   onDuplicateCharacter,
+  onRespecCharacter,
   onPortraitChange,
 }) => {
   const classDisplayName = hero?.heroClass
@@ -244,6 +247,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 >
                   <Copy className="w-4 h-4 mr-2" />
                   Duplicate Character
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={onRespecCharacter}
+                  disabled={!onRespecCharacter}
+                  className="dropdown-item"
+                >
+                  <RefreshCcw className="w-4 h-4 mr-2" />
+                  Re-spec Character
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

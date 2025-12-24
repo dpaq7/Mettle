@@ -18,7 +18,8 @@ import { useDerivedStats } from '@/hooks/useDerivedStats';
 import {
   canLevelUp,
   getLevelProgress,
-  getXpRangeDisplay,
+  getXpWithinCurrentLevel,
+  getXpRequiredForCurrentLevel,
   MAX_LEVEL,
 } from '@/utils/levelProgression';
 import type { Hero } from '@/types/hero';
@@ -73,8 +74,12 @@ export const StatChipsRow: React.FC<StatChipsRowProps> = ({
   const heroXp = hero.xp || 0;
   const isLevelUpAvailable = canLevelUp(heroLevel, heroXp);
   const levelProgress = getLevelProgress(heroLevel, heroXp);
-  const xpDisplay = getXpRangeDisplay(heroLevel, heroXp);
   const isMaxLevel = heroLevel >= MAX_LEVEL;
+
+  // XP display: show progress within current level tier (e.g., "0/3" means 0 of 3 XP earned toward next level)
+  const xpInLevel = getXpWithinCurrentLevel(heroLevel, heroXp);
+  const xpNeededForLevel = getXpRequiredForCurrentLevel(heroLevel);
+  const xpDisplay = isMaxLevel ? `${heroXp} (Max)` : `${xpInLevel}/${xpNeededForLevel}`;
 
   return (
     <div className="stat-chips-row">
@@ -168,7 +173,7 @@ export const StatChipsRow: React.FC<StatChipsRowProps> = ({
         isPinned={pinnedCards.has('victories')}
         onTogglePin={() => onTogglePin('victories')}
         onChange={(delta) => {
-          const newVal = Math.max(0, hero.victories + delta);
+          const newVal = Math.max(0, Math.min(99, hero.victories + delta));
           onVictoriesChange(newVal);
         }}
         onAction={isLevelUpAvailable && onLevelUp ? onLevelUp : undefined}
@@ -176,6 +181,8 @@ export const StatChipsRow: React.FC<StatChipsRowProps> = ({
         minValue={0}
         showProgress={!isMaxLevel}
         highlight={isLevelUpAvailable}
+        controlValue={hero.victories}
+        controlMaxValue={99}
       />
 
       {/* Conditions */}

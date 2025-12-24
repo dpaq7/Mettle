@@ -93,6 +93,13 @@ export interface EquipmentBonuses {
   pushDistance: number;
   teleportDistance: number;
 
+  // Characteristic bonuses (from equipment)
+  might: number;
+  agility: number;
+  reason: number;
+  intuition: number;
+  presence: number;
+
   // Other
   recoveries: number;
   savingThrows: number;
@@ -120,6 +127,11 @@ export const DEFAULT_EQUIPMENT_BONUSES: EquipmentBonuses = {
   summonerRange: 0,
   pushDistance: 0,
   teleportDistance: 0,
+  might: 0,
+  agility: 0,
+  reason: 0,
+  intuition: 0,
+  presence: 0,
   recoveries: 0,
   savingThrows: 0,
   resistPotency: 0,
@@ -160,6 +172,15 @@ export interface DerivedStats {
   reach: number;
   rangedDistance: number;
   magicDistance: number;
+
+  // Effective characteristics (base + equipment bonuses)
+  effectiveCharacteristics: {
+    might: number;
+    agility: number;
+    reason: number;
+    intuition: number;
+    presence: number;
+  };
 
   // Class-specific
   summonerRange?: number;

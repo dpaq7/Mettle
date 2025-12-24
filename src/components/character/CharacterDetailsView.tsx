@@ -1,9 +1,10 @@
 import React from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
+import { useCombatContext } from '../../context/CombatContext';
 import { languages as allLanguages } from '../../data/reference-data';
 import { skills as allSkills } from '../../data/skills';
 import { formations } from '../../data/formations';
-import { getAncestryById, getAncestryTraitsByIds } from '../../data/ancestries';
+import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
 import { getPerkById, PERK_CATEGORY_INFO } from '../../data/perks';
 import { Formation, HeroClass } from '../../types';
 import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
@@ -17,6 +18,7 @@ import {
   Sparkles,
   type LucideIcon,
 } from 'lucide-react';
+import AncestryTraitSelector from '../creation/AncestryTraitSelector';
 import './CharacterDetailsView.css';
 
 // Map category to Lucide icon for perks display
@@ -31,6 +33,7 @@ const perkCategoryIcons: Record<string, LucideIcon> = {
 
 const CharacterDetailsView: React.FC = () => {
   const { hero, updateHero } = useSummonerContext();
+  const { isInCombat } = useCombatContext();
 
   if (!hero) return null;
 
@@ -58,6 +61,18 @@ const CharacterDetailsView: React.FC = () => {
     });
   };
 
+  // Handle ancestry trait changes (saves immediately like character creator)
+  const handleAncestryTraitsChange = (traitIds: string[]) => {
+    if (hero.ancestrySelection) {
+      updateHero({
+        ancestrySelection: {
+          ...hero.ancestrySelection,
+          selectedTraitIds: traitIds,
+        },
+      });
+    }
+  };
+
   // Handle both old and new data structures for ancestry
   // New system: use ancestrySelection to look up from data module
   // Old system: use embedded ancestry object
@@ -75,16 +90,11 @@ const CharacterDetailsView: React.FC = () => {
   // Get signature trait from data module or embedded
   const signatureTrait = ancestryFromData?.signatureTrait || hero.ancestry?.signatureFeature;
 
-  // Get selected purchased traits
-  // New system: look up selected traits from data module
-  // Old system: show all available traits from embedded data
-  const selectedTraits = hero.ancestrySelection && ancestryFromData
-    ? getAncestryTraitsByIds(ancestryFromData.id, hero.ancestrySelection.selectedTraitIds)
-    : [];
-
-  // For backward compatibility, still show embedded purchasedTraits if no selection made
-  const embeddedTraits = hero.ancestry?.purchasedTraits || [];
-  const hasNewSelection = hero.ancestrySelection && selectedTraits.length > 0;
+  // Check if ancestry traits can be edited (has data module with traits and not in combat)
+  const canEditAncestryTraits = hero.ancestrySelection &&
+    ancestryFromData &&
+    isAncestryComplete(ancestryFromData.id) &&
+    !isInCombat;
 
   // Handle both old and new data structures for culture
   const cultureName = hero.culture?.name || 'Unknown';
@@ -163,54 +173,50 @@ const CharacterDetailsView: React.FC = () => {
   return (
     <div className="character-details-view">
       {/* Ancestry Section */}
-      <section className="details-section ancestry-section">
+      <section className="details-section ancestry-section ancestry-section--full-width">
         <h2>Ancestry: {ancestryName}</h2>
         {ancestryDescription && <p className="description">{ancestryDescription}</p>}
 
         <div className="ancestry-stats">
           <span className="stat">Size: {ancestrySize}</span>
           <span className="stat">Base Speed: {ancestrySpeed}</span>
-          {!hasNewSelection && <span className="stat">Ancestry Points: {ancestryPoints}</span>}
         </div>
 
-        {signatureTrait && (
+        {/* Inline trait selector - shows when ancestry has trait data */}
+        {canEditAncestryTraits && hero.ancestrySelection && (
+          <div className="ancestry-trait-selector-wrapper">
+            <AncestryTraitSelector
+              ancestryId={hero.ancestrySelection.ancestryId}
+              selectedTraitIds={hero.ancestrySelection.selectedTraitIds || []}
+              onTraitsChange={handleAncestryTraitsChange}
+            />
+          </div>
+        )}
+
+        {/* Combat locked message */}
+        {hero.ancestrySelection && ancestryFromData && isAncestryComplete(ancestryFromData.id) && isInCombat && (
+          <div className="ancestry-combat-locked">
+            <span className="combat-locked-message">🔒 Ancestry traits cannot be changed during combat</span>
+            {/* Show current traits as read-only */}
+            {signatureTrait && (
+              <div className="feature-block signature">
+                <h4>Signature Trait</h4>
+                <div className="feature">
+                  <strong>{signatureTrait.name}</strong>
+                  <p>{signatureTrait.description}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Fallback for ancestries without trait data */}
+        {(!hero.ancestrySelection || !ancestryFromData || !isAncestryComplete(ancestryFromData?.id || '')) && signatureTrait && (
           <div className="feature-block signature">
             <h4>Signature Trait</h4>
             <div className="feature">
               <strong>{signatureTrait.name}</strong>
               <p>{signatureTrait.description}</p>
-            </div>
-          </div>
-        )}
-
-        {/* New system: Show selected purchased traits */}
-        {hasNewSelection && selectedTraits.length > 0 && (
-          <div className="feature-block purchased">
-            <h4>Purchased Traits</h4>
-            <div className="traits-list">
-              {selectedTraits.map((trait) => (
-                <div key={trait.id} className="trait">
-                  <strong>{trait.name}</strong>
-                  <span className="cost">({trait.cost} pt{trait.cost > 1 ? 's' : ''})</span>
-                  <p>{trait.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Old system: Show all available traits (for characters without ancestrySelection) */}
-        {!hasNewSelection && embeddedTraits.length > 0 && (
-          <div className="feature-block purchased">
-            <h4>Available Purchased Traits</h4>
-            <div className="traits-list">
-              {embeddedTraits.map((trait) => (
-                <div key={trait.id} className="trait">
-                  <strong>{trait.name}</strong>
-                  {trait.cost && <span className="cost">({trait.cost} pts)</span>}
-                  <p>{trait.description}</p>
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -523,6 +529,7 @@ const CharacterDetailsView: React.FC = () => {
           </div>
         </section>
       )}
+
     </div>
   );
 };

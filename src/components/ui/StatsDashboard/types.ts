@@ -217,6 +217,7 @@ export interface StatsDashboardProps {
   onImportCharacter?: () => void;
   onExportCharacter?: () => void;
   onDuplicateCharacter?: () => void;
+  onRespecCharacter?: () => void;
 
   // Dice
   rollHistory?: DiceRoll[];
@@ -258,6 +259,9 @@ export interface StatChipProps {
   minValue?: number;
   showProgress?: boolean;
   highlight?: boolean;
+  // Separate control values when +/- buttons control a different value than the progress bar
+  controlValue?: number; // The actual value being controlled by +/- buttons
+  controlMaxValue?: number; // Max limit for +/- controls (undefined = no max)
 }
 
 // Props for detail cards

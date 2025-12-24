@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { useRollHistory } from '../../context/RollHistoryContext';
+import { useDerivedStats } from '../../hooks/useDerivedStats';
 import { standardManeuvers, standardTriggeredActions, moveActions, quickCommands } from '../../data/action-economy';
 import { Ability, Characteristic } from '../../types';
 import { isSummonerHero } from '../../types/hero';
@@ -17,9 +18,13 @@ type ReferenceSection = 'overview' | 'moves' | 'maneuvers' | 'triggered' | 'comm
 const AbilitiesView: React.FC = () => {
   const { hero } = useSummonerContext();
   const { addRoll } = useRollHistory();
+  const { effectiveCharacteristics } = useDerivedStats();
   const [openSection, setOpenSection] = useState<ReferenceSection>(null);
 
   if (!hero) return null;
+
+  // Get effective characteristics (base + equipment bonuses)
+  const characteristics = effectiveCharacteristics as Record<Characteristic, number>;
 
   // Check if Summoner for formation-specific commands
   const isSummoner = isSummonerHero(hero);
@@ -175,8 +180,10 @@ const AbilitiesView: React.FC = () => {
             <AbilityCard
               key={ability.id}
               ability={ability}
-              characteristics={hero.characteristics}
+              characteristics={characteristics}
               onRoll={handleAbilityRoll}
+              kitMeleeDamageBonus={hero.kit?.meleeDamageBonus}
+              kitRangedDamageBonus={hero.kit?.rangedDamageBonus}
             />
           ))}
         </div>
@@ -208,8 +215,10 @@ const AbilitiesView: React.FC = () => {
           <div className="kit-signature-ability-card">
             <AbilityCard
               ability={kitSignatureAbility}
-              characteristics={hero.characteristics}
+              characteristics={characteristics}
               onRoll={handleKitAbilityRoll}
+              kitMeleeDamageBonus={hero.kit.meleeDamageBonus}
+              kitRangedDamageBonus={hero.kit.rangedDamageBonus}
             />
           </div>
         </section>

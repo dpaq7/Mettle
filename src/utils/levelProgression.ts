@@ -5,18 +5,19 @@
  * Heroes level up when they reach the XP threshold for the next level.
  */
 
-// XP thresholds - total XP needed to reach each level
+// XP thresholds - total XP needed to reach each level (from Draw Steel Heroic Advancement Table)
+// Each level requires 16 XP to progress to the next
 export const XP_THRESHOLDS: Record<number, number> = {
-  1: 0,    // Starting level
-  2: 3,    // 3 XP to reach level 2
-  3: 9,    // +6 XP (9 total)
-  4: 18,   // +9 XP (18 total)
-  5: 30,   // +12 XP (30 total)
-  6: 45,   // +15 XP (45 total)
-  7: 63,   // +18 XP (63 total)
-  8: 84,   // +21 XP (84 total)
-  9: 108,  // +24 XP (108 total)
-  10: 135, // +27 XP (135 total - max level)
+  1: 0,    // Starting level (0-15 XP)
+  2: 16,   // 16 XP to reach level 2 (16-31 XP)
+  3: 32,   // 32 XP to reach level 3 (32-47 XP)
+  4: 48,   // 48 XP to reach level 4 (48-63 XP)
+  5: 64,   // 64 XP to reach level 5 (64-79 XP)
+  6: 80,   // 80 XP to reach level 6 (80-95 XP)
+  7: 96,   // 96 XP to reach level 7 (96-111 XP)
+  8: 112,  // 112 XP to reach level 8 (112-127 XP)
+  9: 128,  // 128 XP to reach level 9 (128-143 XP)
+  10: 144, // 144 XP to reach level 10 (144+ XP, max level)
 };
 
 export const MAX_LEVEL = 10;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Ability, Characteristic } from '../../types';
+import React, { useState, useMemo } from 'react';
+import { Ability, Characteristic, DamageBonus } from '../../types';
 import { PowerRollResult, getTierColor, performPowerRoll, RollModifier } from '../../utils/dice';
 import './AbilityCard.css';
 
@@ -8,6 +8,58 @@ interface AbilityCardProps {
   characteristics: Record<Characteristic, number>;
   onRoll?: (ability: Ability, result: PowerRollResult) => void;
   expanded?: boolean;
+  // Kit damage bonuses - format: "+2/+2/+2" for tier1/tier2/tier3
+  kitMeleeDamageBonus?: DamageBonus | null;
+  kitRangedDamageBonus?: DamageBonus | null;
+}
+
+/**
+ * Parse a kit damage bonus string like "+2/+2/+2" into tier values
+ */
+function parseKitDamageBonus(bonus: DamageBonus | null | undefined): { tier1: number; tier2: number; tier3: number } {
+  if (!bonus) return { tier1: 0, tier2: 0, tier3: 0 };
+  const match = bonus.match(/\+(\d+)\/\+(\d+)\/\+(\d+)/);
+  if (!match) return { tier1: 0, tier2: 0, tier3: 0 };
+  return {
+    tier1: parseInt(match[1], 10),
+    tier2: parseInt(match[2], 10),
+    tier3: parseInt(match[3], 10),
+  };
+}
+
+/**
+ * Apply kit damage bonus to tier effect text
+ * Handles patterns like:
+ * - "5 + M damage" → "7 + M damage"
+ * - "8 + M, R, I, or P lightning damage" → "10 + M, R, I, or P lightning damage"
+ * - "4 damage" → "6 damage"
+ * - "3 + M or A damage; you can shift 1 square" → "5 + M or A damage; you can shift 1 square"
+ */
+function applyDamageBonusToTier(tierText: string, bonus: number): string {
+  if (bonus === 0) return tierText;
+
+  // Pattern 1: Number + characteristic(s) like "5 + M" or "8 + M, R, I, or P"
+  // Matches: "5 + M", "8 + M or A", "5 + M, R, I, or P"
+  const charPattern = /^(\d+)(\s*\+\s*[A-Z](?:(?:,\s*[A-Z])*(?:\s*,?\s*or\s+[A-Z])?)?)/;
+  const charMatch = tierText.match(charPattern);
+
+  if (charMatch) {
+    const baseValue = parseInt(charMatch[1], 10);
+    const newValue = baseValue + bonus;
+    return tierText.replace(charPattern, `${newValue}${charMatch[2]}`);
+  }
+
+  // Pattern 2: Flat damage like "4 damage" (no characteristic)
+  const flatPattern = /^(\d+)(\s+damage)/;
+  const flatMatch = tierText.match(flatPattern);
+
+  if (flatMatch) {
+    const baseValue = parseInt(flatMatch[1], 10);
+    const newValue = baseValue + bonus;
+    return tierText.replace(flatPattern, `${newValue}${flatMatch[2]}`);
+  }
+
+  return tierText;
 }
 
 const AbilityCard: React.FC<AbilityCardProps> = ({
@@ -15,11 +67,52 @@ const AbilityCard: React.FC<AbilityCardProps> = ({
   characteristics,
   onRoll,
   expanded: initialExpanded = false,
+  kitMeleeDamageBonus,
+  kitRangedDamageBonus,
 }) => {
   const [expanded, setExpanded] = useState(initialExpanded);
   const [rollResult, setRollResult] = useState<PowerRollResult | null>(null);
   const [rollModifier, setRollModifier] = useState<RollModifier>('normal');
   const [isRolling, setIsRolling] = useState(false);
+
+  // Calculate adjusted tier effects with kit damage bonuses
+  const adjustedTiers = useMemo(() => {
+    if (!ability.powerRoll) return null;
+
+    const lowerKeywords = ability.keywords.map(k => k.toLowerCase());
+    const isMelee = lowerKeywords.includes('melee');
+    const isRanged = lowerKeywords.includes('ranged');
+
+    // Parse both melee and ranged bonuses
+    const meleeBonus = parseKitDamageBonus(kitMeleeDamageBonus);
+    const rangedBonus = parseKitDamageBonus(kitRangedDamageBonus);
+
+    // Determine which bonus to apply:
+    // - If ability is both melee and ranged, use the higher bonus for each tier
+    // - If ability is only melee, use melee bonus
+    // - If ability is only ranged, use ranged bonus
+    let kitBonus = { tier1: 0, tier2: 0, tier3: 0 };
+
+    if (isMelee && isRanged) {
+      // Use the higher of melee/ranged for each tier
+      kitBonus = {
+        tier1: Math.max(meleeBonus.tier1, rangedBonus.tier1),
+        tier2: Math.max(meleeBonus.tier2, rangedBonus.tier2),
+        tier3: Math.max(meleeBonus.tier3, rangedBonus.tier3),
+      };
+    } else if (isMelee) {
+      kitBonus = meleeBonus;
+    } else if (isRanged) {
+      kitBonus = rangedBonus;
+    }
+
+    return {
+      tier1: applyDamageBonusToTier(ability.powerRoll.tier1, kitBonus.tier1),
+      tier2: applyDamageBonusToTier(ability.powerRoll.tier2, kitBonus.tier2),
+      tier3: applyDamageBonusToTier(ability.powerRoll.tier3, kitBonus.tier3),
+      hasBonus: kitBonus.tier1 > 0 || kitBonus.tier2 > 0 || kitBonus.tier3 > 0,
+    };
+  }, [ability, kitMeleeDamageBonus, kitRangedDamageBonus]);
 
   const getActionTypeIcon = (actionType: string) => {
     switch (actionType) {
@@ -94,14 +187,14 @@ const AbilityCard: React.FC<AbilityCardProps> = ({
   };
 
   const getTierResult = () => {
-    if (!rollResult || !ability.powerRoll) return null;
+    if (!rollResult || !adjustedTiers) return null;
     switch (rollResult.tier) {
       case 1:
-        return ability.powerRoll.tier1;
+        return adjustedTiers.tier1;
       case 2:
-        return ability.powerRoll.tier2;
+        return adjustedTiers.tier2;
       case 3:
-        return ability.powerRoll.tier3;
+        return adjustedTiers.tier3;
     }
   };
 
@@ -176,15 +269,15 @@ const AbilityCard: React.FC<AbilityCardProps> = ({
               <div className="power-roll-tiers">
                 <div className={`tier tier-1 ${rollResult?.tier === 1 ? 'active' : ''}`}>
                   <span className="tier-label">11 or lower</span>
-                  <span className="tier-effect">{ability.powerRoll.tier1}</span>
+                  <span className="tier-effect">{adjustedTiers?.tier1 ?? ability.powerRoll.tier1}</span>
                 </div>
                 <div className={`tier tier-2 ${rollResult?.tier === 2 ? 'active' : ''}`}>
                   <span className="tier-label">12-16</span>
-                  <span className="tier-effect">{ability.powerRoll.tier2}</span>
+                  <span className="tier-effect">{adjustedTiers?.tier2 ?? ability.powerRoll.tier2}</span>
                 </div>
                 <div className={`tier tier-3 ${rollResult?.tier === 3 ? 'active' : ''}`}>
                   <span className="tier-label">17+</span>
-                  <span className="tier-effect">{ability.powerRoll.tier3}</span>
+                  <span className="tier-effect">{adjustedTiers?.tier3 ?? ability.powerRoll.tier3}</span>
                 </div>
               </div>
 

@@ -91,6 +91,8 @@ const ALL_STEPS: Step[] = getStepsForClass('summoner');
 
 interface CharacterCreationProps {
   onComplete?: () => void;
+  /** XP to preserve from a re-spec'd character. Will be applied after creation. */
+  respecXp?: number;
 }
 
 interface SkillSelection {
@@ -100,7 +102,7 @@ interface SkillSelection {
   isFixed: boolean; // true if this is a specific skill, not a choice
 }
 
-const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete }) => {
+const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, respecXp = 0 }) => {
   const { createNewHero } = useSummonerContext();
   const skillAvailability = useSkillAvailability();
 
@@ -665,7 +667,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete }
       surges: 0,
       heroTokens: 0,
       victories: 0,
-      xp: 0,
+      xp: respecXp, // Preserve XP from re-spec'd character
       wealth: 2,
       gold: 0,
       renown: 0,
@@ -1679,6 +1681,21 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete }
 
   return (
     <div className="character-creation" ref={containerRef}>
+      {/* Re-spec Banner - shows preserved XP */}
+      {respecXp > 0 && (
+        <div className="respec-banner">
+          <div className="respec-banner-content">
+            <span className="respec-badge">Re-spec Mode</span>
+            <span className="respec-xp">
+              <strong>{respecXp} XP</strong> will be preserved
+            </span>
+            <span className="respec-hint">
+              Level up after creation using the Victories chip
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="creation-progress">
         <div className="progress-bar">
           <div

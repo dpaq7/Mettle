@@ -95,8 +95,8 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        // Base styles
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden",
+        // Base styles - z-index must be higher than dialog (10000) to appear above modals
+        "z-[10001] max-h-96 min-w-[8rem] overflow-hidden",
         "bg-[var(--bg-card)] text-[var(--text-primary)]",
         "border border-[var(--border-solid)]",
         "shadow-[0_4px_20px_rgba(0,0,0,0.5),0_0_15px_var(--border-glow)]",

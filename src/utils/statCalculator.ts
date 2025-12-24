@@ -75,13 +75,21 @@ function applyStatBonus(bonuses: EquipmentBonuses, bonus: StatBonus): void {
       // This is magic distance from Crystallized Essence
       bonuses.magicDistance += bonus.value;
       break;
-    // Extended stat types (for future use)
+    // Characteristic bonuses from equipment
     case 'might':
+      bonuses.might += bonus.value;
+      break;
     case 'agility':
+      bonuses.agility += bonus.value;
+      break;
     case 'reason':
+      bonuses.reason += bonus.value;
+      break;
     case 'intuition':
+      bonuses.intuition += bonus.value;
+      break;
     case 'presence':
-      // Characteristic bonuses are rare and handled specially
+      bonuses.presence += bonus.value;
       break;
   }
 }
@@ -202,6 +210,16 @@ export function calculateDerivedStats(hero: Hero): DerivedStats {
   const savingThrowBonus = equipmentBonuses.savingThrows;
   const resistPotencyBonus = equipmentBonuses.resistPotency;
 
+  // ===== EFFECTIVE CHARACTERISTICS =====
+  // Base characteristics + equipment bonuses
+  const effectiveCharacteristics = {
+    might: (hero.characteristics?.might ?? 0) + equipmentBonuses.might,
+    agility: (hero.characteristics?.agility ?? 0) + equipmentBonuses.agility,
+    reason: (hero.characteristics?.reason ?? 0) + equipmentBonuses.reason,
+    intuition: (hero.characteristics?.intuition ?? 0) + equipmentBonuses.intuition,
+    presence: (hero.characteristics?.presence ?? 0) + equipmentBonuses.presence,
+  };
+
   return {
     maxStamina,
     windedThreshold,
@@ -215,6 +233,7 @@ export function calculateDerivedStats(hero: Hero): DerivedStats {
     reach,
     rangedDistance,
     magicDistance,
+    effectiveCharacteristics,
     summonerRange,
     nullFieldArea,
     savingThrowBonus,

@@ -1983,7 +1983,13 @@
 
 /* Dialog-specific adjustments */
 .custom-item-form-dialog {
-  /* Additional dialog customizations if needed */
+  /* Remove clip-path to allow Select dropdowns to appear above dialog */
+}
+
+.custom-item-form-dialog .dialog-inner {
+  /* Override clip-path to prevent Select dropdown clipping */
+  clip-path: none !important;
+  border-radius: var(--radius-lg);
 }
 
 /* Form scroll area */

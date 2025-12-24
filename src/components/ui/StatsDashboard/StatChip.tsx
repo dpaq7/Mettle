@@ -27,10 +27,15 @@ export const StatChip: React.FC<StatChipProps> = ({
   minValue = 0,
   showProgress = false,
   highlight = false,
+  controlValue,
+  controlMaxValue,
 }) => {
   const hasControls = onChange !== undefined;
-  const canDecrease = hasControls && value > minValue;
-  const canIncrease = hasControls && (maxValue === undefined || value < maxValue);
+  // Use controlValue/controlMaxValue if provided, otherwise fall back to value/maxValue
+  const effectiveControlValue = controlValue ?? value;
+  const effectiveControlMax = controlMaxValue;
+  const canDecrease = hasControls && effectiveControlValue > minValue;
+  const canIncrease = hasControls && (effectiveControlMax === undefined || effectiveControlValue < effectiveControlMax);
 
   // Display string
   const display =
