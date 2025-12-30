@@ -240,6 +240,7 @@ export interface QuickCommand {
 export interface HeroBase {
   id: string;
   name: string;
+  title?: string; // Optional character title (e.g., "The Bold", "Dragonslayer")
   level: number; // 1-10
   heroClass: HeroClass;
 

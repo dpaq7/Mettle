@@ -12,6 +12,9 @@ export interface EssenceEconomy {
 
   // SRD: Gain +1 Essence when any minion dies in range (limit 1/round)
   minionDeathEssenceGainedThisRound: boolean;
+
+  // Pending free signature minions to be selected by player
+  pendingFreeMinions: number;
 }
 
 export interface SummoningAction {

@@ -31,6 +31,7 @@ interface CombatContextType {
   hasSacrificedThisTurn: boolean;
   sacrificeMinion: () => boolean; // Sacrifice a signature minion for 1 essence (1/turn)
   onEndTurn: () => void; // Generic end-of-turn callback for turn tracker
+  selectFreeMinion: (templateId: string) => void; // Select a signature minion from pending free minions
 }
 
 const CombatContext = createContext<CombatContextType | undefined>(undefined);
@@ -67,6 +68,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     turnNumber: 0,
     signatureMinionsSpawnedThisTurn: false,
     minionDeathEssenceGainedThisRound: false,
+    pendingFreeMinions: 0,
   });
 
   const [hasSacrificedThisTurn, setHasSacrificedThisTurn] = useState(false);
@@ -217,15 +219,14 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       phasesCompleted: [],
     });
 
-    // Summoner-specific: Initialize essence and summon free minions
+    // Summoner-specific: Initialize essence and set up free minion selection
     if (hero) {
       // SRD: Start of Combat - Essence = Current Victories
       const startingEssence = hero.victories || 0;
 
-      // SRD: Start of Combat - Summon free signature minions
+      // SRD: Start of Combat - Free signature minions (player choice)
       // Base: 2, Level 10: +2 per 2 Victories
       const freeMinionCount = calculateCombatStartMinions(hero.level, hero.victories || 0);
-      const freeSquads = summonFreeSignatureMinions(freeMinionCount, []);
 
       // Reset champion state for new encounter (Summoner v1.0 SRD)
       const newChampionState = hero.championState ? {
@@ -250,9 +251,9 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         shouldDismissOnCombatStart: true,
       };
 
-      // Update hero with the new squads AND sync heroicResource
+      // Clear any existing squads and set pending free minions for player selection
       updateHero({
-        activeSquads: freeSquads,
+        activeSquads: [],
         heroicResource: {
           ...hero.heroicResource,
           current: startingEssence,
@@ -266,8 +267,9 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         currentEssence: startingEssence,
         essenceGainedThisTurn: 0,
         turnNumber: 1,
-        signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
+        signatureMinionsSpawnedThisTurn: false, // Will be true after player selects
         minionDeathEssenceGainedThisRound: false,
+        pendingFreeMinions: freeMinionCount, // Player will select these
       });
     } else if (genericHero) {
       // Non-Summoner classes: reset their heroic resource at combat start if needed
@@ -280,6 +282,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         turnNumber: 1,
         signatureMinionsSpawnedThisTurn: false,
         minionDeathEssenceGainedThisRound: false,
+        pendingFreeMinions: 0,
       });
     }
 
@@ -292,11 +295,17 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
   const endCombat = () => {
     setIsInCombat(false);
 
-    // Reset squads
+    // Reset squads and increment victories by 1 (assuming combat victory)
     if (hero) {
       updateHero({
         activeSquads: [],
         fixture: null,
+        victories: (hero.victories || 0) + 1,
+      });
+    } else if (genericHero) {
+      // Non-Summoner classes also get a victory
+      updateHero({
+        victories: (genericHero.victories || 0) + 1,
       });
     }
   };
@@ -319,13 +328,18 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     const essenceGain = calculateEssencePerTurn(hero.level);
     const newEssence = currentEssence + essenceGain;
 
+    // SRD: Start of Turn - Free signature minions (level-based, player choice)
+    // Base: 3, Level 7+ (Minion Improvement): 4, Horde: +1
+    const freeMinionCount = calculateSignatureMinionsPerTurn(hero.formation, hero.level);
+
     setEssenceState(prev => ({
       ...prev,
       currentEssence: newEssence,
       essenceGainedThisTurn: essenceGain,
       turnNumber: newTurnNumber,
-      signatureMinionsSpawnedThisTurn: true, // Mark that we've spawned this turn
+      signatureMinionsSpawnedThisTurn: false, // Will be true after player selects
       minionDeathEssenceGainedThisRound: false, // Reset for new round
+      pendingFreeMinions: freeMinionCount, // Player will select these
     }));
 
     // Reset squad and minion action states (for sacrifice tracking)
@@ -341,11 +355,6 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       })),
     }));
 
-    // SRD: Start of Turn - Free signature minions (level-based)
-    // Base: 3, Level 7+ (Minion Improvement): 4, Horde: +1
-    const freeMinionCount = calculateSignatureMinionsPerTurn(hero.formation, hero.level);
-    const squadsWithFreeMinions = summonFreeSignatureMinions(freeMinionCount, resetSquads);
-
     // Reset champion actions if active
     const updatedChampion = hero.activeChampion ? {
       ...hero.activeChampion,
@@ -356,7 +365,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
 
     // Sync heroicResource with the new essence value
     updateHero({
-      activeSquads: squadsWithFreeMinions,
+      activeSquads: resetSquads,
       activeChampion: updatedChampion,
       heroicResource: {
         ...hero.heroicResource,
@@ -478,6 +487,55 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     setCombatTurnNumber((prev) => prev + 1);
   }, []);
 
+  // Select a free signature minion from pending count (player choice at turn/combat start)
+  const selectFreeMinion = useCallback((templateId: string) => {
+    if (!hero || essenceState.pendingFreeMinions <= 0) return;
+
+    const signatureMinions = hero.portfolio.signatureMinions || [];
+    const template = signatureMinions.find(m => m.id === templateId);
+    if (!template) return;
+
+    // Create a single minion from the template
+    const minion = createSingleMinion(template);
+    if (!minion) return;
+
+    // Find existing squad or create new one
+    const existingSquads = [...hero.activeSquads];
+    let squad = existingSquads.find(s => s.templateId === template.id);
+
+    if (squad) {
+      // Add minion to existing squad
+      squad.members.push(minion);
+      squad.currentStamina += minion.maxStamina;
+      squad.maxStamina += minion.maxStamina;
+    } else {
+      // Create new squad with this single minion
+      squad = {
+        id: generateId(),
+        templateId: template.id,
+        members: [minion],
+        currentStamina: minion.maxStamina,
+        maxStamina: minion.maxStamina,
+        hasMoved: false,
+        hasActed: false,
+      };
+      existingSquads.push(squad);
+    }
+
+    // Update hero with the modified squads
+    updateHero({
+      activeSquads: existingSquads,
+    });
+
+    // Decrement pending count
+    const newPending = essenceState.pendingFreeMinions - 1;
+    setEssenceState(prev => ({
+      ...prev,
+      pendingFreeMinions: newPending,
+      signatureMinionsSpawnedThisTurn: newPending === 0,
+    }));
+  }, [hero, essenceState.pendingFreeMinions, createSingleMinion, updateHero]);
+
   const value: CombatContextType = {
     essenceState,
     turnState,
@@ -494,6 +552,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     hasSacrificedThisTurn,
     sacrificeMinion,
     onEndTurn,
+    selectFreeMinion,
   };
 
   return <CombatContext.Provider value={value}>{children}</CombatContext.Provider>;

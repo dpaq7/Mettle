@@ -7,7 +7,11 @@ import './MagicItemsView.css';
 type CategoryFilter = 'all' | ItemCategory;
 type EchelonFilter = 'all' | 1 | 2 | 3 | 4;
 
-const MagicItemsView: React.FC = () => {
+interface MagicItemsViewProps {
+  onAddConsumable?: (item: MagicItem, quantity: number) => void;
+}
+
+const MagicItemsView: React.FC<MagicItemsViewProps> = ({ onAddConsumable }) => {
   const { hero } = useSummonerContext();
   const { equipItem, unequipItem, isEquipped } = useEquipment();
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
@@ -21,6 +25,13 @@ const MagicItemsView: React.FC = () => {
       unequipItem(item.id);
     } else {
       equipItem(item);
+    }
+  };
+
+  const handleAddConsumable = (e: React.MouseEvent, item: MagicItem) => {
+    e.stopPropagation();
+    if (onAddConsumable) {
+      onAddConsumable(item, 1);
     }
   };
 
@@ -165,6 +176,7 @@ const MagicItemsView: React.FC = () => {
           const equipped = isEquipped(item.id);
           const bonusPreview = getBonusPreview(item);
           const canEquip = item.slot !== undefined;
+          const isConsumable = item.category === 'consumable';
 
           return (
             <div
@@ -186,7 +198,21 @@ const MagicItemsView: React.FC = () => {
                   {equipped && <span className="equipped-badge">Equipped</span>}
                 </div>
                 <h3>{item.name}</h3>
+                {item.keywords && item.keywords.length > 0 && (
+                  <div className="item-keywords">
+                    {item.keywords.map((keyword, idx) => (
+                      <span key={idx} className="keyword-tag">{keyword}</span>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Flavor Text */}
+              {item.flavorText && (
+                <div className="item-flavor">
+                  {item.flavorText}
+                </div>
+              )}
 
               <div className="item-effect">
                 {item.effect}
@@ -219,15 +245,27 @@ const MagicItemsView: React.FC = () => {
                 </div>
               )}
 
-              {/* Equip Button */}
-              {canEquip && hero && (
-                <button
-                  className={`equip-btn ${equipped ? 'equipped' : ''}`}
-                  onClick={(e) => handleEquipClick(e, item)}
-                >
-                  {equipped ? '✓ Unequip' : '+ Equip'}
-                </button>
-              )}
+              <div className="item-actions">
+                {/* Equip Button for equipment */}
+                {canEquip && hero && (
+                  <button
+                    className={`equip-btn ${equipped ? 'equipped' : ''}`}
+                    onClick={(e) => handleEquipClick(e, item)}
+                  >
+                    {equipped ? '✓ Unequip' : '+ Equip'}
+                  </button>
+                )}
+
+                {/* Add to Inventory Button for consumables */}
+                {isConsumable && onAddConsumable && hero && (
+                  <button
+                    className="add-consumable-btn"
+                    onClick={(e) => handleAddConsumable(e, item)}
+                  >
+                    + Add to Inventory
+                  </button>
+                )}
+              </div>
 
               {item.enhancements && (
                 <div className="expand-hint">

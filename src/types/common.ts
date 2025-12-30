@@ -20,6 +20,7 @@ export type ConditionId =
   | 'burning'
   | 'charmed'
   | 'dazed'
+  | 'dying'
   | 'frightened'
   | 'grabbed'
   | 'invisible'

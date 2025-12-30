@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BarChart3, Pin, Dices, Footprints, Anchor } from 'lucide-react';
+import { BarChart3, Pin, Dices, Footprints, Anchor, Target } from 'lucide-react';
 import {
   Tooltip,
   TooltipTrigger,
@@ -21,9 +21,12 @@ export const CharacteristicsCard: React.FC<CharacteristicsCardProps> = ({
   characteristics,
   speed,
   stability,
+  heroClass,
   onRollCharacteristic,
   onUnpin,
 }) => {
+  // Summoner's Range = 5 + Reason (Summoner v1.0 SRD)
+  const summonerRange = heroClass === 'summoner' ? 5 + characteristics.reason : null;
   const [rollingChar, setRollingChar] = useState<CharacteristicId | null>(null);
 
   // Get modifier value by characteristic ID
@@ -154,6 +157,20 @@ export const CharacteristicsCard: React.FC<CharacteristicsCardProps> = ({
               Resistance to forced movement
             </TooltipContent>
           </Tooltip>
+          {summonerRange !== null && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="secondary-stat summoner-range">
+                  <Target className="secondary-icon" />
+                  <span className="secondary-label">Range</span>
+                  <span className="secondary-value">{summonerRange}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Summoner's Range (5 + Reason) - Max distance for summoning and commanding minions
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
     </div>

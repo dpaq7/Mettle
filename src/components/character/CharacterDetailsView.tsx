@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { useCombatContext } from '../../context/CombatContext';
 import { languages as allLanguages } from '../../data/reference-data';
@@ -34,8 +34,33 @@ const perkCategoryIcons: Record<string, LucideIcon> = {
 const CharacterDetailsView: React.FC = () => {
   const { hero, updateHero } = useSummonerContext();
   const { isInCombat } = useCombatContext();
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleInput, setTitleInput] = useState('');
+
+  // Sync title input with hero's title when hero changes
+  useEffect(() => {
+    if (hero?.title !== undefined) {
+      setTitleInput(hero.title);
+    }
+  }, [hero?.title]);
 
   if (!hero) return null;
+
+  // Handle title save
+  const handleSaveTitle = () => {
+    updateHero({ title: titleInput.trim() || undefined });
+    setIsEditingTitle(false);
+  };
+
+  // Handle title input keydown
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      setTitleInput(hero.title || '');
+      setIsEditingTitle(false);
+    }
+  };
 
   // Get hero class and check if Summoner
   const heroClass: HeroClass = hero.heroClass || 'summoner';
@@ -172,6 +197,40 @@ const CharacterDetailsView: React.FC = () => {
 
   return (
     <div className="character-details-view">
+      {/* Title Section - Editable character title */}
+      <section className="details-section title-section">
+        <div className="title-header">
+          <h2>Character Title</h2>
+        </div>
+        <div className="title-content">
+          {isEditingTitle ? (
+            <div className="title-edit-form">
+              <input
+                type="text"
+                className="title-input"
+                value={titleInput}
+                onChange={(e) => setTitleInput(e.target.value)}
+                onKeyDown={handleTitleKeyDown}
+                onBlur={handleSaveTitle}
+                placeholder="e.g., The Bold, Dragonslayer, First of Her Name..."
+                autoFocus
+                maxLength={50}
+              />
+              <span className="title-hint">Press Enter to save, Escape to cancel</span>
+            </div>
+          ) : (
+            <div className="title-display" onClick={() => setIsEditingTitle(true)}>
+              {hero.title ? (
+                <span className="title-value">{hero.title}</span>
+              ) : (
+                <span className="title-placeholder">Click to add a title...</span>
+              )}
+              <span className="title-edit-icon">✏️</span>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Ancestry Section */}
       <section className="details-section ancestry-section ancestry-section--full-width">
         <h2>Ancestry: {ancestryName}</h2>
@@ -193,17 +252,40 @@ const CharacterDetailsView: React.FC = () => {
           </div>
         )}
 
-        {/* Combat locked message */}
+        {/* Combat locked message - shows all traits read-only during combat */}
         {hero.ancestrySelection && ancestryFromData && isAncestryComplete(ancestryFromData.id) && isInCombat && (
           <div className="ancestry-combat-locked">
-            <span className="combat-locked-message">🔒 Ancestry traits cannot be changed during combat</span>
-            {/* Show current traits as read-only */}
+            <span className="combat-locked-message">🔒 Ancestry traits locked during combat</span>
+
+            {/* Show signature trait */}
             {signatureTrait && (
               <div className="feature-block signature">
                 <h4>Signature Trait</h4>
                 <div className="feature">
                   <strong>{signatureTrait.name}</strong>
                   <p>{signatureTrait.description}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Show selected purchased traits read-only */}
+            {hero.ancestrySelection.selectedTraitIds && hero.ancestrySelection.selectedTraitIds.length > 0 && (
+              <div className="feature-block purchased-traits">
+                <h4>Purchased Traits ({ancestryPoints} Points)</h4>
+                <div className="purchased-traits-list">
+                  {hero.ancestrySelection.selectedTraitIds.map(traitId => {
+                    const trait = ancestryFromData.purchasedTraits?.find(t => t.id === traitId);
+                    if (!trait) return null;
+                    return (
+                      <div key={trait.id} className="purchased-trait-display">
+                        <div className="trait-header">
+                          <strong>{trait.name}</strong>
+                          <span className="trait-cost">{trait.cost} pt{trait.cost > 1 ? 's' : ''}</span>
+                        </div>
+                        <p className="trait-description">{trait.description}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

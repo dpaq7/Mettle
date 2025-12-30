@@ -10,6 +10,7 @@ import {
   calculateFuryStamina,
 } from '../../data/fury/progression';
 import { classPerkAtLevel, getAvailablePerkCategories } from '../../data/perks';
+import { classDefinitions } from '../../data/classes/class-definitions';
 import { LevelUpStep, LevelUpChoice, AutomaticFeature } from '../../types/levelup';
 import { WardType, ProgressionChoices } from '../../types/progression';
 import { SelectedPerk } from '../../types/perk';
@@ -150,7 +151,8 @@ const LevelUpWizard: React.FC<LevelUpWizardProps> = ({ onClose }) => {
     return choices.find((c) => c.id === id);
   };
 
-  // Calculate stamina changes - CLASS-SPECIFIC
+  // Calculate stamina changes - CLASS-SPECIFIC using class definitions
+  const classDef = classDefinitions[hero.heroClass];
   const currentStamina = hero.stamina.max;
   const echelon = Math.ceil(targetLevel / 3);
   const kitStamina = (hero.kit?.staminaPerEchelon || 0) * echelon;
@@ -160,10 +162,12 @@ const LevelUpWizard: React.FC<LevelUpWizardProps> = ({ onClose }) => {
     // Fury: Base 21 + 9 per level after 1
     newMaxStamina = calculateFuryStamina(targetLevel, kitStamina);
   } else {
-    // Default (Summoner): Base 15 + 6 per level
-    const baseStamina = 15;
-    const levelBonus = targetLevel >= 2 ? targetLevel * 6 : 0;
-    newMaxStamina = baseStamina + kitStamina + levelBonus;
+    // Use class-specific stamina from definitions
+    // Formula: Class Starting + (Level-1) * Stamina Per Level + Kit
+    const classStartingStamina = classDef?.startingStamina ?? 18;
+    const staminaPerLevel = classDef?.staminaPerLevel ?? 6;
+    const levelBonus = (targetLevel - 1) * staminaPerLevel;
+    newMaxStamina = classStartingStamina + levelBonus + kitStamina;
   }
 
   // Check if all required choices are made

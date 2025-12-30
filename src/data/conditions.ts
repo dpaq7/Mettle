@@ -8,6 +8,7 @@ export type ConditionId =
   | 'burning'
   | 'charmed'
   | 'dazed'
+  | 'dying'
   | 'frightened'
   | 'grabbed'
   | 'invisible'
@@ -70,6 +71,16 @@ export const CONDITIONS: Record<ConditionId, ConditionDefinition> = {
     primaryEffect: 'Limited to ONE of: Move Action, Maneuver, or Main Action. Cannot use triggered actions, free triggered actions, or free maneuvers.',
     saveEnds: true,
     saveRequired: 'd10 roll of 6+ at end of turn',
+    affectsActions: false,
+  },
+  dying: {
+    id: 'dying',
+    name: 'Dying',
+    icon: '💀',
+    description: 'You have been reduced to 0 stamina or below and are close to death.',
+    primaryEffect: 'You are unconscious and cannot take actions. Take 1d6 damage at end of each turn. Death occurs at negative half max stamina.',
+    saveEnds: false,
+    saveRequired: 'Healing to restore stamina above 0',
     affectsActions: false,
   },
   frightened: {

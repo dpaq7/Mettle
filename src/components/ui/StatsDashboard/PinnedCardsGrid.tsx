@@ -16,7 +16,7 @@ import { useDerivedStats } from '@/hooks/useDerivedStats';
 import type { Hero } from '@/types/hero';
 import type { ConditionId } from '@/types/common';
 import type { HeroicResourceConfig } from '@/data/class-resources';
-import type { StatCardType, DiceRoll, DiceType, TurnPhaseId, CharacteristicId, ConditionEndType } from './types';
+import type { StatCardType, DiceRoll, DiceType, TurnPhaseId, CharacteristicId, ConditionEndType, RollModifierState } from './types';
 
 interface PinnedCardsGridProps {
   pinnedCards: StatCardType[];
@@ -38,12 +38,15 @@ interface PinnedCardsGridProps {
   onRespite: () => void;
   // Dice props
   rollHistory: DiceRoll[];
-  onRoll: (type: DiceType, label?: string) => void;
+  currentEdgeBane: RollModifierState;
+  onRoll: (type: DiceType, label?: string, edgeBane?: RollModifierState) => void;
   onClearRollHistory: () => void;
+  onCycleEdgeBane: () => void;
   onRollCharacteristic: (characteristicId: CharacteristicId, modifier: number) => void;
   // Turn tracking props (combat only)
   turnNumber?: number;
   completedPhases?: Set<TurnPhaseId>;
+  pendingFreeMinions?: number; // Summoner: free signature minions to select
   onTogglePhase?: (phaseId: TurnPhaseId) => void;
   onEndTurn?: () => void;
   onResetTurn?: () => void;
@@ -79,11 +82,14 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
   onEndCombat,
   onRespite,
   rollHistory,
+  currentEdgeBane,
   onRoll,
   onClearRollHistory,
+  onCycleEdgeBane,
   onRollCharacteristic,
   turnNumber = 1,
   completedPhases = new Set(),
+  pendingFreeMinions = 0,
   onTogglePhase,
   onEndTurn,
   onResetTurn,
@@ -188,6 +194,7 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
                 characteristics={hero.characteristics}
                 speed={effectiveSpeed}
                 stability={effectiveStability}
+                heroClass={hero.heroClass}
                 onRollCharacteristic={onRollCharacteristic}
                 onUnpin={() => onUnpin('characteristics')}
               />
@@ -211,8 +218,10 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
             {type === 'dice' && (
               <DiceCard
                 rollHistory={rollHistory}
+                currentEdgeBane={currentEdgeBane}
                 onRoll={onRoll}
                 onClearHistory={onClearRollHistory}
+                onCycleEdgeBane={onCycleEdgeBane}
                 onUnpin={() => onUnpin('dice')}
               />
             )}
@@ -223,6 +232,7 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
                 turnNumber={turnNumber}
                 completedPhases={completedPhases}
                 conditions={hero.activeConditions}
+                pendingFreeMinions={pendingFreeMinions}
                 onTogglePhase={onTogglePhase}
                 onEndTurn={onEndTurn}
                 onResetTurn={onResetTurn}

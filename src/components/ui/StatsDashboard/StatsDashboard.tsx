@@ -42,12 +42,15 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
     onShowAbout,
     onLevelUp,
     rollHistory = [],
+    currentEdgeBane = 'normal',
     onRoll,
     onClearRollHistory,
+    onCycleEdgeBane,
     onRollCharacteristic,
     // Turn tracking
     turnNumber = 1,
     completedPhases = new Set<TurnPhaseId>(),
+    pendingFreeMinions = 0,
     onTogglePhase,
     onEndTurn,
     onResetTurn,
@@ -215,11 +218,14 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
                 onEndCombat={onEndCombat}
                 onRespite={onRespite}
                 rollHistory={rollHistory}
+                currentEdgeBane={currentEdgeBane as import('./types').RollModifierState}
                 onRoll={onRoll ?? (() => {})}
                 onClearRollHistory={onClearRollHistory ?? (() => {})}
+                onCycleEdgeBane={onCycleEdgeBane ?? (() => {})}
                 onRollCharacteristic={onRollCharacteristic ?? (() => {})}
                 turnNumber={turnNumber}
                 completedPhases={completedPhases}
+                pendingFreeMinions={pendingFreeMinions}
                 onTogglePhase={onTogglePhase}
                 onEndTurn={onEndTurn}
                 onResetTurn={onResetTurn}

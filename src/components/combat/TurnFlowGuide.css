@@ -137,6 +137,88 @@
   box-shadow: 0 4px 12px rgba(79, 195, 247, 0.4);
 }
 
+/* Free Minion Picker */
+.free-minion-picker {
+  background: rgba(76, 175, 80, 0.1);
+  border: 2px solid #4caf50;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(76, 175, 80, 0.5);
+  }
+}
+
+.picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.picker-title {
+  font-weight: 600;
+  color: #4caf50;
+  font-size: 1rem;
+}
+
+.picker-count {
+  background: #4caf50;
+  color: #1a1a1a;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.signature-minion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.free-minion-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #2a2a2a;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 100px;
+}
+
+.free-minion-btn:hover {
+  background: #4caf50;
+  transform: translateY(-2px);
+}
+
+.free-minion-btn:hover .minion-name,
+.free-minion-btn:hover .minion-role {
+  color: #1a1a1a;
+}
+
+.minion-name {
+  font-weight: 600;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.minion-role {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: capitalize;
+}
+
 @media (max-width: 768px) {
   .turn-header {
     flex-direction: column;
@@ -144,6 +226,14 @@
   }
 
   .new-turn-btn {
+    width: 100%;
+  }
+
+  .signature-minion-buttons {
+    flex-direction: column;
+  }
+
+  .free-minion-btn {
     width: 100%;
   }
 }

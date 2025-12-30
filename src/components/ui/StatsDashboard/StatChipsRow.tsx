@@ -83,25 +83,28 @@ export const StatChipsRow: React.FC<StatChipsRowProps> = ({
 
   return (
     <div className="stat-chips-row">
-      {/* Stamina */}
+      {/* Stamina - allows negative values down to death threshold */}
       <StatChip
         id="stamina"
         icon={Heart}
         label={equipmentStamina > 0 ? `Stamina (+${equipmentStamina})` : "Stamina"}
         value={hero.stamina.current}
         maxValue={effectiveMaxStamina}
-        color="var(--danger)"
+        color={hero.stamina.current <= 0 ? "var(--text-muted)" : "var(--danger)"}
         isPinned={pinnedCards.has('stamina')}
         onTogglePin={() => onTogglePin('stamina')}
         onChange={(delta) => {
+          // Death threshold is negative half max stamina
+          const deathThreshold = -Math.floor(effectiveMaxStamina / 2);
           const newVal = Math.max(
-            0,
+            deathThreshold,
             Math.min(effectiveMaxStamina, hero.stamina.current + delta)
           );
           onStaminaChange(newVal);
         }}
-        minValue={0}
+        minValue={-Math.floor(effectiveMaxStamina / 2)}
         showProgress
+        highlight={hero.stamina.current <= 0}
       />
 
       {/* Recoveries */}

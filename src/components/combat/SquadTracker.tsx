@@ -157,10 +157,13 @@ const SquadTracker: React.FC = () => {
                 </button>
               </div>
 
-              {/* Shared Stamina Pool (SRD) */}
+              {/* Shared Stamina Pool (SRD) - Divided by minion count */}
               <div className="squad-stamina-pool">
                 <div className="stamina-label">
                   Squad HP: {squad.currentStamina}/{squad.maxStamina}
+                  <span className="minion-hp-hint">
+                    ({template.stamina} per minion)
+                  </span>
                 </div>
                 <div className="health-bar squad-health-bar">
                   <div
@@ -174,6 +177,20 @@ const SquadTracker: React.FC = () => {
                         : '#f44336',
                     }}
                   />
+                  {/* Threshold markers showing when each minion dies */}
+                  {squad.members.length > 1 && squad.members.map((_, idx) => {
+                    if (idx === 0) return null; // No marker for first minion
+                    const minionStamina = Array.isArray(template.stamina) ? template.stamina[0] : template.stamina;
+                    const thresholdPercent = ((squad.maxStamina - (idx * minionStamina)) / squad.maxStamina) * 100;
+                    return (
+                      <div
+                        key={idx}
+                        className="minion-threshold-marker"
+                        style={{ left: `${thresholdPercent}%` }}
+                        title={`Minion ${squad.members.length - idx + 1} dies at ${squad.maxStamina - (idx * minionStamina)} HP`}
+                      />
+                    );
+                  })}
                 </div>
                 <div className="squad-damage-controls">
                   <button
@@ -282,6 +299,23 @@ const SquadTracker: React.FC = () => {
                     </button>
                   )}
                 </div>
+
+                {/* Signature Ability Description */}
+                {template.signatureAbility && (
+                  <div className="signature-ability-info">
+                    <div className="sig-ability-header">{template.signatureAbility.name}</div>
+                    {(template.signatureAbility.flavorText || template.signatureAbility.effect) && (
+                      <div className="sig-ability-desc">{template.signatureAbility.flavorText || template.signatureAbility.effect}</div>
+                    )}
+                    {template.signatureAbility.powerRoll && (
+                      <div className="sig-ability-tiers">
+                        <span className="tier tier-1">T1: {template.signatureAbility.powerRoll.tier1}</span>
+                        <span className="tier tier-2">T2: {template.signatureAbility.powerRoll.tier2}</span>
+                        <span className="tier tier-3">T3: {template.signatureAbility.powerRoll.tier3}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {freeStrikeResult && (
                   <div

@@ -4,7 +4,7 @@ import { usePortrait } from '../../hooks/usePortrait';
 import { useCustomItems, CustomMagicItem } from '../../hooks/useCustomItems';
 import { useSummonerContext } from '../../context/HeroContext';
 import { useDerivedStats } from '../../hooks/useDerivedStats';
-import { MagicItem, EquipmentSlot } from '../../data/magicItems';
+import { MagicItem, EquipmentSlot, CONSUMABLE_ITEMS } from '../../data/magicItems';
 import { EquippedItem } from '../../types/equipment';
 import { VisualSlot, SLOT_CONFIG } from './slotConfig';
 import EquipmentLayout from './EquipmentLayout';
@@ -14,7 +14,78 @@ import ArtifactDisplay from './ArtifactDisplay';
 import PortraitUploader from './PortraitUploader';
 import CustomItemForm from './CustomItemForm';
 import { EquipmentBonusSummary } from './EquipmentBonusDisplay';
+import type { Hero } from '../../types/hero';
 import './InventoryView.css';
+
+/**
+ * Parse consumable effect and return stat changes to apply
+ */
+function parseConsumableEffect(itemId: string, hero: Hero): Partial<Hero> | null {
+  const item = CONSUMABLE_ITEMS.find(c => c.id === itemId);
+  if (!item) return null;
+
+  const effect = item.effect.toLowerCase();
+  const updates: Partial<Hero> = {};
+
+  // Healing Potion: regain Stamina equal to Recovery Value
+  if (itemId === 'healing-potion' || effect.includes('recovery value')) {
+    const healAmount = hero.recoveries.value;
+    const newStamina = Math.min(hero.stamina.max, hero.stamina.current + healAmount);
+    updates.stamina = { ...hero.stamina, current: newStamina };
+    return updates;
+  }
+
+  // Buzz Balm: end Bleeding/Weakened, +2 speed (end of turn - just remove conditions)
+  if (itemId === 'buzz-balm') {
+    updates.activeConditions = hero.activeConditions.filter(
+      c => c.conditionId !== 'bleeding' && c.conditionId !== 'weakened'
+    );
+    return updates;
+  }
+
+  // Breath of Dawn: end Frightened/Slowed/Taunted, +8 Stability
+  if (itemId === 'breath-of-dawn') {
+    updates.activeConditions = hero.activeConditions.filter(
+      c => c.conditionId !== 'frightened' && c.conditionId !== 'slowed' && c.conditionId !== 'taunted'
+    );
+    return updates;
+  }
+
+  // Wellness Tonic: end up to 3 conditions
+  if (itemId === 'wellness-tonic') {
+    // Remove first 3 conditions
+    updates.activeConditions = hero.activeConditions.slice(3);
+    return updates;
+  }
+
+  // Chocolate of Immovability: gain 15 Temp Stamina
+  if (itemId === 'chocolate-of-immovability') {
+    // Note: We don't have tempStamina in stamina pool, so just add to current
+    const newStamina = Math.min(hero.stamina.max, hero.stamina.current + 15);
+    updates.stamina = { ...hero.stamina, current: newStamina };
+    return updates;
+  }
+
+  // Restorative of the Bright Court: regain 1d6 Recoveries
+  if (itemId === 'restorative-bright-court') {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const newRecoveries = Math.min(hero.recoveries.max, hero.recoveries.current + roll);
+    updates.recoveries = { ...hero.recoveries, current: newRecoveries };
+    return updates;
+  }
+
+  // Generic surge grant (if effect mentions "surge" or "surges")
+  if (effect.includes('surge') && effect.includes('gain')) {
+    // Extract number of surges if mentioned
+    const surgeMatch = effect.match(/(\d+)\s*surge/);
+    const surgeCount = surgeMatch ? parseInt(surgeMatch[1], 10) : 1;
+    updates.surges = hero.surges + surgeCount;
+    return updates;
+  }
+
+  // If no specific effect was parsed, return null (item used but no stat change)
+  return null;
+}
 
 interface ConsumableInventoryItem {
   itemId: string;
@@ -188,13 +259,23 @@ const InventoryView: React.FC = () => {
     (itemId: string) => {
       if (!hero?.inventory) return;
 
-      const updated = hero.inventory
+      // Decrement quantity in inventory
+      const updatedInventory = hero.inventory
         .map((item) =>
           item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
         )
         .filter((item) => item.quantity > 0);
 
-      updateHero({ inventory: updated });
+      // Parse and apply consumable effect
+      const effectUpdates = parseConsumableEffect(itemId, hero);
+
+      // Combine inventory update with effect updates
+      const allUpdates: Partial<typeof hero> = {
+        inventory: updatedInventory,
+        ...(effectUpdates || {}),
+      };
+
+      updateHero(allUpdates);
     },
     [hero, updateHero]
   );

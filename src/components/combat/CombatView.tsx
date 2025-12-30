@@ -4,7 +4,6 @@ import { useCombatContext } from '../../context/CombatContext';
 import { useSquads } from '../../hooks/useSquads';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useEssence } from '../../hooks/useEssence';
-import { useStaminaStates } from '../../hooks/useStaminaStates';
 import { useRollHistory } from '../../context/RollHistoryContext';
 import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
 import { Squad, MinionTemplate } from '../../types';
@@ -21,7 +20,6 @@ const CombatView: React.FC = () => {
   const { createSquad, addSquad, removeSquad, updateSquad, damageSquad, healSquad } = useSquads();
   const { getSignatureMinions, getUnlockedMinions, getMinionById, getActualEssenceCost, isMinionUnlockedByLevel, getRequiredLevel, isSignatureMinion } = usePortfolio();
   const { canAffordMinion, spendForMinion, currentEssence } = useEssence();
-  const { getSquadStaminaState, getStateColor, getStateLabel } = useStaminaStates();
   const { addRoll } = useRollHistory();
 
   const [rollStates, setRollStates] = useState<Record<string, { result: PowerRollResult; type: string }>>({});
@@ -626,8 +624,6 @@ const CombatView: React.FC = () => {
 
               const alive = aliveCount(squad);
               const healthPct = (squad.currentStamina / squad.maxStamina) * 100;
-              const staminaState = getSquadStaminaState(squad);
-              const stateLabel = getStateLabel(staminaState.currentState);
               const rollMod = getRollModifier(squad.id);
               const freeStrikeResult = rollStates[squad.id];
               const sigResult = rollStates[`${squad.id}_sig`];
@@ -642,29 +638,35 @@ const CombatView: React.FC = () => {
                     <button className="dismiss-btn" onClick={() => handleDismissSquad(squad.id)} title="Dismiss">×</button>
                   </div>
 
-                  {/* HP Bar with Winded/Dying State */}
+                  {/* HP Bar - Minions don't have winded/dying states per SRD */}
                   <div className="squad-hp">
                     <div className="hp-bar">
                       <div
                         className="hp-fill"
                         style={{
                           width: `${healthPct}%`,
-                          background: getStateColor(staminaState.currentState)
+                          background: healthPct > 50 ? 'var(--success)' : healthPct > 25 ? 'var(--warning)' : 'var(--danger)'
                         }}
                       />
-                      {/* Winded threshold marker */}
-                      <div
-                        className="winded-marker"
-                        style={{ left: '50%' }}
-                        title={`Winded threshold: ${staminaState.windedValue}`}
-                      />
+                      {/* Threshold markers showing when each minion dies */}
+                      {squad.members.length > 1 && squad.members.map((_, idx) => {
+                        if (idx === 0) return null;
+                        const minionStamina = Array.isArray(template.stamina) ? template.stamina[0] : template.stamina;
+                        const thresholdPct = ((squad.maxStamina - (idx * minionStamina)) / squad.maxStamina) * 100;
+                        return (
+                          <div
+                            key={idx}
+                            className="minion-threshold-marker"
+                            style={{ left: `${thresholdPct}%` }}
+                            title={`Minion ${squad.members.length - idx + 1} dies at ${squad.maxStamina - (idx * minionStamina)} HP`}
+                          />
+                        );
+                      })}
                     </div>
-                    <span className="hp-text">{squad.currentStamina}/{squad.maxStamina}</span>
-                    {staminaState.currentState !== 'healthy' && (
-                      <span className={`stamina-state state-${staminaState.currentState}`}>
-                        {stateLabel}
-                      </span>
-                    )}
+                    <span className="hp-text">
+                      {squad.currentStamina}/{squad.maxStamina}
+                      <span className="hp-per-minion"> ({template.stamina}/minion)</span>
+                    </span>
                   </div>
 
                   {/* Minion Icons */}

@@ -9,6 +9,7 @@ import {
   Flag,
   ChevronRight,
   AlertCircle,
+  Ghost,
 } from 'lucide-react';
 import {
   Tooltip,
@@ -41,6 +42,7 @@ export const TurnCard: React.FC<TurnCardProps> = ({
   turnNumber,
   completedPhases,
   conditions,
+  pendingFreeMinions = 0,
   onTogglePhase,
   onEndTurn,
   onResetTurn,
@@ -196,6 +198,16 @@ export const TurnCard: React.FC<TurnCardProps> = ({
               <span className="warning-text">
                 {saveableConditions.length} save
                 {saveableConditions.length > 1 ? 's' : ''} at end of turn
+              </span>
+            </div>
+          )}
+
+          {/* Free Minions Indicator (Summoner) */}
+          {pendingFreeMinions > 0 && (
+            <div className="free-minions-indicator">
+              <Ghost className="minion-icon" />
+              <span className="minion-text">
+                {pendingFreeMinions} free minion{pendingFreeMinions > 1 ? 's' : ''} to summon
               </span>
             </div>
           )}

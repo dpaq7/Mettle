@@ -81,6 +81,19 @@ const ConsumablesGrid: React.FC<ConsumablesGridProps> = ({
     }
   };
 
+  // Handle adjusting quantity in modal
+  const handleAdjustQuantityInModal = (delta: number) => {
+    if (!selectedItem) return;
+    const newQuantity = selectedItem.quantity + delta;
+    if (newQuantity < 1) return;
+
+    onAdjustQuantity(selectedItem.itemId, delta);
+    setSelectedItem({
+      ...selectedItem,
+      quantity: newQuantity,
+    });
+  };
+
   // Handle use item
   const handleUseItem = () => {
     if (!selectedItem) return;
@@ -239,7 +252,29 @@ const ConsumablesGrid: React.FC<ConsumablesGridProps> = ({
 
       {/* Consumable Detail Modal */}
       <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <DialogContent variant="fantasy" className="max-w-sm">
+        <DialogContent variant="fantasy" className="max-w-sm consumable-detail-modal">
+          {/* Fixed Close Button */}
+          <button
+            className="consumable-modal-close"
+            onClick={() => setSelectedItem(null)}
+            aria-label="Close"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="text-xl">{getEchelonIcon(getConsumableData(selectedItem?.itemId || '')?.echelon)}</span>
@@ -254,6 +289,13 @@ const ConsumablesGrid: React.FC<ConsumablesGridProps> = ({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Flavor Text */}
+            {getConsumableData(selectedItem?.itemId || '')?.flavorText && (
+              <p className="text-sm italic text-[var(--text-muted)] border-l-2 border-[var(--border-solid)] pl-3">
+                {getConsumableData(selectedItem?.itemId || '')?.flavorText}
+              </p>
+            )}
+
             {/* Effect */}
             {getConsumableData(selectedItem?.itemId || '')?.effect && (
               <div className="p-3 bg-[var(--bg-dark)] rounded border-l-2 border-[var(--accent-primary)]">
@@ -266,25 +308,50 @@ const ConsumablesGrid: React.FC<ConsumablesGridProps> = ({
             {/* Quantity Controls */}
             <div>
               <p className="text-sm font-medium text-[var(--text-muted)] mb-2">Quantity</p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() => selectedItem && onAdjustQuantity(selectedItem.itemId, -1)}
+              <div className="flex items-center gap-3">
+                <button
+                  className="consumable-qty-btn"
+                  onClick={() => handleAdjustQuantityInModal(-1)}
                   disabled={!selectedItem || selectedItem.quantity <= 1}
+                  aria-label="Decrease quantity"
                 >
-                  <Minus className="h-4 w-4" />
-                </Button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
                 <span className="w-12 text-center font-bold text-lg text-[var(--text-primary)]">
                   {selectedItem?.quantity}
                 </span>
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() => selectedItem && onAdjustQuantity(selectedItem.itemId, 1)}
+                <button
+                  className="consumable-qty-btn"
+                  onClick={() => handleAdjustQuantityInModal(1)}
+                  aria-label="Increase quantity"
                 >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -298,9 +365,6 @@ const ConsumablesGrid: React.FC<ConsumablesGridProps> = ({
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Discard All
-            </Button>
-            <Button variant="chamfered" onClick={() => setSelectedItem(null)}>
-              Close
             </Button>
             <Button variant="heroic" onClick={handleUseItem}>
               <Sparkles className="h-4 w-4 mr-2" />

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useHeroContext } from './context/HeroContext';
 import { useCombatContext } from './context/CombatContext';
-import type { DiceRoll, DiceType, TurnPhaseId, CharacteristicId } from './components/ui/StatsDashboard/types';
-import { CHARACTERISTICS } from './components/ui/StatsDashboard/types';
+import { useDiceRolling } from './hooks/useDiceRolling';
+import type { TurnPhaseId, CharacteristicId } from './components/ui/StatsDashboard/types';
 import CharacterCreation from './components/creation/CharacterCreation';
 import CharacterManager from './components/character/CharacterManager';
 import CharacterDetailsView from './components/character/CharacterDetailsView';
@@ -62,7 +62,7 @@ type View = ViewType;
 
 function App() {
   const { hero, setHero, updateHero } = useHeroContext();
-  const { isInCombat, startCombat, endCombat, setOnCombatStartCallback } = useCombatContext();
+  const { isInCombat, startCombat, endCombat, setOnCombatStartCallback, essenceState } = useCombatContext();
   const [activeView, setActiveView] = useState<View>('character');
   const [showCharacterManager, setShowCharacterManager] = useState(false);
   const [showCharacterCreation, setShowCharacterCreation] = useState(false);
@@ -74,7 +74,16 @@ function App() {
   const [characterToDelete, setCharacterToDelete] = useState<Hero | null>(null);
   const [showRespecDialog, setShowRespecDialog] = useState(false);
   const [respecXpToPreserve, setRespecXpToPreserve] = useState<number>(0);
-  const [rollHistory, setRollHistory] = useState<DiceRoll[]>([]);
+
+  // Use centralized dice rolling hook
+  const {
+    rollHistory,
+    currentEdgeBane,
+    handleRoll,
+    handleRollCharacteristic,
+    handleClearRollHistory,
+    cycleEdgeBane,
+  } = useDiceRolling();
 
   // Turn tracking state
   const [turnNumber, setTurnNumber] = useState(1);
@@ -250,103 +259,6 @@ function App() {
     });
   };
 
-  // Power roll tier calculation
-  const calculatePowerRollTier = (total: number): { tier: number; label: string } => {
-    if (total <= 2) return { tier: 1, label: 'Tier 1 (Critical Fail)' };
-    if (total <= 6) return { tier: 1, label: 'Tier 1' };
-    if (total <= 11) return { tier: 2, label: 'Tier 2' };
-    if (total <= 16) return { tier: 3, label: 'Tier 3' };
-    return { tier: 3, label: 'Tier 3+ (Critical!)' };
-  };
-
-  // Dice roll handler
-  const handleRoll = useCallback((type: DiceType, label?: string) => {
-    let results: number[];
-
-    switch (type) {
-      case '2d10':
-      case 'power':
-        results = [
-          Math.floor(Math.random() * 10) + 1,
-          Math.floor(Math.random() * 10) + 1,
-        ];
-        break;
-      case 'd10':
-        results = [Math.floor(Math.random() * 10) + 1];
-        break;
-      case 'd6':
-        results = [Math.floor(Math.random() * 6) + 1];
-        break;
-      case 'd3':
-        results = [Math.floor(Math.random() * 3) + 1];
-        break;
-      default:
-        results = [0];
-    }
-
-    const total = results.reduce((a, b) => a + b, 0);
-    const isPowerRoll = type === '2d10' || type === 'power';
-    const tierInfo = isPowerRoll ? calculatePowerRollTier(total) : undefined;
-
-    const roll: DiceRoll = {
-      id: crypto.randomUUID(),
-      type,
-      results,
-      total,
-      finalTotal: total,
-      tier: tierInfo?.tier,
-      tierLabel: tierInfo?.label,
-      timestamp: Date.now(),
-      label: label || (isPowerRoll ? 'Power Roll' : undefined),
-    };
-
-    // Add to history (newest first, keep last 50)
-    setRollHistory((prev) => [roll, ...prev].slice(0, 50));
-  }, []);
-
-  // Characteristic roll handler (rolls 2d10 + modifier)
-  const handleRollCharacteristic = useCallback((
-    characteristicId: CharacteristicId,
-    modifier: number
-  ) => {
-    // Roll 2d10
-    const results = [
-      Math.floor(Math.random() * 10) + 1,
-      Math.floor(Math.random() * 10) + 1,
-    ];
-
-    const total = results.reduce((a, b) => a + b, 0);
-    const finalTotal = total + modifier;
-
-    // Calculate tier based on final total (with modifier)
-    const tierInfo = calculatePowerRollTier(finalTotal);
-
-    // Get characteristic display name
-    const charInfo = CHARACTERISTICS.find(c => c.id === characteristicId);
-    const modifierName = charInfo?.name || characteristicId;
-
-    const roll: DiceRoll = {
-      id: crypto.randomUUID(),
-      type: 'power',
-      results,
-      total,
-      modifier,
-      modifierName,
-      finalTotal,
-      tier: tierInfo.tier,
-      tierLabel: tierInfo.label,
-      timestamp: Date.now(),
-      label: 'Power Roll',
-    };
-
-    setRollHistory((prev) => [roll, ...prev].slice(0, 50));
-  }, []);
-
-  // Clear roll history
-  const handleClearRollHistory = useCallback(() => {
-    setRollHistory([]);
-  }, []);
-
   // Turn tracking handlers
   const handleTogglePhase = useCallback((phaseId: TurnPhaseId) => {
     setCompletedPhases((prev) => {
@@ -487,7 +399,56 @@ function App() {
           }
         }}
         onStaminaChange={(newValue: number) => {
-          updateHero({ stamina: { ...hero.stamina, current: newValue } });
+          // Calculate death threshold (negative half max stamina)
+          const deathThreshold = -Math.floor(hero.stamina.max / 2);
+
+          // Clamp stamina to not go below death threshold
+          const clampedValue = Math.max(deathThreshold, newValue);
+
+          // Check stamina state changes
+          const wasAboveZero = hero.stamina.current > 0;
+          const isNowBelowZero = clampedValue <= 0;
+          const wasNotDying = !hero.activeConditions.some(c => c.conditionId === 'dying');
+
+          // Build updates object
+          const updates: Partial<Hero> = {
+            stamina: { ...hero.stamina, current: clampedValue },
+          };
+
+          // Add dying condition when stamina drops to 0 or below
+          if (wasAboveZero && isNowBelowZero && wasNotDying) {
+            // Add both dying and bleeding conditions
+            const newConditions = [...hero.activeConditions];
+
+            // Add dying if not already present
+            if (!newConditions.some(c => c.conditionId === 'dying')) {
+              newConditions.push({
+                conditionId: 'dying',
+                appliedAt: Date.now(),
+                endType: 'manual',
+              });
+            }
+
+            // Add bleeding if not already present
+            if (!newConditions.some(c => c.conditionId === 'bleeding')) {
+              newConditions.push({
+                conditionId: 'bleeding',
+                appliedAt: Date.now(),
+                endType: 'manual', // Dying bleeding doesn't save-end normally
+              });
+            }
+
+            updates.activeConditions = newConditions;
+          }
+
+          // Remove dying condition when stamina goes above 0
+          if (!wasAboveZero && clampedValue > 0) {
+            updates.activeConditions = hero.activeConditions.filter(
+              c => c.conditionId !== 'dying'
+            );
+          }
+
+          updateHero(updates);
         }}
         onRecoveriesChange={(newValue: number) => {
           updateHero({ recoveries: { ...hero.recoveries, current: newValue } });
@@ -502,12 +463,15 @@ function App() {
         onRemoveCondition={handleRemoveCondition}
         onUpdateConditionEndType={handleUpdateConditionEndType}
         rollHistory={rollHistory}
+        currentEdgeBane={currentEdgeBane}
         onRoll={handleRoll}
         onClearRollHistory={handleClearRollHistory}
+        onCycleEdgeBane={cycleEdgeBane}
         onRollCharacteristic={handleRollCharacteristic}
         // Turn tracking
         turnNumber={turnNumber}
         completedPhases={completedPhases}
+        pendingFreeMinions={essenceState.pendingFreeMinions}
         onTogglePhase={handleTogglePhase}
         onEndTurn={handleEndTurn}
         onResetTurn={handleResetTurn}

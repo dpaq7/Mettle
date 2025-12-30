@@ -165,6 +165,9 @@ export const CHARACTERISTICS: CharacteristicInfo[] = [
   },
 ];
 
+// Edge/Bane roll modifier for power rolls
+export type RollModifierState = 'normal' | 'edge' | 'bane' | 'doubleEdge' | 'doubleBane';
+
 export interface DiceRoll {
   id: string;
   type: DiceType;
@@ -174,7 +177,10 @@ export interface DiceRoll {
   modifierName?: string;   // e.g., "Might", "Agility"
   finalTotal: number;      // total + modifier (or just total if no modifier)
   tier?: number;           // Power roll tier (1-3)
+  baseTier?: number;       // Tier before double edge/bane adjustment
+  tierAdjustment?: number; // +1 for double edge, -1 for double bane
   tierLabel?: string;      // "Tier 1", "Tier 2", etc.
+  edgeBane?: RollModifierState; // Edge/bane state for this roll
   timestamp: number;
   label?: string;          // Optional label like "Power Roll", "Damage", etc.
 }
@@ -221,13 +227,16 @@ export interface StatsDashboardProps {
 
   // Dice
   rollHistory?: DiceRoll[];
-  onRoll?: (type: DiceType, label?: string) => void;
+  currentEdgeBane?: RollModifierState;
+  onRoll?: (type: DiceType, label?: string, edgeBane?: RollModifierState) => void;
   onClearRollHistory?: () => void;
+  onCycleEdgeBane?: () => void;
   onRollCharacteristic?: (characteristicId: CharacteristicId, modifier: number) => void;
 
   // Turn tracking (combat only)
   turnNumber?: number;
   completedPhases?: Set<TurnPhaseId>;
+  pendingFreeMinions?: number; // Summoner: free signature minions to select
   onTogglePhase?: (phaseId: TurnPhaseId) => void;
   onEndTurn?: () => void;
   onResetTurn?: () => void;
@@ -313,6 +322,7 @@ export interface CharacteristicsCardProps extends BaseCardProps {
   characteristics: Characteristics;
   speed: number;
   stability: number;
+  heroClass?: HeroClass; // For class-specific stats like Summoner's Range
   onRollCharacteristic: (characteristicId: CharacteristicId, modifier: number) => void;
 }
 
@@ -337,8 +347,10 @@ export interface ConditionsCardProps extends BaseCardProps {
 
 export interface DiceCardProps extends BaseCardProps {
   rollHistory: DiceRoll[];
-  onRoll: (type: DiceType, label?: string) => void;
+  currentEdgeBane: RollModifierState;
+  onRoll: (type: DiceType, label?: string, edgeBane?: RollModifierState) => void;
   onClearHistory: () => void;
+  onCycleEdgeBane: () => void;
 }
 
 // Turn card props
@@ -346,6 +358,7 @@ export interface TurnCardProps extends BaseCardProps {
   turnNumber: number;
   completedPhases: Set<TurnPhaseId>;
   conditions: ActiveCondition[];
+  pendingFreeMinions?: number; // Summoner-specific: free signature minions to select
   onTogglePhase: (phaseId: TurnPhaseId) => void;
   onEndTurn: () => void;
   onResetTurn: () => void;

@@ -878,6 +878,102 @@
   }
 }
 
+/* Dying State */
+.stamina-card.dying {
+  border-color: var(--text-muted);
+  background: rgba(100, 100, 100, 0.15);
+}
+
+.stamina-card.dying .stat-card-icon {
+  color: var(--text-muted);
+}
+
+.stamina-card.dying .stamina-progress-fill {
+  width: 0 !important;
+}
+
+.dying-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.0625rem 0.3rem;
+  background: rgba(150, 150, 150, 0.25);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  animation: dying-pulse 2s ease-in-out infinite;
+}
+
+.dying-badge svg {
+  width: 8px;
+  height: 8px;
+}
+
+@keyframes dying-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Dead State */
+.stamina-card.dead {
+  border-color: #333;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.stamina-card.dead .stat-card-icon {
+  color: #666;
+}
+
+.stamina-card.dead .stat-card-title span {
+  color: #666;
+}
+
+.stamina-card.dead .stamina-progress-fill {
+  width: 0 !important;
+}
+
+.dead-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.0625rem 0.3rem;
+  background: rgba(50, 50, 50, 0.5);
+  border: 1px solid #444;
+  border-radius: var(--radius-sm);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #666;
+}
+
+.dead-badge svg {
+  width: 8px;
+  height: 8px;
+}
+
+/* Negative stamina display */
+.stamina-current.negative {
+  color: var(--text-muted);
+}
+
+/* Negative stamina fill (shows in bar when below 0) */
+.stamina-negative-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(100, 100, 100, 0.4), rgba(50, 50, 50, 0.6));
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+/* Death threshold display */
+.status-item.death .status-value {
+  color: #666;
+}
+
 /* ============================================
    RECOVERIES CARD - Compact Layout
    ============================================ */
@@ -1492,6 +1588,19 @@
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+/* Summoner's Range - class-specific stat */
+.secondary-stat.summoner-range {
+  color: var(--color-essence);
+}
+
+.secondary-stat.summoner-range .secondary-icon {
+  color: var(--color-essence);
+}
+
+.secondary-stat.summoner-range .secondary-value {
+  color: var(--color-essence);
 }
 
 /* ============================================
@@ -2328,6 +2437,68 @@
   }
 }
 
+/* Edge/Bane Toggle */
+.edge-bane-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.edge-bane-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edge-bane-btn:hover {
+  background: var(--bg-dark);
+}
+
+.edge-bane-btn.edge,
+.edge-bane-btn.doubleEdge {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.edge-bane-btn.bane,
+.edge-bane-btn.doubleBane {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Tier Adjustment Display */
+.tier-adjustment {
+  font-size: 0.5rem;
+}
+
+.tier-adjustment.positive {
+  color: var(--success);
+}
+
+.tier-adjustment.negative {
+  color: var(--danger);
+}
+
+/* Edge/Bane indicator in roll entry */
+.roll-edge-bane {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+
+.roll-edge-bane svg {
+  width: 10px;
+  height: 10px;
+}
+
 /* ============================================
    RESPONSIVE ADJUSTMENTS
    ============================================ */
@@ -2926,6 +3097,31 @@
   font-size: 0.55rem;
   font-weight: 600;
   color: var(--warning);
+}
+
+/* Free Minions Indicator (Summoner) */
+.turn-card .free-minions-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(168, 125, 232, 0.1);
+  border: 1px solid var(--color-essence);
+  border-radius: var(--radius-sm);
+  margin-top: 0.25rem;
+}
+
+.turn-card .free-minions-indicator .minion-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-essence);
+}
+
+.turn-card .free-minions-indicator .minion-text {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--color-essence);
 }
 
 /* Phase Tooltip */

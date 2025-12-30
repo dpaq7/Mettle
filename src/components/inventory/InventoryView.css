@@ -2062,3 +2062,73 @@
   letter-spacing: 0.5px;
   margin-bottom: 0.35rem;
 }
+
+/* ============================================
+   CONSUMABLE DETAIL MODAL
+   ============================================ */
+
+.consumable-detail-modal {
+  position: relative;
+}
+
+.consumable-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-darker, #0d1515);
+  border: 1px solid var(--border-dark, #2a3a3a);
+  border-radius: 4px;
+  color: var(--text-muted, #666);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+  padding: 0;
+}
+
+.consumable-modal-close:hover {
+  background: var(--color-danger, #f44336);
+  border-color: var(--color-danger, #f44336);
+  color: white;
+}
+
+.consumable-modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Quantity Buttons */
+.consumable-qty-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-darker, #0d1515);
+  border: 1px solid var(--border-dark, #2a3a3a);
+  border-radius: 6px;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.consumable-qty-btn:hover:not(:disabled) {
+  background: var(--accent-dim, #1a3535);
+  border-color: var(--accent-primary, #4de8b2);
+  color: var(--accent-primary, #4de8b2);
+}
+
+.consumable-qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.consumable-qty-btn svg {
+  width: 16px;
+  height: 16px;
+}

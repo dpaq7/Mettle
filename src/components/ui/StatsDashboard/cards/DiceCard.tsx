@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Dices, Pin, Trash2, Swords } from 'lucide-react';
+import { Dices, Pin, Trash2, Swords, TrendingUp, TrendingDown } from 'lucide-react';
 import { Button } from '@/components/ui/shadcn/button';
 import {
   Tooltip,
@@ -9,7 +9,7 @@ import {
   TooltipContent,
 } from '@/components/ui/shadcn/tooltip';
 
-import type { DiceCardProps, DiceRoll } from '../types';
+import type { DiceCardProps, DiceRoll, RollModifierState } from '../types';
 
 // Get tier color
 const getTierColor = (tier?: number): string => {
@@ -31,10 +31,28 @@ const formatModifier = (value: number): string => {
   return `${value}`;
 };
 
+// Get edge/bane display info
+const getEdgeBaneInfo = (state: RollModifierState): { label: string; color: string; icon: React.ReactNode } => {
+  switch (state) {
+    case 'edge':
+      return { label: 'Edge (+2)', color: 'var(--success)', icon: <TrendingUp className="w-3 h-3" /> };
+    case 'bane':
+      return { label: 'Bane (-2)', color: 'var(--danger)', icon: <TrendingDown className="w-3 h-3" /> };
+    case 'doubleEdge':
+      return { label: '2x Edge (T+1)', color: 'var(--success)', icon: <TrendingUp className="w-3 h-3" /> };
+    case 'doubleBane':
+      return { label: '2x Bane (T-1)', color: 'var(--danger)', icon: <TrendingDown className="w-3 h-3" /> };
+    default:
+      return { label: 'Normal', color: 'var(--text-muted)', icon: null };
+  }
+};
+
 export const DiceCard: React.FC<DiceCardProps> = ({
   rollHistory,
+  currentEdgeBane,
   onRoll,
   onClearHistory,
+  onCycleEdgeBane,
   onUnpin,
 }) => {
   const historyRef = useRef<HTMLDivElement>(null);
@@ -78,6 +96,28 @@ export const DiceCard: React.FC<DiceCardProps> = ({
 
       {/* Content */}
       <div className="stat-card-content dice-content">
+        {/* Edge/Bane Toggle */}
+        <div className="edge-bane-toggle">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className={`edge-bane-btn ${currentEdgeBane}`}
+                onClick={onCycleEdgeBane}
+                style={{
+                  borderColor: getEdgeBaneInfo(currentEdgeBane).color,
+                  color: getEdgeBaneInfo(currentEdgeBane).color
+                }}
+              >
+                {getEdgeBaneInfo(currentEdgeBane).icon}
+                <span>{getEdgeBaneInfo(currentEdgeBane).label}</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              Click to cycle: Normal → Edge → Bane → 2x Edge → 2x Bane
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
         {/* Dice Buttons */}
         <div className="dice-buttons">
           <Tooltip>
@@ -86,13 +126,13 @@ export const DiceCard: React.FC<DiceCardProps> = ({
                 variant="outline"
                 size="sm"
                 className="dice-btn power-roll"
-                onClick={() => onRoll('2d10', 'Power Roll')}
+                onClick={() => onRoll('2d10', 'Power Roll', currentEdgeBane)}
               >
                 <Swords className="w-3 h-3" />
                 <span>2d10</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">Power Roll (2d10)</TooltipContent>
+            <TooltipContent side="top">Power Roll (2d10) with {getEdgeBaneInfo(currentEdgeBane).label}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -215,6 +255,19 @@ export const DiceCard: React.FC<DiceCardProps> = ({
                           style={{ color: tierColor }}
                         >
                           {roll.tierLabel}
+                          {roll.tierAdjustment !== undefined && roll.tierAdjustment !== 0 && (
+                            <span className={`tier-adjustment ${roll.tierAdjustment > 0 ? 'positive' : 'negative'}`}>
+                              {roll.tierAdjustment > 0 ? ` (+${roll.tierAdjustment})` : ` (${roll.tierAdjustment})`}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Edge/Bane indicator */}
+                      {roll.edgeBane && roll.edgeBane !== 'normal' && (
+                        <div className={`roll-edge-bane ${roll.edgeBane}`} style={{ color: getEdgeBaneInfo(roll.edgeBane).color }}>
+                          {getEdgeBaneInfo(roll.edgeBane).icon}
+                          <span>{roll.edgeBane === 'edge' ? 'Edge' : roll.edgeBane === 'bane' ? 'Bane' : roll.edgeBane === 'doubleEdge' ? '2x Edge' : '2x Bane'}</span>
                         </div>
                       )}
 

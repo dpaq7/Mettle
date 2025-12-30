@@ -22,6 +22,90 @@
 }
 
 /* ============================================
+   TITLE SECTION - Editable Character Title
+   ============================================ */
+
+.details-section.title-section {
+  grid-column: 1 / -1; /* Full width */
+}
+
+.title-section .title-content {
+  padding: 1rem;
+}
+
+.title-section .title-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.title-section .title-display:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-card);
+}
+
+.title-section .title-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--accent-primary);
+  letter-spacing: 0.02em;
+}
+
+.title-section .title-placeholder {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.title-section .title-edit-icon {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.title-section .title-display:hover .title-edit-icon {
+  opacity: 1;
+}
+
+.title-section .title-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title-section .title-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  font-style: italic;
+  text-align: center;
+  background: var(--bg-input);
+  border: 2px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.title-section .title-input::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.title-section .title-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ============================================
    SECTION FRAME - Base Banner Style
    ============================================ */
 
@@ -918,6 +1002,51 @@
   color: #ff9999;
   font-size: 0.85rem;
   text-align: center;
+}
+
+/* Purchased traits read-only display during combat */
+.ancestry-combat-locked .feature-block.purchased-traits {
+  margin-top: 1rem;
+}
+
+.ancestry-combat-locked .purchased-traits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ancestry-combat-locked .purchased-trait-display {
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+}
+
+.ancestry-combat-locked .purchased-trait-display .trait-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.ancestry-combat-locked .purchased-trait-display .trait-header strong {
+  color: var(--accent-primary);
+  font-size: 0.95rem;
+}
+
+.ancestry-combat-locked .purchased-trait-display .trait-cost {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-dark);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+}
+
+.ancestry-combat-locked .purchased-trait-display .trait-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* ============================================
