@@ -32,6 +32,7 @@ import {
   organizationOptions,
   upbringingOptions,
 } from '@/data/reference-data';
+import { CLASS_RESOURCE_CONFIG } from '@/data/class-resources';
 
 import type {
   DrawSteelData,
@@ -65,6 +66,63 @@ import {
   isAbility,
   isTrait,
 } from '@/types/game-data';
+
+// ============================================
+// INTERNAL: Data Store
+// ============================================
+
+// ============================================
+// CLASS STATS (stamina/recovery base values)
+// ============================================
+
+/**
+ * Class stamina configuration.
+ * Each class has a base stamina at level 1 and gains per level after.
+ */
+const CLASS_STAMINA_CONFIG: Record<HeroClass, { level1: number; perLevel: number; recoveries: number }> = {
+  censor: { level1: 21, perLevel: 9, recoveries: 8 },
+  conduit: { level1: 18, perLevel: 9, recoveries: 8 },
+  elementalist: { level1: 15, perLevel: 6, recoveries: 8 },
+  fury: { level1: 21, perLevel: 9, recoveries: 8 },
+  null: { level1: 18, perLevel: 9, recoveries: 8 },
+  shadow: { level1: 18, perLevel: 9, recoveries: 8 },
+  summoner: { level1: 15, perLevel: 6, recoveries: 8 },
+  tactician: { level1: 21, perLevel: 9, recoveries: 10 },
+  talent: { level1: 18, perLevel: 9, recoveries: 8 },
+  troubadour: { level1: 18, perLevel: 9, recoveries: 8 },
+};
+
+/**
+ * Build minimal HeroClassDefinition array from existing data.
+ */
+function buildClassDefinitions(): HeroClassDefinition[] {
+  const classes: HeroClass[] = [
+    'censor', 'conduit', 'elementalist', 'fury', 'null',
+    'shadow', 'summoner', 'tactician', 'talent', 'troubadour',
+  ];
+
+  return classes.map((id) => {
+    const resourceConfig = CLASS_RESOURCE_CONFIG[id];
+    const staminaConfig = CLASS_STAMINA_CONFIG[id];
+
+    return {
+      id,
+      name: id.charAt(0).toUpperCase() + id.slice(1),
+      heroicResource: resourceConfig.name.toLowerCase() as HeroicResource,
+      primaryCharacteristic: (resourceConfig.characteristic || 'might') as Characteristic,
+      baseStats: {
+        stamina: {
+          level1: staminaConfig.level1,
+          perLevel: staminaConfig.perLevel,
+        },
+        recoveries: staminaConfig.recoveries,
+      },
+      potency: { weak: -2, average: -1, strong: 0 },
+      subclasses: [], // TODO: Add subclass data
+      levelProgression: [], // TODO: Add level progression data
+    };
+  });
+}
 
 // ============================================
 // INTERNAL: Data Store
@@ -212,7 +270,7 @@ function initializeData(): DrawSteelData {
     skills,
     conditions,
     perks: [],
-    classes: [],
+    classes: buildClassDefinitions(),
 
     // Cross-reference index
     byScc: {},
@@ -227,7 +285,8 @@ function initializeData(): DrawSteelData {
       `[GameData] Loaded: ${abilities.length} abilities, ${allFeatures.length} features, ` +
         `${data.monsters.length} monsters, ${data.traps.length} traps, ` +
         `${skills.length} skills, ${conditions.length} conditions, ` +
-        `${careers.length} careers, ${cultures.length} cultures, ${data.kits.length} kits`
+        `${careers.length} careers, ${cultures.length} cultures, ` +
+        `${data.kits.length} kits, ${data.classes.length} classes`
     );
   }
 
