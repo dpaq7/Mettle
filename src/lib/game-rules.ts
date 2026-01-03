@@ -23,6 +23,8 @@ import monstersJson from '@/data/generated/monsters.json';
 import trapsJson from '@/data/generated/traps.json';
 // Parsed from MD files
 import skillsJson from '@/data/generated/skills.json';
+// Existing structured data (richer than MD)
+import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
 
 import type {
   DrawSteelData,
@@ -140,6 +142,18 @@ function initializeData(): DrawSteelData {
     description: s.use,
   }));
 
+  // ─────────────────────────────────────────────
+  // Conditions Data Loading (from existing structured data)
+  // ─────────────────────────────────────────────
+
+  // Transform existing conditions to our ConditionDefinition format
+  const conditions: ConditionDefinition[] = ALL_CONDITIONS.map((c: SourceCondition) => ({
+    id: c.id as ConditionName,
+    name: c.name,
+    effect: c.rulesDescription,
+    endTrigger: c.saveEnds ? 'save' : (c.saveRequired.includes('maneuver') ? 'action' : 'special'),
+  }));
+
   const data: DrawSteelData = {
     // From JSON - now populated
     abilities,
@@ -153,7 +167,7 @@ function initializeData(): DrawSteelData {
     cultures: [],
     kits: [],
     skills,
-    conditions: [],
+    conditions,
     perks: [],
     classes: [],
 
@@ -168,7 +182,8 @@ function initializeData(): DrawSteelData {
   if (import.meta.env.DEV) {
     console.log(
       `[GameData] Loaded: ${abilities.length} abilities, ${allFeatures.length} features, ` +
-        `${data.monsters.length} monsters, ${data.traps.length} traps, ${skills.length} skills`
+        `${data.monsters.length} monsters, ${data.traps.length} traps, ` +
+        `${skills.length} skills, ${conditions.length} conditions`
     );
   }
 
