@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { Hero, isSummonerHero } from '../../types/hero';
-import { classDefinitions } from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import {
   getAllCharacters,
   deleteCharacter,
@@ -33,7 +33,7 @@ import './CharacterManager.css';
 
 // Get display details for a hero based on their class
 const getHeroDisplayInfo = (hero: Hero): { class: string; subinfo: string } => {
-  const classDef = classDefinitions[hero.heroClass];
+  const classDef = GameData.getClass(hero.heroClass);
   const className = classDef?.name ?? 'Unknown';
 
   if (isSummonerHero(hero)) {

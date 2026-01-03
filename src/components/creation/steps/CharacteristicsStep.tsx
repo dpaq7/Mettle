@@ -1,5 +1,5 @@
 import React from 'react';
-import { classDefinitions } from '@/data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import { HeroClass } from '@/types/hero';
 import { CharacteristicAssignments } from '@/hooks/useCharacterCreation';
 
@@ -37,7 +37,7 @@ export const CharacteristicsStep: React.FC<CharacteristicsStepProps> = ({
   allCharacteristicsAssigned,
 }) => {
   const availableValues = getAvailableValues();
-  const currentClassDef = selectedClass ? classDefinitions[selectedClass] : null;
+  const currentClassDef = selectedClass ? GameData.getClass(selectedClass) : null;
   const fixedChars = currentClassDef?.startingCharacteristics || {};
   const potencyChar = currentClassDef?.potencyCharacteristic;
   const className = currentClassDef?.name || 'Hero';

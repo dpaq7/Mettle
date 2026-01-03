@@ -36,7 +36,7 @@ import { formations } from '../data/formations';
 import { circleToPortfolio } from '../types/summoner';
 import { summonerAbilitiesByLevel } from '../data/abilities/summoner-abilities';
 import { getAugmentationBonuses } from '../data/null/augmentations';
-import { classDefinitions } from '../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import { getPrimordialStormForKit } from '../data/fury/stormwight-kits';
 import { SkillGroup, findSkillByName, isSkillGroup } from '../data/skills';
 import {
@@ -407,9 +407,9 @@ export function useCharacterCreation(options: UseCharacterCreationOptions = {}) 
       return { might: 2, agility: 2, reason: 1, intuition: 0, presence: -1 };
     }
 
-    const classDef = classDefinitions[selectedClass];
-    const fixed = classDef.startingCharacteristics;
-    const potency = classDef.potencyCharacteristic;
+    const classDef = GameData.getClass(selectedClass);
+    const fixed = classDef?.startingCharacteristics || {};
+    const potency = classDef?.potencyCharacteristic;
 
     const recommended: Record<string, number> = { ...fixed };
     const remaining = [2, 2, 1, 0, -1];
@@ -630,12 +630,12 @@ export function useCharacterCreation(options: UseCharacterCreationOptions = {}) 
     }
 
     const level = 1;
-    const classDef = classDefinitions[selectedClass];
-    const baseStamina = classDef.startingStamina;
+    const classDef = GameData.getClass(selectedClass);
+    const baseStamina = classDef?.baseStats.stamina.level1 ?? 18;
     const echelon = 1;
     const kitStaminaBonus = (selectedKit.staminaPerEchelon || 0) * echelon;
     const maxStamina = baseStamina + kitStaminaBonus;
-    const maxRecoveries = classDef.startingRecoveries;
+    const maxRecoveries = classDef?.baseStats.recoveries ?? 8;
     const recoveryValue = Math.floor(maxStamina / 3);
 
     const ancestrySelection: HeroAncestry | undefined = selectedAncestryId

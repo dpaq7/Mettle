@@ -3,11 +3,7 @@
 
 import React from 'react';
 import { HeroClass } from '../../types/hero';
-import {
-  classDefinitions,
-  getSubclassSelectCount,
-  requiresMultipleSubclasses,
-} from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import './SubclassSelector.css';
 
 interface SubclassSelectorProps {
@@ -27,9 +23,9 @@ const SubclassSelector: React.FC<SubclassSelectorProps> = ({
   selectedSubclasses = [],
   onMultiSelect,
 }) => {
-  const classDef = classDefinitions[heroClass];
-  const isMultiSelect = requiresMultipleSubclasses(heroClass);
-  const selectCount = getSubclassSelectCount(heroClass);
+  const classDef = GameData.getClass(heroClass);
+  const isMultiSelect = GameData.requiresMultipleSubclasses(heroClass);
+  const selectCount = GameData.getSubclassSelectCount(heroClass);
 
   if (!classDef) {
     return <div>Unknown class</div>;

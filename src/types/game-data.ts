@@ -849,6 +849,41 @@ export interface LevelProgression {
 }
 
 /**
+ * Subclass option within a hero class.
+ *
+ * @see rules-md/Classes/
+ */
+export interface SubclassDefinition {
+  /** Subclass identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Description of the subclass */
+  description?: string;
+}
+
+/**
+ * Full heroic resource definition for a class.
+ */
+export interface HeroicResourceDefinition {
+  /** Display name (e.g., "Wrath", "Piety") */
+  name: string;
+  /** Resource type identifier */
+  type: HeroicResource;
+  /** How starting amount is determined */
+  startingAmount: 'victories' | string;
+  /** Resource gained per turn (e.g., "2", "1d3") */
+  gainPerTurn: string;
+  /** Conditions that trigger resource gain */
+  gainTrigger: string;
+}
+
+/**
+ * Combat role for a hero class.
+ */
+export type ClassRole = 'Defender' | 'Controller' | 'Striker' | 'Support';
+
+/**
  * Complete class definition combining all sources.
  *
  * @see rules-md/Classes/
@@ -858,18 +893,40 @@ export interface HeroClassDefinition {
   id: HeroClass;
   /** Display name */
   name: string;
-  /** Primary heroic resource */
+  /** Class description */
+  description: string;
+  /** Combat role */
+  role: ClassRole;
+  /** Whether this is a master class (e.g., Summoner) */
+  masterClass: boolean;
+  /** Primary heroic resource type */
   heroicResource: HeroicResource;
+  /** Full heroic resource definition */
+  heroicResourceDef: HeroicResourceDefinition;
   /** Primary characteristic for the class */
   primaryCharacteristic: Characteristic;
+  /** The characteristic used for potency calculations */
+  potencyCharacteristic: Characteristic;
   /** Starting statistics */
   baseStats: ClassBaseStats;
   /** Potency calculations */
   potency: Potency;
-  /** Available subclass names */
-  subclasses: string[];
+  /** Starting characteristic values (fixed by class) */
+  startingCharacteristics: Partial<Record<Characteristic, number>>;
+  /** Subclass term (e.g., "Circle", "Aspect", "Domain") */
+  subclassName: string;
+  /** Plural form of subclass term */
+  subclassNamePlural?: string;
+  /** How many subclasses to select (1 for most, 2 for Conduit) */
+  subclassSelectCount: number;
+  /** Available subclass options */
+  subclasses: SubclassDefinition[];
   /** Level-by-level progression */
   levelProgression: LevelProgression[];
+  /** Fixed skills granted by class */
+  fixedSkills: string[];
+  /** Skill group choices */
+  skillGroupChoices: { groups: string[]; count: number }[];
   /** Raw markdown source for reference */
   rawMarkdown?: string;
 }

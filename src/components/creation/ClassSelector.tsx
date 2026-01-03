@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { HeroClass } from '../../types/hero';
-import { classDefinitions } from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import './ClassSelector.css';
 
 interface ClassSelectorProps {
@@ -25,7 +25,7 @@ const getRoleClass = (role: string): string => {
 };
 
 const ClassSelector: React.FC<ClassSelectorProps> = ({ selectedClass, onSelect }) => {
-  const classes = Object.values(classDefinitions);
+  const classes = GameData.getAllClasses();
 
   return (
     <div className="creation-step class-selection-step">
@@ -64,11 +64,11 @@ const ClassSelector: React.FC<ClassSelectorProps> = ({ selectedClass, onSelect }
             <div className="class-stats">
               <div className="stat-row">
                 <span className="stat-label">Stamina:</span>
-                <span className="stat-value">{classDef.startingStamina}</span>
+                <span className="stat-value">{classDef.baseStats.stamina.level1}</span>
               </div>
               <div className="stat-row">
                 <span className="stat-label">Resource:</span>
-                <span className="stat-value resource-name">{classDef.heroicResource.name}</span>
+                <span className="stat-value resource-name">{classDef.heroicResourceDef.name}</span>
               </div>
               <div className="stat-row">
                 <span className="stat-label">Potency:</span>

@@ -9,12 +9,7 @@ import { EdgeBaneState } from '../../utils/dice';
 import { Characteristic, ConditionId, HeroClass } from '../../types';
 import { isSummonerHero, SummonerHeroV2, isConduitHero, ConduitHero, Hero } from '../../types/hero';
 import { getResourceConfig } from '../../data/class-resources';
-import {
-  classDefinitions,
-  getSubclassTypeName,
-  getSubclassTypeNamePlural,
-  getSubclassById,
-} from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import { Button } from '@/components/ui/shadcn/button';
 import {
   Tooltip,
@@ -56,19 +51,19 @@ function getSubclassDisplay(hero: Hero): SubclassDisplayInfo | null {
     const conduitHero = hero as ConduitHero;
     if (conduitHero.domains && conduitHero.domains.length > 0) {
       const domainNames = conduitHero.domains
-        .map(d => getSubclassById('conduit', d)?.name || d)
+        .map(d => GameData.getSubclass('conduit', d)?.name || d)
         .join(' / ');
       return {
-        label: getSubclassTypeNamePlural('conduit'),
+        label: GameData.getSubclassTypeNamePlural('conduit'),
         value: domainNames,
         colorClass: 'subclass-conduit',
       };
     }
     // Fallback to single subclass field if domains array is empty
     if (conduitHero.subclass) {
-      const option = getSubclassById('conduit', conduitHero.subclass);
+      const option = GameData.getSubclass('conduit', conduitHero.subclass);
       return {
-        label: getSubclassTypeName('conduit'),
+        label: GameData.getSubclassTypeName('conduit'),
         value: option?.name || conduitHero.subclass,
         colorClass: 'subclass-conduit',
       };
@@ -79,11 +74,11 @@ function getSubclassDisplay(hero: Hero): SubclassDisplayInfo | null {
   // Handle single subclass for other classes
   if (!hero.subclass) return null;
 
-  const option = getSubclassById(hero.heroClass, hero.subclass);
+  const option = GameData.getSubclass(hero.heroClass, hero.subclass);
   if (!option) return null;
 
   return {
-    label: getSubclassTypeName(hero.heroClass),
+    label: GameData.getSubclassTypeName(hero.heroClass),
     value: option.name,
     colorClass: `subclass-${hero.heroClass}`,
   };
@@ -199,7 +194,7 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
   const heroClass: HeroClass = hero.heroClass || 'summoner';
   const isSummoner = isSummonerHero(hero);
   const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
-  const classDef = classDefinitions[heroClass];
+  const classDef = GameData.getClass(heroClass);
 
   // Get subclass display info for the current hero
   const subclassInfo = getSubclassDisplay(hero);

@@ -35,6 +35,7 @@ import {
 } from '@/data/reference-data';
 import { CLASS_RESOURCE_CONFIG } from '@/data/class-resources';
 import { PERKS } from '@/data/perks/perks-data';
+import { classDefinitions as sourceClassDefinitions, ClassDefinition } from '@/data/classes/class-definitions';
 
 import type {
   DrawSteelData,
@@ -49,6 +50,8 @@ import type {
   ConditionDefinition,
   PerkDefinition,
   HeroClassDefinition,
+  SubclassDefinition,
+  ClassRole,
   MonsterStatblock,
   TrapStatblock,
   Characteristic,
@@ -95,23 +98,44 @@ const CLASS_STAMINA_CONFIG: Record<HeroClass, { level1: number; perLevel: number
 };
 
 /**
- * Build minimal HeroClassDefinition array from existing data.
+ * Build HeroClassDefinition array from existing class-definitions.ts data.
+ * Converts the ClassDefinition format to HeroClassDefinition.
  */
 function buildClassDefinitions(): HeroClassDefinition[] {
-  const classes: HeroClass[] = [
-    'censor', 'conduit', 'elementalist', 'fury', 'null',
-    'shadow', 'summoner', 'tactician', 'talent', 'troubadour',
-  ];
+  return Object.values(sourceClassDefinitions).map((source: ClassDefinition): HeroClassDefinition => {
+    const staminaConfig = CLASS_STAMINA_CONFIG[source.id];
 
-  return classes.map((id) => {
-    const resourceConfig = CLASS_RESOURCE_CONFIG[id];
-    const staminaConfig = CLASS_STAMINA_CONFIG[id];
+    // Convert subclasses from SubclassOption to SubclassDefinition
+    const subclasses: SubclassDefinition[] = source.subclasses.map((sub) => ({
+      id: sub.id,
+      name: sub.name,
+      description: sub.description,
+    }));
+
+    // Convert starting characteristics to proper format
+    const startingCharacteristics: Partial<Record<Characteristic, number>> = {};
+    for (const [key, value] of Object.entries(source.startingCharacteristics)) {
+      if (value !== undefined) {
+        startingCharacteristics[key as Characteristic] = value;
+      }
+    }
 
     return {
-      id,
-      name: id.charAt(0).toUpperCase() + id.slice(1),
-      heroicResource: resourceConfig.name.toLowerCase() as HeroicResource,
-      primaryCharacteristic: (resourceConfig.characteristic || 'might') as Characteristic,
+      id: source.id,
+      name: source.name,
+      description: source.description,
+      role: source.role as ClassRole,
+      masterClass: source.masterClass,
+      heroicResource: source.heroicResource.type as HeroicResource,
+      heroicResourceDef: {
+        name: source.heroicResource.name,
+        type: source.heroicResource.type as HeroicResource,
+        startingAmount: source.heroicResource.startingAmount,
+        gainPerTurn: source.heroicResource.gainPerTurn,
+        gainTrigger: source.heroicResource.gainTrigger,
+      },
+      primaryCharacteristic: source.potencyCharacteristic as Characteristic,
+      potencyCharacteristic: source.potencyCharacteristic as Characteristic,
       baseStats: {
         stamina: {
           level1: staminaConfig.level1,
@@ -120,8 +144,14 @@ function buildClassDefinitions(): HeroClassDefinition[] {
         recoveries: staminaConfig.recoveries,
       },
       potency: { weak: -2, average: -1, strong: 0 },
-      subclasses: [], // TODO: Add subclass data
-      levelProgression: [], // TODO: Add level progression data
+      startingCharacteristics,
+      subclassName: source.subclassName,
+      subclassNamePlural: source.subclassNamePlural,
+      subclassSelectCount: source.subclassSelectCount,
+      subclasses,
+      levelProgression: [],
+      fixedSkills: source.fixedSkills,
+      skillGroupChoices: source.skillGroupChoices,
     };
   });
 }
@@ -623,6 +653,75 @@ export const GameData = {
    */
   getHeroicResource: (heroClass: HeroClass): HeroicResource | undefined =>
     getData().classes.find((c) => c.id === heroClass)?.heroicResource,
+
+  /**
+   * Get subclass options for a class.
+   * @param heroClass - Class identifier
+   * @returns Array of subclass definitions
+   */
+  getSubclasses: (heroClass: HeroClass): SubclassDefinition[] =>
+    getData().classes.find((c) => c.id === heroClass)?.subclasses ?? [],
+
+  /**
+   * Find a specific subclass by class and subclass id.
+   * @param heroClass - Class identifier
+   * @param subclassId - Subclass identifier
+   * @returns The subclass definition or undefined
+   */
+  getSubclass: (heroClass: HeroClass, subclassId: string): SubclassDefinition | undefined =>
+    getData().classes.find((c) => c.id === heroClass)?.subclasses.find((s) => s.id === subclassId),
+
+  /**
+   * Get the subclass type name for a class (e.g., "Circle", "Domain", "Aspect").
+   * @param heroClass - Class identifier
+   * @returns The subclass type name or "Subclass"
+   */
+  getSubclassTypeName: (heroClass: HeroClass): string =>
+    getData().classes.find((c) => c.id === heroClass)?.subclassName ?? 'Subclass',
+
+  /**
+   * Get the plural form of subclass type name for a class.
+   * @param heroClass - Class identifier
+   * @returns The plural subclass type name
+   */
+  getSubclassTypeNamePlural: (heroClass: HeroClass): string => {
+    const classDef = getData().classes.find((c) => c.id === heroClass);
+    return classDef?.subclassNamePlural ?? `${classDef?.subclassName ?? 'Subclass'}s`;
+  },
+
+  /**
+   * Get how many subclasses a class can select (1 for most, 2 for Conduit).
+   * @param heroClass - Class identifier
+   * @returns Number of subclasses to select
+   */
+  getSubclassSelectCount: (heroClass: HeroClass): number =>
+    getData().classes.find((c) => c.id === heroClass)?.subclassSelectCount ?? 1,
+
+  /**
+   * Check if a class requires multiple subclass selections.
+   * @param heroClass - Class identifier
+   * @returns True if class needs more than 1 subclass
+   */
+  requiresMultipleSubclasses: (heroClass: HeroClass): boolean =>
+    (getData().classes.find((c) => c.id === heroClass)?.subclassSelectCount ?? 1) > 1,
+
+  /**
+   * Get color for a class role (for UI theming).
+   * @param role - Class combat role
+   * @returns Hex color code
+   */
+  getClassRoleColor: (role: ClassRole): string => {
+    switch (role) {
+      case 'Defender':
+        return '#3b82f6'; // Blue
+      case 'Controller':
+        return '#a855f7'; // Purple
+      case 'Striker':
+        return '#ef4444'; // Red
+      case 'Support':
+        return '#22c55e'; // Green
+    }
+  },
 
   // ═══════════════════════════════════════════
   // SKILLS (from MD)

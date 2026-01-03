@@ -12,13 +12,15 @@ import { NULL_TRADITIONS, TraditionData } from '../../data/null/traditions';
 import { PSIONIC_AUGMENTATIONS, AugmentationData, getAugmentationBonuses } from '../../data/null/augmentations';
 import { NullTradition, PsionicAugmentation } from '../../types/hero';
 import { skills, getSkillsByGroup, SkillGroup, Skill, isSkillGroup, findSkillByName } from '../../data/skills';
-import { classDefinitions, getClassRoleColor, getSubclassTypeName, requiresMultipleSubclasses, getSubclassSelectCount } from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import ClassSelector from './ClassSelector';
 import SubclassSelector from './SubclassSelector';
 import FuryAspectSelector from './FuryAspectSelector';
-import CreationNavigation from './CreationNavigation';
 import AncestrySelector from './AncestrySelector';
 import AncestryTraitSelector from './AncestryTraitSelector';
+import { CreatorShell } from './CreatorShell';
+import { CreatorMasterList, type CreatorStep } from './CreatorMasterList';
+import { CreatorSection, getSectionForStep, CREATOR_SECTIONS } from './CreatorCommandBar';
 import { useSkillAvailability, getSourceLabel, SkillAvailabilityProvider } from '../../context/SkillAvailabilityContext';
 import { TroubadourClass, FuryAspect, StormwightKit, ConduitDomain } from '../../types/hero';
 import { getPrimordialStormForKit } from '../../data/fury/stormwight-kits';
@@ -88,6 +90,29 @@ function getStepsForClass(heroClass: HeroClass | null): Step[] {
 
 // Legacy constant for backward compatibility
 const ALL_STEPS: Step[] = getStepsForClass('summoner');
+
+// Step labels for display
+const STEP_LABELS: Record<Step, string> = {
+  name: 'Name',
+  class: 'Class',
+  subclass: 'Subclass',
+  furyAspect: 'Aspect',
+  stormwightKit: 'Stormwight Kit',
+  ancestry: 'Ancestry',
+  ancestryTraits: 'Traits',
+  culture: 'Culture',
+  cultureSkills: 'Culture Skills',
+  career: 'Career',
+  careerSkills: 'Career Skills',
+  languages: 'Languages',
+  circle: 'Circle',
+  signatureMinions: 'Minions',
+  formation: 'Formation',
+  nullTradition: 'Tradition',
+  psionicAugmentation: 'Augmentation',
+  kit: 'Kit',
+  characteristics: 'Characteristics',
+};
 
 interface CharacterCreationProps {
   onComplete?: () => void;
@@ -236,9 +261,9 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       return { might: 2, agility: 2, reason: 1, intuition: 0, presence: -1 };
     }
 
-    const classDef = classDefinitions[selectedClass];
-    const fixed = classDef.startingCharacteristics;
-    const potency = classDef.potencyCharacteristic;
+    const classDef = GameData.getClass(selectedClass);
+    const fixed = classDef?.startingCharacteristics || {};
+    const potency = classDef?.potencyCharacteristic;
 
     // Start with fixed characteristics from class
     const recommended: Record<string, number> = { ...fixed };
@@ -488,8 +513,8 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
         // Subclass selection required for classes that have this step
         if (!selectedClass) return false;
         // Conduit requires 2 domains (multi-select)
-        if (requiresMultipleSubclasses(selectedClass)) {
-          return selectedSubclasses.length === getSubclassSelectCount(selectedClass);
+        if (GameData.requiresMultipleSubclasses(selectedClass)) {
+          return selectedSubclasses.length === GameData.getSubclassSelectCount(selectedClass);
         }
         return selectedSubclass !== null;
       case 'furyAspect':
@@ -622,16 +647,16 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
     }
 
     const level = 1;
-    const classDef = classDefinitions[selectedClass];
+    const classDef = GameData.getClass(selectedClass);
 
     // Calculate stamina based on class
-    const baseStamina = classDef.startingStamina;
+    const baseStamina = classDef?.baseStats.stamina.level1 ?? 18;
     const echelon = 1; // Level 1 = echelon 1
     const kitStaminaBonus = (selectedKit.staminaPerEchelon || 0) * echelon;
     const maxStamina = baseStamina + kitStaminaBonus;
 
     // Calculate recoveries based on class
-    const maxRecoveries = classDef.startingRecoveries;
+    const maxRecoveries = classDef?.baseStats.recoveries ?? 8;
     const recoveryValue = Math.floor(maxStamina / 3);
 
     // Build ancestry selection for the new point-buy system
@@ -1122,7 +1147,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       case 'subclass':
         if (!selectedClass) return null;
         // Check if this class requires multi-select (Conduit)
-        if (requiresMultipleSubclasses(selectedClass)) {
+        if (GameData.requiresMultipleSubclasses(selectedClass)) {
           return (
             <SubclassSelector
               heroClass={selectedClass}
@@ -1538,7 +1563,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
         ];
 
         // Get class-specific info
-        const currentClassDef = selectedClass ? classDefinitions[selectedClass] : null;
+        const currentClassDef = selectedClass ? GameData.getClass(selectedClass) : null;
         const fixedChars = currentClassDef?.startingCharacteristics || {};
         const potencyChar = currentClassDef?.potencyCharacteristic;
         const className = currentClassDef?.name || 'Hero';
@@ -1678,60 +1703,170 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
   const isFirstStep = step === 'name';
   const isFinalStep = step === 'characteristics';
   const nextLabel = isFinalStep ? 'Create Character' : 'Next';
+  const currentStepIndex = currentSteps.indexOf(step);
+
+  // Get the value to display for a step
+  const getStepValue = (stepId: Step): string | null => {
+    switch (stepId) {
+      case 'name':
+        return name || null;
+      case 'class':
+        return selectedClass ? selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1) : null;
+      case 'subclass':
+        if (selectedSubclasses.length > 0) return selectedSubclasses.join(', ');
+        return selectedSubclass ? selectedSubclass.charAt(0).toUpperCase() + selectedSubclass.slice(1) : null;
+      case 'furyAspect':
+        return selectedFuryAspect ? selectedFuryAspect.charAt(0).toUpperCase() + selectedFuryAspect.slice(1) : null;
+      case 'stormwightKit':
+        return selectedStormwightKit || null;
+      case 'ancestry':
+        return selectedAncestry?.name || null;
+      case 'ancestryTraits':
+        return selectedAncestryTraitIds.length > 0 ? `${selectedAncestryTraitIds.length} traits` : null;
+      case 'culture':
+        return selectedCulture?.name || null;
+      case 'cultureSkills':
+        const cultureSkillCount = cultureSkillSelections.filter(s => s.selectedSkillId).length;
+        return cultureSkillCount > 0 ? `${cultureSkillCount} skills` : null;
+      case 'career':
+        return selectedCareer?.name || null;
+      case 'careerSkills':
+        const careerSkillCount = careerSkillSelections.filter(s => s.selectedSkillId).length;
+        return careerSkillCount > 0 ? `${careerSkillCount} skills` : null;
+      case 'languages':
+        return selectedLanguages.length > 0 ? `${selectedLanguages.length} languages` : null;
+      case 'circle':
+        return selectedCircle ? selectedCircle.charAt(0).toUpperCase() + selectedCircle.slice(1) : null;
+      case 'signatureMinions':
+        return selectedSignatureMinions.length > 0 ? `${selectedSignatureMinions.length} minions` : null;
+      case 'formation':
+        return selectedFormation ? selectedFormation.charAt(0).toUpperCase() + selectedFormation.slice(1) : null;
+      case 'nullTradition':
+        return selectedNullTradition || null;
+      case 'psionicAugmentation':
+        return selectedPsionicAugmentation || null;
+      case 'kit':
+        return selectedKit?.name || null;
+      case 'characteristics':
+        return allCharacteristicsAssigned() ? 'Assigned' : null;
+      default:
+        return null;
+    }
+  };
+
+  // Build progress items for the stat ribbon
+  const progressItems = useMemo(() => {
+    return [
+      { label: 'Name', value: name || null, completed: !!name },
+      { label: 'Class', value: selectedClass?.charAt(0).toUpperCase() || null, completed: !!selectedClass },
+      { label: 'Ancestry', value: selectedAncestry?.name?.slice(0, 8) || null, completed: !!selectedAncestry },
+      { label: 'Culture', value: selectedCulture?.name?.slice(0, 8) || null, completed: !!selectedCulture },
+      { label: 'Career', value: selectedCareer?.name?.slice(0, 8) || null, completed: !!selectedCareer },
+      { label: 'Kit', value: selectedKit?.name?.slice(0, 8) || null, completed: !!selectedKit },
+      { label: 'Stats', value: allCharacteristicsAssigned() ? 'Done' : null, completed: allCharacteristicsAssigned() },
+    ];
+  }, [name, selectedClass, selectedAncestry, selectedCulture, selectedCareer, selectedKit, allCharacteristicsAssigned]);
+
+  // Get current section for command bar
+  const currentSection = getSectionForStep(step);
+
+  // Get available sections (all sections that have at least one step in currentSteps)
+  const availableSections = useMemo(() => {
+    const sections = new Set<CreatorSection>();
+    currentSteps.forEach(s => {
+      sections.add(getSectionForStep(s));
+    });
+    return Array.from(sections);
+  }, [currentSteps]);
+
+  // Get completed sections
+  const completedSections = useMemo(() => {
+    const completed: CreatorSection[] = [];
+    for (const section of CREATOR_SECTIONS) {
+      const sectionSteps = section.steps.filter(s => currentSteps.includes(s as Step));
+      if (sectionSteps.length > 0) {
+        const allCompleted = sectionSteps.every(s => {
+          const stepIndex = currentSteps.indexOf(s as Step);
+          return stepIndex >= 0 && stepIndex < currentStepIndex;
+        });
+        if (allCompleted) {
+          completed.push(section.id);
+        }
+      }
+    }
+    return completed;
+  }, [currentSteps, currentStepIndex]);
+
+  // Build master list steps for current section
+  const masterListSteps = useMemo((): CreatorStep[] => {
+    return currentSteps.map((s, idx) => ({
+      id: s,
+      label: STEP_LABELS[s],
+      value: getStepValue(s),
+      completed: idx < currentStepIndex,
+      current: s === step,
+      locked: idx > currentStepIndex + 1, // Can only go one step ahead
+    }));
+  }, [currentSteps, step, currentStepIndex, getStepValue]);
+
+  // Handle section change - jump to first step in section
+  const handleSectionChange = (section: CreatorSection) => {
+    const sectionDef = CREATOR_SECTIONS.find(s => s.id === section);
+    if (sectionDef) {
+      const firstStepInSection = sectionDef.steps.find(s => currentSteps.includes(s as Step));
+      if (firstStepInSection) {
+        setStep(firstStepInSection as Step);
+        scrollToTop();
+      }
+    }
+  };
+
+  // Handle step selection from master list
+  const handleStepSelect = (stepId: string) => {
+    const targetIndex = currentSteps.indexOf(stepId as Step);
+    if (targetIndex >= 0 && targetIndex <= currentStepIndex + 1) {
+      setStep(stepId as Step);
+      scrollToTop();
+    }
+  };
+
+  // Render master pane
+  const masterPane = (
+    <CreatorMasterList
+      steps={masterListSteps}
+      onStepSelect={handleStepSelect}
+      sectionLabel="Creation Steps"
+    />
+  );
+
+  // Render detail pane (existing step content)
+  const detailPane = (
+    <div className="creator-step-content" ref={containerRef}>
+      {renderStep()}
+    </div>
+  );
 
   return (
-    <div className="character-creation" ref={containerRef}>
-      {/* Re-spec Banner - shows preserved XP */}
-      {respecXp > 0 && (
-        <div className="respec-banner">
-          <div className="respec-banner-content">
-            <span className="respec-badge">Re-spec Mode</span>
-            <span className="respec-xp">
-              <strong>{respecXp} XP</strong> will be preserved
-            </span>
-            <span className="respec-hint">
-              Level up after creation using the Victories chip
-            </span>
-          </div>
-        </div>
-      )}
-
-      <div className="creation-progress">
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{
-              width: `${((currentSteps.indexOf(step) + 1) / currentSteps.length) * 100}%`,
-            }}
-          />
-        </div>
-        <span className="progress-text">
-          Step {currentSteps.indexOf(step) + 1} of {currentSteps.length}
-        </span>
-      </div>
-
-      {/* Top Navigation */}
-      <CreationNavigation
-        position="top"
-        onBack={handleBack}
-        onNext={handleNext}
-        nextLabel={nextLabel}
-        nextDisabled={!canProceed()}
-        showBack={!isFirstStep}
-      />
-
-      {renderStep()}
-
-      {/* Bottom Navigation */}
-      <CreationNavigation
-        position="bottom"
-        onBack={handleBack}
-        onNext={handleNext}
-        nextLabel={nextLabel}
-        nextDisabled={!canProceed()}
-        showBack={!isFirstStep}
-      />
-    </div>
+    <CreatorShell
+      characterName={name}
+      respecXp={respecXp}
+      currentStep={step}
+      completedSteps={currentSteps.slice(0, currentStepIndex)}
+      totalSteps={currentSteps.length}
+      currentStepIndex={currentStepIndex}
+      progressItems={progressItems}
+      activeSection={currentSection}
+      onSectionChange={handleSectionChange}
+      availableSections={availableSections}
+      masterPane={masterPane}
+      detailPane={detailPane}
+      canGoBack={!isFirstStep}
+      canGoForward={canProceed()}
+      onBack={handleBack}
+      onNext={handleNext}
+      isLastStep={isFinalStep}
+      nextLabel={nextLabel}
+    />
   );
 };
 

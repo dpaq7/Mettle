@@ -8,7 +8,7 @@ import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
 import { getPerkById, PERK_CATEGORY_INFO } from '../../data/perks';
 import { Formation, HeroClass } from '../../types';
 import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
-import { classDefinitions } from '../../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import {
   Hammer,
   Compass,
@@ -65,7 +65,7 @@ const CharacterDetailsView: React.FC = () => {
   // Get hero class and check if Summoner
   const heroClass: HeroClass = hero.heroClass || 'summoner';
   const isSummoner = isSummonerHero(hero);
-  const classDef = classDefinitions[heroClass];
+  const classDef = GameData.getClass(heroClass);
 
   // Get Summoner-specific data if applicable
   const summonerHero = isSummoner ? (hero as SummonerHeroV2) : null;
@@ -595,7 +595,7 @@ const CharacterDetailsView: React.FC = () => {
               <strong>Role:</strong> {classDef?.role || 'Unknown'}
             </div>
             <div className="class-stat">
-              <strong>Heroic Resource:</strong> {classDef?.heroicResource?.name || 'Unknown'}
+              <strong>Heroic Resource:</strong> {classDef?.heroicResourceDef?.name || 'Unknown'}
             </div>
             <div className="class-stat">
               <strong>Potency:</strong> {classDef?.potencyCharacteristic ?
