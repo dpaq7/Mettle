@@ -25,7 +25,12 @@ import trapsJson from '@/data/generated/traps.json';
 import skillsJson from '@/data/generated/skills.json';
 // Existing structured data (richer than MD)
 import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
-import { careers as sourceCareers } from '@/data/reference-data';
+import {
+  careers as sourceCareers,
+  environmentOptions,
+  organizationOptions,
+  upbringingOptions,
+} from '@/data/reference-data';
 
 import type {
   DrawSteelData,
@@ -162,6 +167,35 @@ function initializeData(): DrawSteelData {
   // Cast existing careers to CareerDefinition format
   const careers = sourceCareers as CareerDefinition[];
 
+  // ─────────────────────────────────────────────
+  // Cultures Data Loading (from existing reference data)
+  // ─────────────────────────────────────────────
+
+  // Transform culture options to CultureBenefit format
+  const cultures: CultureBenefit[] = [
+    ...environmentOptions.map((o) => ({
+      id: o.type,
+      name: o.name,
+      type: 'environment' as const,
+      effect: `Grants skills from ${o.skills.join(', ')} groups`,
+      skill: o.skills[0],
+    })),
+    ...organizationOptions.map((o) => ({
+      id: o.type,
+      name: o.name,
+      type: 'organization' as const,
+      effect: `Grants skills from ${o.skills.join(', ')} groups`,
+      skill: o.skills[0],
+    })),
+    ...upbringingOptions.map((o) => ({
+      id: o.type,
+      name: o.name,
+      type: 'upbringing' as const,
+      effect: `Grants skills: ${o.skills.join(', ')}`,
+      skill: o.skills[0],
+    })),
+  ];
+
   const data: DrawSteelData = {
     // From JSON - now populated
     abilities,
@@ -172,7 +206,7 @@ function initializeData(): DrawSteelData {
     // From existing reference data + parsed MD
     ancestries: [],
     careers,
-    cultures: [],
+    cultures,
     kits: [],
     skills,
     conditions,
@@ -191,7 +225,8 @@ function initializeData(): DrawSteelData {
     console.log(
       `[GameData] Loaded: ${abilities.length} abilities, ${allFeatures.length} features, ` +
         `${data.monsters.length} monsters, ${data.traps.length} traps, ` +
-        `${skills.length} skills, ${conditions.length} conditions, ${careers.length} careers`
+        `${skills.length} skills, ${conditions.length} conditions, ` +
+        `${careers.length} careers, ${cultures.length} cultures`
     );
   }
 
