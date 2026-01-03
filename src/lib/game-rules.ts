@@ -33,6 +33,7 @@ import {
   upbringingOptions,
 } from '@/data/reference-data';
 import { CLASS_RESOURCE_CONFIG } from '@/data/class-resources';
+import { PERKS } from '@/data/perks/perks-data';
 
 import type {
   DrawSteelData,
@@ -269,7 +270,7 @@ function initializeData(): DrawSteelData {
     kits: sourceKits as KitDefinition[],
     skills,
     conditions,
-    perks: [],
+    perks: PERKS as PerkDefinition[],
     classes: buildClassDefinitions(),
 
     // Cross-reference index
