@@ -666,21 +666,32 @@ export interface CultureBenefit {
  *
  * @see rules-md/Kits/
  */
-export interface KitBonuses {
-  /** Stamina bonus string, e.g., "+6 per echelon" */
-  stamina?: string;
-  /** Speed bonus in squares */
-  speed?: number;
-  /** Stability bonus */
-  stability?: number;
-  /** Melee damage bonus by tier, e.g., "+0/+0/+4" */
-  meleeDamage?: string;
-  /** Ranged damage bonus by tier */
-  rangedDamage?: string;
-  /** Magic damage bonus by tier */
-  magicDamage?: string;
-  /** Distance bonus for abilities */
-  distance?: number;
+/**
+ * Kit signature ability with power roll tiers.
+ */
+export interface KitSignatureAbility {
+  /** Ability name */
+  name: string;
+  /** Description text */
+  description: string;
+  /** Keywords for this ability */
+  keywords: string[];
+  /** Action type */
+  type: string;
+  /** Range/distance */
+  distance: string;
+  /** Target specification */
+  target: string;
+  /** Characteristic(s) for power roll */
+  powerRoll: string;
+  /** Tier 1 (≤11) effect */
+  tier1: string;
+  /** Tier 2 (12-16) effect */
+  tier2: string;
+  /** Tier 3 (17+) effect */
+  tier3: string;
+  /** Additional effect text */
+  effect?: string;
 }
 
 /**
@@ -693,16 +704,30 @@ export interface KitDefinition {
   id: string;
   /** Display name */
   name: string;
-  /** Armor type, e.g., "Light Armor", "No Armor" */
+  /** Description of the kit */
+  description: string;
+  /** Armor type, e.g., "Light", "Heavy", "None" */
   armor: string;
-  /** Weapon type, e.g., "Heavy Weapon", "Bow" */
-  weapon: string;
-  /** Stat bonuses from this kit */
-  bonuses: KitBonuses;
+  /** Weapon types available */
+  weapons: string[];
+  /** Stamina bonus per echelon (0, 3, 6, 9, or 12) */
+  staminaPerEchelon: number;
+  /** Speed bonus in squares */
+  speedBonus: number;
+  /** Stability bonus */
+  stabilityBonus: number;
+  /** Melee damage bonus by tier, e.g., "+2/+2/+2" */
+  meleeDamageBonus: string | null;
+  /** Ranged damage bonus by tier */
+  rangedDamageBonus: string | null;
+  /** Melee distance bonus */
+  meleeDistanceBonus: number;
+  /** Ranged distance bonus */
+  rangedDistanceBonus: number;
+  /** Disengage bonus */
+  disengageBonus: number;
   /** The signature ability granted by this kit */
-  signatureAbility: Ability;
-  /** Raw markdown source for reference */
-  rawMarkdown?: string;
+  signatureAbility: KitSignatureAbility;
 }
 
 /**

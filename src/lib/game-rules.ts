@@ -27,6 +27,7 @@ import skillsJson from '@/data/generated/skills.json';
 import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
 import {
   careers as sourceCareers,
+  kits as sourceKits,
   environmentOptions,
   organizationOptions,
   upbringingOptions,
@@ -207,7 +208,7 @@ function initializeData(): DrawSteelData {
     ancestries: [],
     careers,
     cultures,
-    kits: [],
+    kits: sourceKits as KitDefinition[],
     skills,
     conditions,
     perks: [],
@@ -226,7 +227,7 @@ function initializeData(): DrawSteelData {
       `[GameData] Loaded: ${abilities.length} abilities, ${allFeatures.length} features, ` +
         `${data.monsters.length} monsters, ${data.traps.length} traps, ` +
         `${skills.length} skills, ${conditions.length} conditions, ` +
-        `${careers.length} careers, ${cultures.length} cultures`
+        `${careers.length} careers, ${cultures.length} cultures, ${data.kits.length} kits`
     );
   }
 
