@@ -620,18 +620,22 @@ export interface CareerDefinition {
   id: string;
   /** Display name */
   name: string;
+  /** Description of the career */
+  description: string;
   /** Skills granted (as skill group references or specific skills) */
   skills: string[];
-  /** Number of languages gained */
-  languages: number;
+  /** Languages gained (e.g., ["1 Language", "Caelian"]) */
+  languages: string[];
   /** Starting renown bonus */
   renown: number;
-  /** Perk granted (category or specific perk name) */
-  perk?: string;
-  /** d6 inciting incident table entries */
-  incitingIncidents: string[];
-  /** Raw markdown source for reference */
-  rawMarkdown?: string;
+  /** Starting wealth bonus */
+  wealth: number;
+  /** Project points to start with */
+  projectPoints: number;
+  /** Perk category granted */
+  perkType: PerkCategory;
+  /** Sample inciting incident */
+  incitingIncident: string;
 }
 
 /**

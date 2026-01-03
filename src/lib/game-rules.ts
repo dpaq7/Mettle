@@ -25,6 +25,7 @@ import trapsJson from '@/data/generated/traps.json';
 import skillsJson from '@/data/generated/skills.json';
 // Existing structured data (richer than MD)
 import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
+import { careers as sourceCareers } from '@/data/reference-data';
 
 import type {
   DrawSteelData,
@@ -154,6 +155,13 @@ function initializeData(): DrawSteelData {
     endTrigger: c.saveEnds ? 'save' : (c.saveRequired.includes('maneuver') ? 'action' : 'special'),
   }));
 
+  // ─────────────────────────────────────────────
+  // Careers Data Loading (from existing reference data)
+  // ─────────────────────────────────────────────
+
+  // Cast existing careers to CareerDefinition format
+  const careers = sourceCareers as CareerDefinition[];
+
   const data: DrawSteelData = {
     // From JSON - now populated
     abilities,
@@ -161,9 +169,9 @@ function initializeData(): DrawSteelData {
     monsters: monstersData.statblocks,
     traps: trapsData.traps,
 
-    // From MD (partially parsed)
+    // From existing reference data + parsed MD
     ancestries: [],
-    careers: [],
+    careers,
     cultures: [],
     kits: [],
     skills,
@@ -183,7 +191,7 @@ function initializeData(): DrawSteelData {
     console.log(
       `[GameData] Loaded: ${abilities.length} abilities, ${allFeatures.length} features, ` +
         `${data.monsters.length} monsters, ${data.traps.length} traps, ` +
-        `${skills.length} skills, ${conditions.length} conditions`
+        `${skills.length} skills, ${conditions.length} conditions, ${careers.length} careers`
     );
   }
 
