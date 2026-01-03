@@ -26,6 +26,7 @@ import skillsJson from '@/data/generated/skills.json';
 // Existing structured data (richer than MD)
 import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
 import {
+  ancestries as sourceAncestries,
   careers as sourceCareers,
   kits as sourceKits,
   environmentOptions,
@@ -264,7 +265,7 @@ function initializeData(): DrawSteelData {
     traps: trapsData.traps,
 
     // From existing reference data + parsed MD
-    ancestries: [],
+    ancestries: sourceAncestries as AncestryDefinition[],
     careers,
     cultures,
     kits: sourceKits as KitDefinition[],
