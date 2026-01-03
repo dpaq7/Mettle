@@ -1,6 +1,6 @@
 import React from 'react';
 import { Career } from '@/types';
-import { getSelectableLanguages } from '@/data/reference-data';
+import { GameData } from '@/lib/game-rules';
 
 interface LanguagesStepProps {
   selectedCareer: Career | null;
@@ -15,7 +15,7 @@ export const LanguagesStep: React.FC<LanguagesStepProps> = ({
   requiredCount,
   onToggleLanguage,
 }) => {
-  const selectableLanguages = getSelectableLanguages();
+  const selectableLanguages = GameData.getSelectableLanguages();
 
   // If career grants no languages, show simplified view
   if (requiredCount === 0) {

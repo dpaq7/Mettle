@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
 import { useCombatContext } from '../../context/CombatContext';
-import { languages as allLanguages } from '../../data/reference-data';
 import { skills as allSkills } from '../../data/skills';
 import { formations } from '../../data/formations';
 import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
@@ -152,7 +151,7 @@ const CharacterDetailsView: React.FC = () => {
 
   // Get language names from hero's language IDs
   const getLanguageName = (langId: string): string => {
-    const lang = allLanguages.find(l => l.id === langId);
+    const lang = GameData.getLanguage(langId);
     return lang?.name || langId;
   };
 

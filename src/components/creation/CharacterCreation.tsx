@@ -3,7 +3,7 @@ import { useSummonerContext } from '../../context/HeroContext';
 import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand, HeroAncestry } from '../../types';
 import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
 import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
-import { ancestries, cultures, careers, kits, getSelectableLanguages, languages as allLanguages } from '../../data/reference-data';
+import { cultures } from '../../data/reference-data';
 import { portfolios } from '../../data/portfolios';
 import { formations } from '../../data/formations';
 import { circleToPortfolio } from '../../types/summoner';
@@ -1235,7 +1235,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
           <div className="creation-step">
             <h2>Choose Your Career</h2>
             <div className="options-grid">
-              {careers.map((career) => (
+              {GameData.getAllCareers().map((career) => (
                 <div
                   key={career.id}
                   className={`option-card ${selectedCareer?.id === career.id ? 'selected' : ''}`}
@@ -1264,7 +1264,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
 
       case 'languages':
         const requiredCount = getRequiredLanguageCount();
-        const selectableLanguages = getSelectableLanguages();
+        const selectableLanguages = GameData.getSelectableLanguages();
 
         // If career grants no languages, skip this step automatically
         if (requiredCount === 0) {
@@ -1535,7 +1535,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
             <h2>Choose Your Kit</h2>
             <p className="step-description">Your kit determines your starting equipment and stats</p>
             <div className="options-grid">
-              {kits.map((kit) => (
+              {GameData.getAllKits().map((kit) => (
                 <div
                   key={kit.id}
                   className={`option-card ${selectedKit?.id === kit.id ? 'selected' : ''}`}

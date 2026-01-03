@@ -1,6 +1,6 @@
 import React from 'react';
 import { Kit } from '@/types';
-import { kits } from '@/data/reference-data';
+import { GameData } from '@/lib/game-rules';
 
 interface KitStepProps {
   selectedKit: Kit | null;
@@ -8,6 +8,8 @@ interface KitStepProps {
 }
 
 export const KitStep: React.FC<KitStepProps> = ({ selectedKit, onSelect }) => {
+  const kits = GameData.getAllKits();
+
   return (
     <div className="creation-step">
       <h2>Choose Your Kit</h2>
@@ -17,7 +19,7 @@ export const KitStep: React.FC<KitStepProps> = ({ selectedKit, onSelect }) => {
           <div
             key={kit.id}
             className={`option-card ${selectedKit?.id === kit.id ? 'selected' : ''}`}
-            onClick={() => onSelect(kit)}
+            onClick={() => onSelect(kit as Kit)}
           >
             <h3>{kit.name}</h3>
             <p>Stamina: +{kit.staminaPerEchelon}/echelon</p>

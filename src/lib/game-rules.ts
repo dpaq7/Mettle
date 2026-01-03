@@ -29,6 +29,7 @@ import {
   ancestries as sourceAncestries,
   careers as sourceCareers,
   kits as sourceKits,
+  languages as sourceLanguages,
   environmentOptions,
   organizationOptions,
   upbringingOptions,
@@ -49,6 +50,7 @@ import type {
   SkillDefinition,
   ConditionDefinition,
   PerkDefinition,
+  LanguageDefinition,
   HeroClassDefinition,
   SubclassDefinition,
   ClassRole,
@@ -302,6 +304,7 @@ function initializeData(): DrawSteelData {
     skills,
     conditions,
     perks: PERKS as PerkDefinition[],
+    languages: sourceLanguages as LanguageDefinition[],
     classes: buildClassDefinitions(),
 
     // Cross-reference index
@@ -792,6 +795,53 @@ export const GameData = {
    */
   getPerk: (id: string): PerkDefinition | undefined =>
     getData().perks.find((p) => p.id === id),
+
+  // ═══════════════════════════════════════════
+  // LANGUAGES
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get all languages.
+   * @returns Array of all language definitions
+   */
+  getAllLanguages: (): LanguageDefinition[] => getData().languages,
+
+  /**
+   * Find a language by id.
+   * @param id - Language identifier
+   * @returns The language definition or undefined
+   */
+  getLanguage: (id: string): LanguageDefinition | undefined =>
+    getData().languages.find((l) => l.id === id),
+
+  /**
+   * Find a language by name (case-insensitive).
+   * @param name - Language display name
+   * @returns The language definition or undefined
+   */
+  getLanguageByName: (name: string): LanguageDefinition | undefined =>
+    getData().languages.find((l) => l.name.toLowerCase() === name.toLowerCase()),
+
+  /**
+   * Get languages that heroes can select (excludes default and dead languages).
+   * @returns Array of selectable languages
+   */
+  getSelectableLanguages: (): LanguageDefinition[] =>
+    getData().languages.filter((l) => !l.isDefault && !l.isDead),
+
+  /**
+   * Get the default language that all heroes know (Caelian).
+   * @returns The default language or undefined
+   */
+  getDefaultLanguage: (): LanguageDefinition | undefined =>
+    getData().languages.find((l) => l.isDefault),
+
+  /**
+   * Get dead languages (used for research).
+   * @returns Array of dead languages
+   */
+  getDeadLanguages: (): LanguageDefinition[] =>
+    getData().languages.filter((l) => l.isDead),
 
   // ═══════════════════════════════════════════
   // MONSTERS (from JSON)

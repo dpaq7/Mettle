@@ -1,6 +1,6 @@
 import React from 'react';
 import { Career } from '@/types';
-import { careers } from '@/data/reference-data';
+import { GameData } from '@/lib/game-rules';
 
 interface CareerStepProps {
   selectedCareer: Career | null;
@@ -8,6 +8,8 @@ interface CareerStepProps {
 }
 
 export const CareerStep: React.FC<CareerStepProps> = ({ selectedCareer, onSelect }) => {
+  const careers = GameData.getAllCareers();
+
   return (
     <div className="creation-step">
       <h2>Choose Your Career</h2>
@@ -16,7 +18,7 @@ export const CareerStep: React.FC<CareerStepProps> = ({ selectedCareer, onSelect
           <div
             key={career.id}
             className={`option-card ${selectedCareer?.id === career.id ? 'selected' : ''}`}
-            onClick={() => onSelect(career)}
+            onClick={() => onSelect(career as Career)}
           >
             <h3>{career.name}</h3>
             <p className="description">{career.description}</p>

@@ -782,6 +782,26 @@ export interface PerkDefinition {
   rawMarkdown?: string;
 }
 
+/**
+ * Language definition.
+ *
+ * @see rules-md/Character Options/Languages.md
+ */
+export interface LanguageDefinition {
+  /** Unique identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Related ancestry or use case */
+  relatedTo: string;
+  /** Whether this is a dead language (for research only) */
+  isDead?: boolean;
+  /** Whether all heroes know this language (Caelian) */
+  isDefault?: boolean;
+  /** What research this dead language unlocks */
+  researchFocus?: string;
+}
+
 // ============================================
 // CLASS DEFINITIONS (combining JSON + MD)
 // ============================================
@@ -967,6 +987,8 @@ export interface DrawSteelData {
   conditions: ConditionDefinition[];
   /** All perk definitions */
   perks: PerkDefinition[];
+  /** All languages */
+  languages: LanguageDefinition[];
   /** All class definitions */
   classes: HeroClassDefinition[];
 
