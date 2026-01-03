@@ -1,3 +1,5 @@
+import { GameData } from '@/lib/game-rules';
+
 /**
  * Roll a die with the specified number of sides
  */
@@ -37,11 +39,11 @@ export const rollCharacteristic = (): number => {
  * Tier 1: 2-11
  * Tier 2: 12-16
  * Tier 3: 17+
+ *
+ * @see GameData.getTierForRoll for the authoritative implementation
  */
 export const getPowerRollTier = (roll: number): 1 | 2 | 3 => {
-  if (roll >= 17) return 3;
-  if (roll >= 12) return 2;
-  return 1;
+  return GameData.getTierForRoll(roll);
 };
 
 /**

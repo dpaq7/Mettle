@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useRollHistory } from '../../context/RollHistoryContext';
 import { ActionType, ActionTag, Characteristic, TierResult, ActionRollResult } from '../../types/action';
 import { Characteristics } from '../../types';
+import { GameData } from '@/lib/game-rules';
 import './ActionCard.css';
 
 interface PowerRoll {
@@ -86,10 +87,7 @@ export const ActionCard = ({
     const total = die1 + die2 + characteristicBonus + (powerRoll.bonus || 0);
 
     // Determine tier based on total
-    let tier: 1 | 2 | 3;
-    if (total >= 17) tier = 3;
-    else if (total >= 12) tier = 2;
-    else tier = 1;
+    const tier = GameData.getTierForRoll(total);
 
     const result: ActionRollResult = {
       type: 'power',
@@ -131,9 +129,7 @@ export const ActionCard = ({
   // Get current tier for highlighting
   const getCurrentTier = (): 1 | 2 | 3 | null => {
     if (lastRollResult === null) return null;
-    if (lastRollResult >= 17) return 3;
-    if (lastRollResult >= 12) return 2;
-    return 1;
+    return GameData.getTierForRoll(lastRollResult);
   };
 
   const currentTier = getCurrentTier();

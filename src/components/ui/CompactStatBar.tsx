@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useRollHistory } from '../../context/RollHistoryContext';
 import { useConditions } from '../../hooks/useConditions';
 import { EdgeBaneState, resolveEdgeBane, performPowerRoll } from '../../utils/dice';
+import { GameData } from '@/lib/game-rules';
 import './CompactStatBar.css';
 
 interface CompactStatBarProps {
@@ -41,12 +42,8 @@ interface CompactStatBarProps {
   onVictoriesChange?: (newVictories: number) => void;
 }
 
-// Tier calculation
-const getTier = (total: number): 1 | 2 | 3 => {
-  if (total >= 17) return 3;
-  if (total >= 12) return 2;
-  return 1;
-};
+// Tier calculation - delegates to GameData
+const getTier = (total: number): 1 | 2 | 3 => GameData.getTierForRoll(total);
 
 // Tier colors
 const getTierColor = (tier: 1 | 2 | 3): string => {
