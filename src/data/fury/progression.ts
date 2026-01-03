@@ -2,6 +2,7 @@
 import { LevelProgression, LevelFeature, FeatureCategory } from '../../types/progression';
 import { FuryAspect } from '../../types/hero';
 import { berserkerFeatures, reaverFeatures, stormwightFeatures } from './features';
+import { GameData } from '@/lib/game-rules';
 
 // ============================================================
 // 7-FEROCITY ABILITY CHOICES (Level 3)
@@ -628,10 +629,12 @@ export function getFuryProgressionWithAspect(
 
 /**
  * Calculate Fury stamina for a given level
- * Fury: Base 21 + 9 per level after 1
+ * Uses GameData for base stats
  */
 export function calculateFuryStamina(level: number, kitStaminaBonus: number = 0): number {
-  const baseStamina = 21;
-  const levelBonus = level >= 2 ? (level - 1) * 9 : 0;
+  const furyClass = GameData.getClass('fury');
+  const baseStamina = furyClass?.baseStats.stamina.level1 ?? 21;
+  const staminaPerLevel = furyClass?.baseStats.stamina.perLevel ?? 9;
+  const levelBonus = level >= 2 ? (level - 1) * staminaPerLevel : 0;
   return baseStamina + kitStaminaBonus + levelBonus;
 }

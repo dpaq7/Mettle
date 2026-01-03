@@ -1,18 +1,21 @@
 import { SummonerHero, Formation, Kit, SummonerCircle } from '../types';
+import { GameData } from '@/lib/game-rules';
 
 /**
  * Calculate max stamina for a Summoner hero
- * Base: 15 (Summoner class base per SRD)
+ * Base: from GameData (Summoner class)
  * Kit: varies by kit
- * Level: +6 per level (starting at level 2)
+ * Level: +perLevel per level-up (level - 1)
  */
 export const calculateMaxStamina = (hero: Partial<SummonerHero>): number => {
-  const baseClassStamina = 15; // Summoner base (SRD: Level 1 = 15)
+  const summonerClass = GameData.getClass('summoner');
+  const baseClassStamina = summonerClass?.baseStats.stamina.level1 ?? 15;
+  const staminaPerLevel = summonerClass?.baseStats.stamina.perLevel ?? 6;
   const level = hero.level || 1;
   const echelon = Math.ceil(level / 3);
   const kitStamina = (hero.kit?.staminaPerEchelon || 0) * echelon;
-  // Level 1 gets base stamina, level 2+ gets +6 per level
-  const levelBonus = level >= 2 ? level * 6 : 0;
+  // Each level-up (after level 1) grants stamina per level
+  const levelBonus = (level - 1) * staminaPerLevel;
   return baseClassStamina + kitStamina + levelBonus;
 };
 
@@ -175,11 +178,12 @@ export const calculateMinionLevelStaminaBonus = (
 
 /**
  * Calculate maximum recoveries
- * Base: 8 (SRD specification)
+ * Base: from GameData (Summoner class)
  * Circle of Spring: +2 recoveries (Pixie Dust feature)
  */
 export const calculateMaxRecoveries = (circle?: SummonerCircle): number => {
-  const baseRecoveries = 8; // SRD: Summoners have 8 recoveries
+  const summonerClass = GameData.getClass('summoner');
+  const baseRecoveries = summonerClass?.baseStats.recoveries ?? 8;
   const circleBonus = circle === 'spring' ? 2 : 0; // Pixie Dust feature
   return baseRecoveries + circleBonus;
 };

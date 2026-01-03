@@ -8,7 +8,7 @@
  */
 
 import { Hero, isSummonerHero, isNullHero } from '../types/hero';
-import { classDefinitions } from '../data/classes/class-definitions';
+import { GameData } from '@/lib/game-rules';
 import {
   EquipmentBonuses,
   DerivedStats,
@@ -99,7 +99,7 @@ function applyStatBonus(bonuses: EquipmentBonuses, bonus: StatBonus): void {
  * Combines class base stats + kit bonuses + equipment bonuses
  */
 export function calculateDerivedStats(hero: Hero): DerivedStats {
-  const classDef = classDefinitions[hero.heroClass];
+  const classDef = GameData.getClass(hero.heroClass);
   const kit = hero.kit;
   const equippedItems = hero.equippedItems || [];
 
@@ -108,8 +108,8 @@ export function calculateDerivedStats(hero: Hero): DerivedStats {
 
   // ===== STAMINA CALCULATION =====
   // Formula: Class Starting + (Level-1) * Stamina Per Level + Kit (per echelon) + Equipment
-  const classStartingStamina = classDef?.startingStamina ?? 18;
-  const levelStaminaBonus = (hero.level - 1) * (classDef?.staminaPerLevel ?? 6);
+  const classStartingStamina = classDef?.baseStats.stamina.level1 ?? 18;
+  const levelStaminaBonus = (hero.level - 1) * (classDef?.baseStats.stamina.perLevel ?? 6);
   const echelon = Math.ceil(hero.level / 3);
   const kitStamina = (kit?.staminaPerEchelon ?? 0) * echelon;
   const equipStamina = equipmentBonuses.stamina;
@@ -134,7 +134,7 @@ export function calculateDerivedStats(hero: Hero): DerivedStats {
 
   // ===== RECOVERIES CALCULATION =====
   // Formula: Class Starting Recoveries + Equipment
-  const baseRecoveries = classDef?.startingRecoveries ?? 8;
+  const baseRecoveries = classDef?.baseStats.recoveries ?? 8;
   const maxRecoveries = baseRecoveries + equipmentBonuses.recoveries;
 
   // ===== SPEED CALCULATION =====
