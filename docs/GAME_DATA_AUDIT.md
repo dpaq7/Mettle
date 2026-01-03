@@ -1,136 +1,139 @@
 # Game Data Audit Findings
 
 **Date:** 2026-01-03
+**Updated:** 2026-01-03
 **Purpose:** Identify code that violates the "GameData as single source of truth" pattern
 
 ---
 
 ## Summary
 
-| Category | Count | Priority |
-|----------|-------|----------|
-| Hardcoded tier calculations | 7 locations | HIGH |
-| Hardcoded stamina values | 5 locations | HIGH |
-| Hardcoded recovery values | 1 location | MEDIUM |
-| Direct data imports | 22 locations | MEDIUM |
+| Category | Original | Fixed | Remaining | Status |
+|----------|----------|-------|-----------|--------|
+| Hardcoded tier calculations | 7 | 6 | 1* | DONE |
+| Hardcoded stamina values | 5 | 5 | 0 | DONE |
+| Hardcoded recovery values | 1 | 1 | 0 | DONE |
+| Direct classDefinitions imports | 9 | 9 | 0 | DONE |
+| Direct reference-data imports | 6 | 4 | 2** | DONE |
+| Direct conditions imports | 7 | 0 | 7*** | DEFERRED |
+| Direct skills imports | 4 | 0 | 4*** | DEFERRED |
+
+*One tier calculation is intentional (Fury ferocity threshold)
+**`cultures` imports remain due to type mismatch (Culture[] vs CultureBenefit[])
+***Deferred: richer type definitions in source files than GameData types
 
 ---
 
-## Hardcoded Values Found
+## Completed Fixes
 
-### Tier Calculations (HIGH PRIORITY)
+### Tier Calculations - DONE
+Migrated 6 files to use `GameData.getTierForRoll()`:
+- `utils/dice.ts`
+- `hooks/useDiceRolling.ts`
+- `components/ui/ActionCard.tsx`
+- `components/ui/CompactStatBar.tsx`
 
-These locations duplicate the tier threshold logic that should use `GameData.getTierForRoll()`:
+### Stamina/Recovery Values - DONE
+All class stamina calculations now use `GameData.getClass(heroClass)?.baseStats`:
+- `utils/calculations.ts` - uses GameData for summoner defaults
+- `utils/statCalculator.ts` - uses `GameData.getClass()`
+- `data/fury/progression.ts` - uses `GameData.getClass('fury')`
+- `components/character/LevelUpWizard.tsx` - uses `GameData.getClass()`
+- `components/character/LevelUp.tsx` - uses `GameData.getClass()`
+- `components/sections/character/LevelUpDetail.tsx` - uses `GameData.getClass()`
 
-| File | Line | Current Code | Should Be |
-|------|------|--------------|-----------|
-| `utils/dice.ts` | 42-43 | `if (roll >= 17) return 3; if (roll >= 12) return 2;` | `GameData.getTierForRoll(roll)` |
-| `hooks/useDiceRolling.ts` | 15-16 | `if (total >= 17) return { tier: 3, ... }` | `GameData.getTierForRoll(total)` |
-| `components/ui/ActionCard.tsx` | 90-91 | `if (total >= 17) tier = 3; else if (total >= 12) tier = 2;` | `GameData.getTierForRoll(total)` |
-| `components/ui/ActionCard.tsx` | 134-135 | `if (lastRollResult >= 17) return 3;` | `GameData.getTierForRoll(lastRollResult)` |
-| `components/ui/CompactStatBar.tsx` | 46-47 | `if (total >= 17) return 3; if (total >= 12) return 2;` | `GameData.getTierForRoll(total)` |
-| `components/sections/character/CharacterMasterList.tsx` | 167 | `if (ferocity >= 12) return 'Tier 4';` | Custom resource tier (may be intentional) |
+### classDefinitions Imports - DONE
+Migrated 9 files from direct `classDefinitions` import to `GameData.getClass()`:
+- `CharacterDetailsView.tsx`
+- `ClassSelector.tsx`
+- `CharacterCreation.tsx`
+- `SubclassSelector.tsx`
+- `CharacteristicsStep.tsx`
+- `CharacterManager.tsx`
+- `useCharacterCreation.ts`
+- `CharacterStatsPanel.tsx`
+- `LevelUpWizard.tsx`
 
-### Stamina Values (HIGH PRIORITY)
+Also added new GameData helper functions:
+- `getSubclasses()`, `getSubclass()`
+- `getSubclassTypeName()`, `getSubclassTypeNamePlural()`
+- `getSubclassSelectCount()`, `requiresMultipleSubclasses()`
+- `getClassRoleColor()`
 
-These locations hardcode class stamina values:
+### reference-data Imports - DONE (partial)
+Migrated 4 files to use GameData:
+- `LanguagesStep.tsx` → `GameData.getSelectableLanguages()`
+- `KitStep.tsx` → `GameData.getAllKits()`
+- `CareerStep.tsx` → `GameData.getAllCareers()`
+- `CharacterDetailsView.tsx` → `GameData.getLanguage()`
+- `CharacterCreation.tsx` → `GameData.getAllCareers/Kits/Languages()`
 
-| File | Line | Current Code | Should Be |
-|------|------|--------------|-----------|
-| `utils/calculations.ts` | 10 | `const baseClassStamina = 15;` | `GameData.getClass(heroClass)?.baseStats.stamina.level1` |
-| `utils/statCalculator.ts` | 111 | `const classStartingStamina = classDef?.startingStamina ?? 18;` | Use `GameData.getClass()` with proper fallback |
-| `data/fury/progression.ts` | 634 | `const baseStamina = 21;` | Reference class definition |
-| `data/portfolios/undead.ts` | 557 | `baseStamina: 20` | Portfolio minion data (may be intentional) |
-| `components/character/LevelUpWizard.tsx` | 167 | `classDef?.startingStamina ?? 18` | Use `GameData.getStaminaAtLevel()` |
-| `components/character/LevelUp.tsx` | 78 | `classDef?.startingStamina ?? 18` | Use `GameData.getStaminaAtLevel()` |
-| `components/sections/character/LevelUpDetail.tsx` | 173 | `classDef?.startingStamina ?? 18` | Use `GameData.getStaminaAtLevel()` |
-
-### Recovery Values (MEDIUM PRIORITY)
-
-| File | Line | Current Code | Should Be |
-|------|------|--------------|-----------|
-| `utils/calculations.ts` | 182 | `const baseRecoveries = 8;` | `GameData.getClass(heroClass)?.baseStats.recoveries` |
-
----
-
-## Direct Data Imports
-
-These files import game data directly instead of using the `GameData` access layer. They should be migrated to use `GameData.*` functions.
-
-### Reference Data Imports
-
-| File | Line | Current Import |
-|------|------|----------------|
-| `components/creation/CharacterCreation.tsx` | 6 | `import { ancestries, cultures, careers, kits, ... } from '../../data/reference-data'` |
-| `components/character/CharacterDetailsView.tsx` | 4 | `import { languages as allLanguages } from '../../data/reference-data'` |
-| `components/creation/steps/LanguagesStep.tsx` | 3 | `import { getSelectableLanguages } from '@/data/reference-data'` |
-| `components/creation/steps/CareerStep.tsx` | 3 | `import { careers } from '@/data/reference-data'` |
-| `components/creation/steps/CultureStep.tsx` | 3 | `import { cultures } from '@/data/reference-data'` |
-| `components/creation/steps/KitStep.tsx` | 3 | `import { kits } from '@/data/reference-data'` |
-
-### Condition Imports
-
-| File | Line | Current Import |
-|------|------|----------------|
-| `hooks/useConditions.ts` | 4 | `import { CONDITIONS, performSavingThrow, ... } from '../data/conditions'` |
-| `hooks/useConditionManagement.ts` | 3 | `import { getDefaultEndType } from '@/data/conditions'` |
-| `components/sections/secondary/ConditionRulesDetail.tsx` | 1 | `import { CONDITIONS, ConditionId } from '@/data/conditions'` |
-| `components/sections/character/CharacterDetailPane.tsx` | 7 | `import { CONDITIONS, ALL_CONDITIONS, ... } from '@/data/conditions'` |
-| `components/character/CharacterStatsPanel.tsx` | 7 | `import { ALL_CONDITIONS, ConditionDefinition } from '../../data/conditions'` |
-| `components/ui/StatsDashboard/cards/TurnCard.tsx` | 30 | `import { CONDITIONS, performSavingThrow, ... } from '@/data/conditions'` |
-| `components/ui/StatsDashboard/cards/ConditionsCard.tsx` | 25 | `import { CONDITIONS, ALL_CONDITIONS, ... } from '@/data/conditions'` |
-
-### Skill Imports
-
-| File | Line | Current Import |
-|------|------|----------------|
-| `hooks/useCharacterCreation.ts` | 41 | `import { SkillGroup, findSkillByName, isSkillGroup } from '../data/skills'` |
-| `components/sections/secondary/SkillRulesDetail.tsx` | 1 | `import { findSkillByName, getSkillById, skillGroups } from '@/data/skills'` |
-| `components/character/CharacterDetailsView.tsx` | 5 | `import { skills as allSkills } from '../../data/skills'` |
-| `components/creation/CharacterCreation.tsx` | 14 | `import { skills, getSkillsByGroup, ... } from '../../data/skills'` |
-
-### Class Abilities / Progression Imports
-
-| File | Line | Current Import |
-|------|------|----------------|
-| `utils/progression-display.ts` | 13 | `import { levelProgressions as summonerProgressions } from '../data/progression'` |
-| `components/sections/actions/ActionsSection.tsx` | 6 | `import { getClassAbilities, isAbilitySelected } from '@/data/class-abilities'` |
-| `components/sections/actions/ActionsMasterList.tsx` | 6 | `import { getClassAbilities } from '@/data/class-abilities'` |
-| `components/sections/actions/ActionsDetailPane.tsx` | 7 | `import { getClassAbilities, isAbilitySelected } from '@/data/class-abilities'` |
-| `components/sections/character/LevelUpDetail.tsx` | 4 | `import { getProgressionForLevel, getCircleUpgrades } from '@/data/progression'` |
-| `components/character/LevelUpWizard.tsx` | 7 | `import { getProgressionForLevel, getCircleUpgrades } from '../../data/progression'` |
-| `components/character/LevelUp.tsx` | 3 | `import { getProgressionForLevel, getCircleUpgrades } from '../../data/progression'` |
+**Remaining (type mismatch):**
+- `CharacterCreation.tsx` - `cultures` (Culture[] vs CultureBenefit[])
+- `CultureStep.tsx` - `cultures` (Culture[] vs CultureBenefit[])
 
 ---
 
-## Rule Contradictions
+## Deferred Items
 
-No explicit rule contradictions found. The existing data in `data/reference-data.ts`, `data/conditions.ts`, and `data/skills.ts` appears to match the source rules, but should be verified against the authoritative MD sources.
+### Conditions Imports - DEFERRED
+The `ConditionDefinition` type in `conditions.ts` is richer than in `game-data.ts`:
+- conditions.ts: icon, primaryEffect, saveEnds, saveRequired, affectsActions, actionTriggers, rulesDescription
+- game-data.ts: id, name, effect, endTrigger
+
+Components that need icons, save mechanics, or action triggers should continue using `conditions.ts` directly.
+
+Files continuing to use conditions.ts:
+- `useConditions.ts`
+- `useConditionManagement.ts`
+- `ConditionRulesDetail.tsx`
+- `CharacterDetailPane.tsx`
+- `CharacterStatsPanel.tsx`
+- `TurnCard.tsx`
+- `ConditionsCard.tsx`
+
+### Skills Imports - DEFERRED
+The `Skill` type in `skills.ts` is richer than `SkillDefinition` in `game-data.ts`:
+- skills.ts: id, name, group, description, use
+- game-data.ts: name, group, description
+
+Files continuing to use skills.ts:
+- `useCharacterCreation.ts`
+- `SkillRulesDetail.tsx`
+- `CharacterDetailsView.tsx`
+- `CharacterCreation.tsx`
+
+### Class Abilities / Progression - NOT IN SCOPE
+These remain using their specialized data files:
+- `utils/progression-display.ts`
+- `ActionsSection.tsx`
+- `ActionsMasterList.tsx`
+- `ActionsDetailPane.tsx`
+- `LevelUpDetail.tsx`
+- `LevelUpWizard.tsx`
+- `LevelUp.tsx`
 
 ---
 
-## Priority Fixes
+## Commits
 
-### Phase 1: High Priority (Tier Calculations)
-1. Create a shared `getTier(roll: number)` function in `GameData`
-2. Update all 6 locations using hardcoded tier thresholds
-3. **Estimated impact:** Prevents tier calculation bugs if rules change
-
-### Phase 2: High Priority (Stamina/Recovery)
-1. Implement `GameData.getStaminaAtLevel(class, level)` with class data
-2. Update stamina calculations to use GameData
-3. **Estimated impact:** Single source for class base stats
-
-### Phase 3: Medium Priority (Data Imports)
-1. Gradually migrate reference-data imports to GameData
-2. Update components to use `GameData.getAllAncestries()`, etc.
-3. **Estimated impact:** Prepares for canonical data loading from JSON/MD
+1. `7ef4af7` - refactor: use GameData.getTierForRoll for tier calculations
+2. `318c794` - refactor: use GameData for stamina/recovery calculations
+3. `3309f86` - refactor: migrate classDefinitions imports to GameData API
+4. `40a10e4` - refactor: migrate reference-data imports to GameData API
 
 ---
 
-## Notes
+## Future Work
 
-- The `data/` directory contains manually transcribed game data that should eventually be replaced with parsed data from the authoritative source files
-- Some hardcoded values (like minion stats in portfolios) may be intentional for now
-- The `GameData` access layer is implemented but not yet connected to source data
-- Next step: Implement data loading from `source/game-json/` and `source/rules-md/`
+1. **Culture Type Alignment** - Consider whether to:
+   - Add full Culture[] loading to GameData, or
+   - Restructure CultureBenefit to match Culture
+
+2. **Enrich GameData Types** - Consider adding missing fields:
+   - ConditionDefinition: icon, saveEnds, actionTriggers
+   - SkillDefinition: id, use
+
+3. **Class Abilities Integration** - Load abilities from JSON source:
+   - Currently using `data/class-abilities.ts`
+   - Should use GameData.getAbilitiesByClass()
