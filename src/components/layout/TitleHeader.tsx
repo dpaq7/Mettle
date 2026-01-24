@@ -1,6 +1,7 @@
 import { useHeroContext } from '@/context/HeroContext';
 import { useCombatContext } from '@/context/CombatContext';
-import { Swords, MoreVertical, UserPlus, Moon, TrendingUp } from 'lucide-react';
+import { useNavigation } from '@/context/NavigationContext';
+import { Swords, MoreVertical, UserPlus, Moon, RefreshCcw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +18,10 @@ interface TitleHeaderProps {
   onImportCharacter: () => void;
   onExportCharacter: () => void;
   onDuplicateCharacter: () => void;
-  onRespecCharacter: () => void;
+  onFullRebuild: () => void;
   onRespite: () => void;
-  onLevelUp: () => void;
   onShowAbout: () => void;
-  canLevelUp?: boolean;
+  canRespec?: boolean;
 }
 
 export function TitleHeader({
@@ -30,14 +30,14 @@ export function TitleHeader({
   onImportCharacter,
   onExportCharacter,
   onDuplicateCharacter,
-  onRespecCharacter,
+  onFullRebuild,
   onRespite,
-  onLevelUp,
   onShowAbout,
-  canLevelUp = false,
+  canRespec = false,
 }: TitleHeaderProps) {
   const { hero } = useHeroContext();
   const { isInCombat, startCombat, endCombat } = useCombatContext();
+  const { setActiveSection, setSelectedItem } = useNavigation();
 
   const handleCombatToggle = () => {
     if (isInCombat) {
@@ -84,17 +84,20 @@ export function TitleHeader({
               <span>Respite</span>
             </Button>
 
-            {/* Level Up */}
-            {canLevelUp && (
+            {/* Respec */}
+            {canRespec && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onLevelUp}
+                onClick={() => {
+                  setActiveSection('character');
+                  setSelectedItem('respec');
+                }}
                 className="header-action-btn"
-                title="Level Up"
+                title="Respec Progression"
               >
-                <TrendingUp size={16} />
-                <span>Level Up</span>
+                <RefreshCcw size={16} />
+                <span>Respec</span>
               </Button>
             )}
 
@@ -129,8 +132,8 @@ export function TitleHeader({
                 <DropdownMenuItem onClick={onDuplicateCharacter}>
                   Duplicate Character
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onRespecCharacter}>
-                  Respec Character
+                <DropdownMenuItem onClick={onFullRebuild}>
+                  Full Rebuild
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

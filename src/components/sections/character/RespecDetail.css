@@ -1,0 +1,236 @@
+/**
+ * RespecDetail styles
+ */
+
+/* Title row with icon */
+.respec-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* XP Display */
+.respec-xp-display-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-darkest);
+  border: 1px solid var(--xp);
+  border-radius: var(--radius-md);
+}
+
+/* Section titles with icons */
+.respec-section-preserved {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--status-success);
+}
+
+.respec-section-reset {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--status-warning);
+}
+
+/* Info lists */
+.respec-list {
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  list-style: disc;
+}
+
+.respec-list li {
+  padding: 2px 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Features list */
+.respec-features-list {
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  list-style: none;
+}
+
+.respec-features-list li {
+  padding: var(--space-1) 0;
+  color: var(--text-primary);
+}
+
+.respec-features-list .choice-indicator {
+  color: var(--accent-primary);
+  font-weight: 400;
+  font-size: var(--text-sm);
+}
+
+/* Level Progress Dots */
+.respec-level-progress-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.respec-level-progress-inline .level-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--bg-deep);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.respec-level-progress-inline .level-dot.completed {
+  background: var(--status-success);
+  color: white;
+  border-color: var(--status-success);
+}
+
+.respec-level-progress-inline .level-dot.current {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--accent-primary);
+}
+
+/* Step content */
+.respec-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Choices summary */
+.respec-choices-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-deep);
+  border-radius: var(--radius-md);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.respec-level-summary {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.respec-level-summary:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.respec-level-summary strong {
+  color: var(--accent-primary);
+  font-size: var(--text-sm);
+}
+
+.respec-level-summary ul {
+  margin: var(--space-1) 0 0;
+  padding: 0 0 0 var(--space-4);
+}
+
+.respec-level-summary li {
+  padding: 2px 0;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+/* Action buttons */
+.respec-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.respec-cancel-button,
+.respec-back-button {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.respec-cancel-button:hover,
+.respec-back-button:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.respec-begin-button,
+.respec-continue-button {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 500;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.respec-begin-button:hover,
+.respec-continue-button:hover {
+  background: var(--accent-bright);
+}
+
+.respec-confirm-button {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--status-success);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 500;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.respec-confirm-button:hover {
+  filter: brightness(1.1);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .respec-level-progress-inline {
+    display: none;
+  }
+
+  .respec-actions {
+    flex-direction: column;
+  }
+
+  .respec-cancel-button,
+  .respec-back-button,
+  .respec-begin-button,
+  .respec-continue-button,
+  .respec-confirm-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

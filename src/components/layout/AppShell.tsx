@@ -14,11 +14,10 @@ interface AppShellProps {
   onImportCharacter: () => void;
   onExportCharacter: () => void;
   onDuplicateCharacter: () => void;
-  onRespecCharacter: () => void;
+  onFullRebuild: () => void;
   onRespite: () => void;
-  onLevelUp: () => void;
   onShowAbout: () => void;
-  canLevelUp?: boolean;
+  canRespec?: boolean;
   // Content - master-detail layout
   masterPane?: ReactNode;
   detailPane?: ReactNode;
@@ -34,11 +33,10 @@ export function AppShell({
   onImportCharacter,
   onExportCharacter,
   onDuplicateCharacter,
-  onRespecCharacter,
+  onFullRebuild,
   onRespite,
-  onLevelUp,
   onShowAbout,
-  canLevelUp = false,
+  canRespec = false,
   masterPane,
   detailPane,
   secondaryPane,
@@ -56,11 +54,10 @@ export function AppShell({
           onImportCharacter={onImportCharacter}
           onExportCharacter={onExportCharacter}
           onDuplicateCharacter={onDuplicateCharacter}
-          onRespecCharacter={onRespecCharacter}
+          onFullRebuild={onFullRebuild}
           onRespite={onRespite}
-          onLevelUp={onLevelUp}
           onShowAbout={onShowAbout}
-          canLevelUp={canLevelUp}
+          canRespec={canRespec}
         />
 
         {/* Stat Ribbon */}

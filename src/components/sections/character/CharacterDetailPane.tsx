@@ -14,6 +14,7 @@ import { isSummonerHero, isTacticianHero, isFuryHero, isConduitHero } from '@/ty
 import type { ConditionId, ConditionEndType, ActiveCondition } from '@/types/common';
 import type { SummonerHeroV2, TacticianHero, FuryHero, Formation } from '@/types/hero';
 import { LevelUpDetail } from './LevelUpDetail';
+import { RespecDetail } from './RespecDetail';
 import { RulesLink } from '@/components/shared/RulesLink';
 import { MinionInfoCard } from '@/components/portfolio/MinionInfoCard';
 import { FixtureInfoCard } from '@/components/portfolio/FixtureInfoCard';
@@ -2126,6 +2127,8 @@ export function CharacterDetailPane() {
       return <ConditionsDetail />;
     case 'level-up':
       return <LevelUpDetail />;
+    case 'respec':
+      return <RespecDetail />;
     // Class-specific items
     case 'class-mechanics':
       return <ClassMechanicsDetail />;

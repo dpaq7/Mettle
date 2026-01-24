@@ -21,6 +21,7 @@ type CharacterItemId =
   | 'perks'
   | 'conditions'
   | 'level-up'
+  | 'respec'
   // Class-specific items
   | 'class-mechanics'
   | 'formation'
@@ -214,18 +215,29 @@ export function CharacterMasterList() {
 
   const isLevelUpReady = canLevelUp(hero.level, hero.xp || 0);
   const xpDisplay = getXpRangeDisplay(hero.level, hero.xp || 0);
+  const canRespec = hero.level >= 2;
 
   return (
     <MasterList>
-      {/* Level Up - Shown at top when ready */}
-      {isLevelUpReady && (
+      {/* Progression section - shown when level up ready or can respec */}
+      {(isLevelUpReady || canRespec) && (
         <MasterListSection label="Progression">
-          <MasterListItem
-            label="Level Up!"
-            value={`Lv ${hero.level} → ${hero.level + 1}`}
-            selected={selectedItemId === 'level-up'}
-            onClick={() => setSelectedItem('level-up')}
-          />
+          {isLevelUpReady && (
+            <MasterListItem
+              label="Level Up!"
+              value={`Lv ${hero.level} → ${hero.level + 1}`}
+              selected={selectedItemId === 'level-up'}
+              onClick={() => setSelectedItem('level-up')}
+            />
+          )}
+          {canRespec && (
+            <MasterListItem
+              label="Respec"
+              value="Reset choices"
+              selected={selectedItemId === 'respec'}
+              onClick={() => setSelectedItem('respec')}
+            />
+          )}
         </MasterListSection>
       )}
 

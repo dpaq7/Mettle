@@ -55,6 +55,7 @@
 
 /* Ability Card */
 .ability-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -76,6 +77,63 @@
 
 .ability-card.insufficient-resource {
   opacity: 0.7;
+}
+
+/* Level-locked abilities (character doesn't meet level requirement) */
+.ability-card.level-locked {
+  position: relative;
+  opacity: 0.5;
+  filter: grayscale(0.3);
+}
+
+.ability-card.level-locked .ability-card-header {
+  background: var(--bg-deep);
+}
+
+.ability-card.level-locked .ability-card-name {
+  color: var(--text-muted);
+}
+
+.ability-card.level-locked .ability-card-power-roll {
+  pointer-events: none;
+}
+
+.ability-level-locked-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--status-warning);
+  color: var(--bg-void);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-sm);
+  z-index: 1;
+}
+
+.ability-level-locked-badge svg {
+  flex-shrink: 0;
+}
+
+/* Selected ability indicator */
+.ability-selected-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--status-success);
+  color: var(--bg-void);
+  border-radius: var(--radius-full);
+  z-index: 1;
 }
 
 /* Card Header */

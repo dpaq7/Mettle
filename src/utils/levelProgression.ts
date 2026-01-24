@@ -32,6 +32,20 @@ export function getXpForLevel(level: number): number {
 }
 
 /**
+ * Get the maximum achievable level for a given total XP
+ * @param totalXp - The total XP available
+ * @returns The highest level achievable (1-10)
+ */
+export function getLevelForXp(totalXp: number): number {
+  for (let level = MAX_LEVEL; level >= 1; level--) {
+    if (totalXp >= XP_THRESHOLDS[level]) {
+      return level;
+    }
+  }
+  return 1;
+}
+
+/**
  * Get the XP needed for the next level from current level
  * Returns 0 if at max level
  */

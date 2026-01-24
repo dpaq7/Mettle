@@ -5,12 +5,13 @@ import { useRollHistory } from '@/context/RollHistoryContext';
 import { useDerivedStats } from '@/hooks/useDerivedStats';
 import { getResourceConfig } from '@/data/class-resources';
 import { getClassAbilities, isAbilitySelected } from '@/data/class-abilities';
+import { GameData } from '@/lib/game-rules';
 import { standardManeuvers, standardTriggeredActions, moveActions, mainActions } from '@/data/action-economy';
 import { Ability } from '@/types/abilities';
 import { Characteristic } from '@/types/common';
 import { isFuryHero } from '@/types/hero';
 import { PowerRollResult, performPowerRoll, RollModifier, getTierColor } from '@/utils/dice';
-import { Dices, Lock, Zap } from 'lucide-react';
+import { Dices, Lock, Zap, Check } from 'lucide-react';
 import './ActionsDetailPane.css';
 
 // Parse kit power roll characteristic from string like "Might or Agility"
@@ -101,6 +102,7 @@ interface AbilityCardProps {
   characteristics: Record<Characteristic, number>;
   currentResource: number;
   resourceName: string;
+  heroLevel: number;
   kitMeleeDamageBonus?: string | null;
   kitRangedDamageBonus?: string | null;
   onRoll: (ability: Ability, result: PowerRollResult) => void;
@@ -114,6 +116,7 @@ function AbilityCard({
   characteristics,
   currentResource,
   resourceName,
+  heroLevel,
   kitMeleeDamageBonus,
   kitRangedDamageBonus,
   onRoll,
@@ -128,6 +131,11 @@ function AbilityCard({
   const cost = getAbilityCost(ability);
   const canAfford = currentResource >= cost;
   const costDisplay = formatCost(ability, resourceName);
+
+  // Level gating - check if character level is high enough to use this ability
+  const minLevelRequired = cost > 0 ? GameData.getMinLevelForAbilityCost(cost) : 1;
+  const isLevelLocked = heroLevel < minLevelRequired;
+  const canUse = canAfford && !isLevelLocked;
 
   // Calculate adjusted tier effects with kit damage bonuses
   const adjustedTiers = useMemo(() => {
@@ -212,7 +220,22 @@ function AbilityCard({
   };
 
   return (
-    <div className={`ability-card ${!canAfford && cost > 0 ? 'insufficient-resource' : ''} ${isSelected ? 'selected' : ''}`}>
+    <div className={`ability-card ${!canAfford && cost > 0 ? 'insufficient-resource' : ''} ${isLevelLocked ? 'level-locked' : ''} ${isSelected ? 'selected' : ''}`}>
+      {/* Level locked indicator */}
+      {isLevelLocked && (
+        <div className="ability-level-locked-badge">
+          <Lock size={10} />
+          <span>Level {minLevelRequired}</span>
+        </div>
+      )}
+
+      {/* Selected indicator */}
+      {isSelected && !isLevelLocked && (
+        <div className="ability-selected-badge">
+          <Check size={12} />
+        </div>
+      )}
+
       {/* Header */}
       <div className="ability-card-header">
         <h3 className="ability-card-name">{ability.name}</h3>
@@ -283,16 +306,23 @@ function AbilityCard({
               className={`modifier-btn ${getModifierClass()}`}
               onClick={cycleModifier}
               title="Toggle Edge/Bane"
+              disabled={isLevelLocked}
             >
               {getModifierLabel()}
             </button>
             <button
-              className={`roll-btn ${isRolling ? 'rolling' : ''} ${!canAfford && cost > 0 ? 'disabled' : ''}`}
+              className={`roll-btn ${isRolling ? 'rolling' : ''} ${!canUse && cost > 0 ? 'disabled' : ''}`}
               onClick={handleRoll}
-              disabled={isRolling || (!canAfford && cost > 0)}
-              title={!canAfford && cost > 0 ? `Need ${cost} ${resourceName}` : 'Roll'}
+              disabled={isRolling || (!canUse && cost > 0)}
+              title={
+                isLevelLocked
+                  ? `Requires Level ${minLevelRequired}`
+                  : !canAfford && cost > 0
+                    ? `Need ${cost} ${resourceName}`
+                    : 'Roll'
+              }
             >
-              {!canAfford && cost > 0 ? <Lock size={14} /> : <Dices size={14} />}
+              {!canUse && cost > 0 ? <Lock size={14} /> : <Dices size={14} />}
               <span>{isRolling ? '...' : 'Roll'}</span>
             </button>
           </div>
@@ -525,6 +555,7 @@ export function ActionsDetailPane() {
             characteristics={characteristics}
             currentResource={currentResource}
             resourceName={resourceConfig.name}
+            heroLevel={hero.level}
             kitMeleeDamageBonus={hero.kit.meleeDamageBonus}
             kitRangedDamageBonus={hero.kit.rangedDamageBonus}
             onRoll={handleAbilityRoll}
@@ -595,6 +626,7 @@ export function ActionsDetailPane() {
             characteristics={characteristics}
             currentResource={currentResource}
             resourceName={resourceConfig.name}
+            heroLevel={hero.level}
             kitMeleeDamageBonus={hero.kit?.meleeDamageBonus}
             kitRangedDamageBonus={hero.kit?.rangedDamageBonus}
             onRoll={handleAbilityRoll}

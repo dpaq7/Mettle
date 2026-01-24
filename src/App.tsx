@@ -100,7 +100,7 @@ function AppContent() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Hero | null>(null);
-  const [showRespecDialog, setShowRespecDialog] = useState(false);
+  const [showFullRebuildDialog, setShowFullRebuildDialog] = useState(false);
   const [respecXpToPreserve, setRespecXpToPreserve] = useState<number>(0);
 
   // Use centralized dice rolling hook
@@ -167,17 +167,18 @@ function AppContent() {
     setCharacterToDelete(null);
   }, [characterToDelete, setHero]);
 
-  const handleRespecCharacterClick = useCallback(() => {
+  // Full Rebuild (dropdown menu) - rebuilds entire character from scratch
+  const handleFullRebuildClick = useCallback(() => {
     if (hero) {
-      setShowRespecDialog(true);
+      setShowFullRebuildDialog(true);
     }
   }, [hero]);
 
-  const handleConfirmRespec = useCallback(() => {
+  const handleConfirmFullRebuild = useCallback(() => {
     if (!hero) return;
     const totalXp = (hero.xp || 0) + (hero.victories || 0);
     setRespecXpToPreserve(totalXp);
-    setShowRespecDialog(false);
+    setShowFullRebuildDialog(false);
     setHero(null);
     setShowCharacterCreation(true);
   }, [hero, setHero]);
@@ -209,8 +210,8 @@ function AppContent() {
     endCombat();
   }, [endCombat]);
 
-  // Check if can level up
-  const canLevelUp = hero ? (hero.xp || 0) >= (hero.level * 3) : false;
+  // Check if can respec (level 2+ characters)
+  const canRespec = hero ? hero.level >= 2 : false;
 
   // Get section content - must be called unconditionally (uses hooks)
   const { masterPane, detailPane, secondaryPane, fullWidthPane } = SectionContent();
@@ -256,11 +257,10 @@ function AppContent() {
         onImportCharacter={handleImportCharacter}
         onExportCharacter={handleExportCharacter}
         onDuplicateCharacter={handleDuplicateCharacter}
-        onRespecCharacter={handleRespecCharacterClick}
+        onFullRebuild={handleFullRebuildClick}
         onRespite={() => setShowRespiteConfirm(true)}
-        onLevelUp={() => setShowLevelUp(true)}
         onShowAbout={() => setShowLegalModal(true)}
-        canLevelUp={canLevelUp}
+        canRespec={canRespec}
         masterPane={masterPane}
         detailPane={detailPane}
         secondaryPane={secondaryPane}
@@ -340,12 +340,12 @@ function AppContent() {
         isCurrentCharacter={characterToDelete?.id === hero?.id}
       />
 
-      {/* Re-spec Character Confirmation Dialog */}
+      {/* Full Rebuild Character Confirmation Dialog */}
       <RespecConfirmDialog
-        open={showRespecDialog}
-        onOpenChange={setShowRespecDialog}
+        open={showFullRebuildDialog}
+        onOpenChange={setShowFullRebuildDialog}
         character={hero}
-        onConfirm={handleConfirmRespec}
+        onConfirm={handleConfirmFullRebuild}
       />
     </div>
   );

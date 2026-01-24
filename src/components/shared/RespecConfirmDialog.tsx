@@ -48,13 +48,13 @@ export const RespecConfirmDialog: React.FC<RespecConfirmDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <RefreshCcw className="w-5 h-5 text-[var(--accent-primary)]" />
-            Re-spec Character?
+            Full Rebuild Character?
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div>
               <p className="mb-3">
-                Re-speccing <strong className="text-[var(--text-primary)]">{character.name}</strong> will
-                allow you to rebuild your character from scratch, starting at the class selection step.
+                Full rebuild of <strong className="text-[var(--text-primary)]">{character.name}</strong> will
+                let you completely recreate your character from scratch, starting at the class selection step.
               </p>
 
               <div className="flex items-center gap-2 p-3 bg-[var(--bg-darkest)] border border-[var(--xp)] rounded mb-3">
@@ -103,7 +103,7 @@ export const RespecConfirmDialog: React.FC<RespecConfirmDialogProps> = ({
             className="bg-[var(--accent-primary)] hover:bg-[var(--accent-bright)] text-white"
           >
             <RefreshCcw className="w-4 h-4 mr-2" />
-            Begin Re-spec
+            Begin Full Rebuild
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
