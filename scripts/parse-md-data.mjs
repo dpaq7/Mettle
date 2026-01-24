@@ -128,6 +128,11 @@ function parseSkills() {
   console.log('Parsing skills...');
   const skillsDir = join(RULES_MD_ROOT, 'Skills');
 
+  if (!existsSync(skillsDir)) {
+    console.log('  Skills directory not found, skipping');
+    return { skillGroups: [], skills: [] };
+  }
+
   const skillGroups = [];
   const allSkills = [];
 
@@ -174,6 +179,11 @@ function parseSkills() {
 function parseConditions() {
   console.log('Parsing conditions...');
   const conditionsDir = join(RULES_MD_ROOT, 'Conditions');
+
+  if (!existsSync(conditionsDir)) {
+    console.log('  Conditions directory not found, skipping');
+    return { conditions: [] };
+  }
 
   const conditions = [];
   const files = readdirSync(conditionsDir).filter(
