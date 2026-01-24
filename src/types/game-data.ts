@@ -574,11 +574,17 @@ export interface FeaturesFile {
  * @see types/ancestry.ts
  * @see data/ancestries/ancestries.ts
  */
-export type {
-  AncestryDefinition,
+import type {
+  AncestryDefinition as AncestryDef,
   AncestrySignatureTrait,
   AncestryPurchasedTrait,
 } from './ancestry';
+
+// Re-export for external consumers
+export type { AncestryDef as AncestryDefinition, AncestrySignatureTrait, AncestryPurchasedTrait };
+
+// Make AncestryDefinition available within this file
+type AncestryDefinition = AncestryDef;
 
 /**
  * Career definition providing starting benefits.
@@ -795,7 +801,7 @@ export interface ClassBaseStats {
   /** Fixed starting Presence (if any) */
   startingPresence?: number;
   /** Available arrays for non-fixed characteristics */
-  characteristicArrays: number[][];
+  characteristicArrays?: number[][];
   /** Stamina progression */
   stamina: {
     /** Starting stamina at level 1 */
@@ -806,7 +812,7 @@ export interface ClassBaseStats {
   /** Number of recoveries */
   recoveries: number;
   /** Starting skills (references) */
-  skills: string[];
+  skills?: string[];
 }
 
 /**

@@ -84,7 +84,7 @@ const CHARACTER_ITEMS: CharacterItem[] = [
   {
     id: 'complications',
     label: 'Complications',
-    getValue: (hero) => hero.complications ? 'Defined' : undefined,
+    getValue: (hero) => hero.selectedComplication ? 'Defined' : undefined,
   },
   {
     id: 'titles',

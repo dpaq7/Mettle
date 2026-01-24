@@ -147,8 +147,8 @@ export interface Kit {
   staminaPerEchelon: number; // 0, 3, 6, 9, or 12
   speedBonus: number; // 0, 1, 2, or 3
   stabilityBonus: number; // 0, 1, or 2
-  meleeDamageBonus: DamageBonus | null; // e.g., "+2/+2/+2", "+0/+0/+4"
-  rangedDamageBonus: DamageBonus | null;
+  meleeDamageBonus: string | null; // e.g., "+2/+2/+2", "+0/+0/+4"
+  rangedDamageBonus: string | null;
   meleeDistanceBonus: number; // 0 or 1
   rangedDistanceBonus: number; // 0, 5, 7, or 10
   disengageBonus: number; // 0 or 1

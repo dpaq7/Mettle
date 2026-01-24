@@ -1,5 +1,4 @@
-import { GameData } from '@/lib/game-rules';
-import type { ConditionName } from '@/types/game-data';
+import { CONDITIONS, type ConditionDefinition, type ConditionId } from '@/data/conditions';
 import { AlertTriangle, Clock, Zap } from 'lucide-react';
 
 interface ConditionRulesDetailProps {
@@ -7,7 +6,8 @@ interface ConditionRulesDetailProps {
 }
 
 export function ConditionRulesDetail({ conditionId }: ConditionRulesDetailProps) {
-  const condition = GameData.getCondition(conditionId as ConditionName);
+  // Use the rich condition data directly from the conditions module
+  const condition: ConditionDefinition | undefined = CONDITIONS[conditionId as ConditionId];
 
   if (!condition) {
     return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSummonerContext } from '../../context/HeroContext';
-import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand, HeroAncestry } from '../../types';
+import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, MinionTemplate, QuickCommand, HeroAncestry, Portfolio } from '../../types';
+import type { KitDefinition } from '@/lib/game-rules';
 import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
 import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
 import { circleToPortfolio } from '../../types/summoner';
@@ -154,7 +155,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
   const [selectedCircle, setSelectedCircle] = useState<SummonerCircle | null>(null);
   const [selectedSignatureMinions, setSelectedSignatureMinions] = useState<MinionTemplate[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
-  const [selectedKit, setSelectedKit] = useState<Kit | null>(null);
+  const [selectedKit, setSelectedKit] = useState<KitDefinition | null>(null);
 
   // Inciting incident and complications state
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
@@ -732,7 +733,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       const portfolio = GameData.getPortfolio(portfolioType);
       const maxEssencePerTurn = calculateEssencePerTurn(level);
       const formationData = GameData.getFormation(selectedFormation!);
-      const quickCommand = formationData?.quickCommands[0];
+      const quickCommand = formationData!.quickCommands[0];
 
       const newHero: SummonerHeroV2 = {
         ...baseHeroData,
@@ -745,10 +746,15 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
         subclass: selectedCircle!,
         formation: selectedFormation!,
         quickCommand,
-        portfolio: portfolio ? {
-          ...portfolio,
+        portfolio: {
+          ...(portfolio ?? {
+            type: circleToPortfolio[selectedCircle!],
+            unlockedMinions: [],
+            fixture: {} as Portfolio['fixture'],
+            champion: null,
+          }),
           signatureMinions: selectedSignatureMinions,
-        } : { signatureMinions: selectedSignatureMinions, additionalMinions: [], championMinion: null },
+        } as Portfolio,
         activeSquads: [],
         fixture: null,
         abilities: summonerAbilitiesByLevel[1] || [],
@@ -1486,7 +1492,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
               </span>
             </div>
             <div className="options-grid">
-              {availableSignature.map((minion) => {
+              {availableSignature.map((minion: MinionTemplate) => {
                 const isSelected = selectedSignatureMinions.find(m => m.id === minion.id);
                 const isDisabled = maxMinionsReached && !isSelected;
 

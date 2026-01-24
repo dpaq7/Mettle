@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Ability, Characteristic, DamageBonus } from '../../types';
+import { Ability, Characteristic } from '../../types';
 import { PowerRollResult, getTierColor, performPowerRoll, RollModifier } from '../../utils/dice';
 import { RulesLink } from './RulesLink';
 import './AbilityCard.css';
@@ -10,14 +10,14 @@ interface AbilityCardProps {
   onRoll?: (ability: Ability, result: PowerRollResult) => void;
   expanded?: boolean;
   // Kit damage bonuses - format: "+2/+2/+2" for tier1/tier2/tier3
-  kitMeleeDamageBonus?: DamageBonus | null;
-  kitRangedDamageBonus?: DamageBonus | null;
+  kitMeleeDamageBonus?: string | null;
+  kitRangedDamageBonus?: string | null;
 }
 
 /**
  * Parse a kit damage bonus string like "+2/+2/+2" into tier values
  */
-function parseKitDamageBonus(bonus: DamageBonus | null | undefined): { tier1: number; tier2: number; tier3: number } {
+function parseKitDamageBonus(bonus: string | null | undefined): { tier1: number; tier2: number; tier3: number } {
   if (!bonus) return { tier1: 0, tier2: 0, tier3: 0 };
   const match = bonus.match(/\+(\d+)\/\+(\d+)\/\+(\d+)/);
   if (!match) return { tier1: 0, tier2: 0, tier3: 0 };

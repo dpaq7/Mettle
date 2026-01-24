@@ -1,5 +1,8 @@
 import { SummonerHero, Formation, Kit, SummonerCircle } from '../types';
-import { GameData } from '@/lib/game-rules';
+import { GameData, type KitDefinition } from '@/lib/game-rules';
+
+// Type for kit-like objects with shared properties
+type KitLike = Kit | KitDefinition;
 
 /**
  * Calculate max stamina for a Summoner hero
@@ -191,14 +194,14 @@ export const calculateMaxRecoveries = (circle?: SummonerCircle): number => {
 /**
  * Calculate speed from kit (base speed 5 + kit bonus)
  */
-export const calculateSpeed = (kit: Kit | undefined): number => {
+export const calculateSpeed = (kit: KitLike | undefined): number => {
   return 5 + (kit?.speedBonus || 0);
 };
 
 /**
  * Calculate stability from kit
  */
-export const calculateStability = (kit: Kit | undefined): number => {
+export const calculateStability = (kit: KitLike | undefined): number => {
   return kit?.stabilityBonus || 0;
 };
 

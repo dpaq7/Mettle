@@ -40,7 +40,8 @@ import { CLASS_RESOURCE_CONFIG, type HeroicResourceConfig } from '@/data/class-r
 import { PERKS } from '@/data/perks/perks-data';
 import { classDefinitions as sourceClassDefinitions, ClassDefinition } from '@/data/classes/class-definitions';
 // Summoner data
-import { portfolios, type Portfolio } from '@/data/portfolios';
+import { portfolios } from '@/data/portfolios';
+import type { Portfolio } from '@/types';
 import { formations, type FormationData } from '@/data/formations';
 // Null data
 import { NULL_TRADITIONS, type TraditionData } from '@/data/null/traditions';
@@ -64,7 +65,7 @@ import {
   type Complication,
 } from '@/data/complications';
 
-import type { Culture } from '@/types';
+import type { Culture, KitSignatureAbility } from '@/types';
 import type {
   DrawSteelData,
   Feature,
@@ -157,7 +158,7 @@ function buildClassDefinitions(): HeroClassDefinition[] {
         },
         recoveries: source.startingRecoveries,
       },
-      potency: { weak: -2, average: -1, strong: 0 },
+      potency: { weak: 'Potency - 2', average: 'Potency - 1', strong: 'Potency' },
       startingCharacteristics,
       subclassName: source.subclassName,
       subclassNamePlural: source.subclassNamePlural,
@@ -230,8 +231,8 @@ function initializeData(): DrawSteelData {
   // Monster & Trap Data Loading
   // ─────────────────────────────────────────────
 
-  // Cast imported JSON to appropriate types
-  const monstersData = monstersJson as {
+  // Cast imported JSON to appropriate types (use unknown for type-unsafe conversion)
+  const monstersData = monstersJson as unknown as {
     statblocks: MonsterStatblock[];
     features: Feature[];
   };
@@ -316,7 +317,13 @@ function initializeData(): DrawSteelData {
     kits: sourceKits as KitDefinition[],
     skills,
     conditions,
-    perks: PERKS as PerkDefinition[],
+    perks: PERKS.map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      prerequisite: p.prerequisite,
+      effect: p.description,
+    })) as PerkDefinition[],
     languages: sourceLanguages as LanguageDefinition[],
     classes: buildClassDefinitions(),
 
@@ -533,7 +540,7 @@ export const GameData = {
    * @param kitId - Kit identifier
    * @returns The signature ability or undefined
    */
-  getKitAbility: (kitId: string): Ability | undefined =>
+  getKitAbility: (kitId: string): KitSignatureAbility | undefined =>
     getData().kits.find((k) => k.id === kitId)?.signatureAbility,
 
   // ═══════════════════════════════════════════
@@ -1383,7 +1390,7 @@ export const GameData = {
    * @returns Object with stamina, stability, and speed bonuses
    */
   getAugmentationBonuses: (augmentation: string | undefined, level: number) =>
-    getAugmentationBonuses(augmentation, level),
+    getAugmentationBonuses(augmentation as Parameters<typeof getAugmentationBonuses>[0], level),
 
   // ═══════════════════════════════════════════
   // CULTURE OPTIONS
@@ -1428,6 +1435,7 @@ export const GameData = {
     return {
       id: `custom-${environmentType}-${organizationType}-${upbringingType}`,
       name: `${env.name} ${org.name} (${upb.name})`,
+      description: `A custom culture combining ${env.name.toLowerCase()} environment, ${org.name.toLowerCase()} organization, and ${upb.name.toLowerCase()} upbringing.`,
       environment: env,
       organization: org,
       upbringing: upb,
@@ -1606,7 +1614,7 @@ export {
 } from '@/types/game-data';
 
 // Re-export class-specific data types
-export type { Portfolio } from '@/data/portfolios';
+export type { Portfolio } from '@/types';
 export type { FormationData } from '@/data/formations';
 export type { TraditionData } from '@/data/null/traditions';
 export type { AugmentationData } from '@/data/null/augmentations';

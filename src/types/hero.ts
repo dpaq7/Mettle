@@ -1,7 +1,8 @@
 // Generalized Hero type for all Draw Steel classes
 // Supports all 10 classes via discriminated unions
 
-import { Ancestry, Career, Culture, Kit, Item, Characteristics, ActiveCondition, IncitingIncident, Complication } from './common';
+import { Ancestry, Career, Culture, Item, Characteristics, ActiveCondition, IncitingIncident, Complication } from './common';
+import type { KitDefinition } from './game-data';
 import { Ability, Feature } from './abilities';
 import { HeroAncestry } from './ancestry';
 import { Portfolio, Squad, Fixture, Champion } from './minion';
@@ -277,7 +278,7 @@ export interface HeroBase {
   languages: string[];
 
   // Equipment
-  kit: Kit;
+  kit: KitDefinition;
   items: Item[];
   equippedItems: EquippedItem[];
   inventory: InventoryItem[];
@@ -407,7 +408,7 @@ export interface TacticianHero extends HeroBase {
   heroClass: 'tactician';
   heroicResource: HeroicResource<'focus'>;
   markedTargets: string[];
-  secondaryKit: Kit | null; // Field Arsenal allows two kits
+  secondaryKit: KitDefinition | null; // Field Arsenal allows two kits
   subclass?: TacticianDoctrine;
 }
 
