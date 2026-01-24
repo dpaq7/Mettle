@@ -568,47 +568,17 @@ export interface FeaturesFile {
 // ============================================
 
 /**
- * Ancestry trait (signature or purchased).
- * Each ancestry has one signature trait and several purchasable traits.
+ * Re-export ancestry types from canonical source.
+ * The JSON-backed ancestries module is the authoritative source.
  *
- * @see rules-md/Ancestries/
+ * @see types/ancestry.ts
+ * @see data/ancestries/ancestries.ts
  */
-export interface AncestryTrait {
-  /** Unique identifier for the trait */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Ancestry point cost (undefined for signature traits) */
-  pointCost?: number;
-  /** Full effect description */
-  effect: string;
-  /** Raw markdown source for reference */
-  rawMarkdown?: string;
-}
-
-/**
- * Complete ancestry definition with all traits.
- *
- * @see rules-md/Ancestries/
- */
-export interface AncestryDefinition {
-  /** Unique identifier derived from scc code */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Size notation (most are "1M") */
-  size: Size;
-  /** Base speed in squares */
-  speed: number;
-  /** The single signature trait every member has */
-  signatureTrait: AncestryTrait;
-  /** Purchasable traits with point costs */
-  purchasedTraits: AncestryTrait[];
-  /** Total ancestry points available */
-  totalPoints: number;
-  /** Raw markdown source for reference */
-  rawMarkdown?: string;
-}
+export type {
+  AncestryDefinition,
+  AncestrySignatureTrait,
+  AncestryPurchasedTrait,
+} from './ancestry';
 
 /**
  * Career definition providing starting benefits.
@@ -736,7 +706,9 @@ export interface KitDefinition {
  * @see rules-md/Skills/
  */
 export interface SkillDefinition {
-  /** Skill name (used as identifier) */
+  /** Unique identifier (lowercase, hyphenated) */
+  id: string;
+  /** Skill name (display name) */
   name: string;
   /** Which skill group this belongs to */
   group: SkillGroup;

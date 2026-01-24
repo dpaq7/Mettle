@@ -2,3 +2,4 @@
 
 export * from './doctrines';
 export * from './features';
+export * from './abilities';

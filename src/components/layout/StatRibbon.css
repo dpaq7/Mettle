@@ -1,0 +1,226 @@
+/* ============================================
+   STAT RIBBON - Read-only compact stat display
+   ============================================ */
+
+.stat-ribbon {
+  display: flex;
+  align-items: center;
+  height: var(--stat-ribbon-height);
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+.stat-ribbon::-webkit-scrollbar {
+  height: 4px;
+}
+
+.stat-ribbon::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stat-ribbon::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 2px;
+}
+
+.stat-ribbon.combat {
+  border-bottom-color: var(--status-danger);
+}
+
+.stat-ribbon-empty {
+  justify-content: center;
+}
+
+.stat-ribbon-placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+/* Individual stat items */
+.stat-ribbon-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  border-right: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  height: 100%;
+}
+
+.stat-ribbon-item:last-child {
+  border-right: none;
+}
+
+.stat-ribbon-label {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.stat-ribbon-value {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.stat-ribbon-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* State variations */
+.stat-ribbon-item.warning .stat-ribbon-value {
+  color: var(--status-warning);
+}
+
+.stat-ribbon-item.critical .stat-ribbon-value {
+  color: var(--status-danger);
+  animation: pulse-critical 1.5s ease-in-out infinite;
+}
+
+.stat-ribbon-item.accent .stat-ribbon-label,
+.stat-ribbon-item.accent .stat-ribbon-value {
+  color: var(--accent);
+}
+
+/* Clickable items (open popovers) - now buttons */
+button.stat-ribbon-item.clickable {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+button.stat-ribbon-item.clickable:hover {
+  background: var(--bg-surface);
+}
+
+button.stat-ribbon-item.clickable:hover .stat-ribbon-label {
+  color: var(--text-secondary);
+}
+
+button.stat-ribbon-item.clickable:hover .stat-ribbon-value {
+  color: var(--mettle-accent);
+}
+
+button.stat-ribbon-item.clickable:focus {
+  outline: none;
+  background: var(--bg-surface);
+}
+
+button.stat-ribbon-item.clickable:focus-visible {
+  outline: 2px solid var(--mettle-accent);
+  outline-offset: -2px;
+}
+
+/* Keep warning/critical colors on hover */
+button.stat-ribbon-item.clickable.warning:hover .stat-ribbon-value {
+  color: var(--status-warning);
+}
+
+button.stat-ribbon-item.clickable.critical:hover .stat-ribbon-value {
+  color: var(--status-danger);
+}
+
+/* Accent items should keep their accent color on hover */
+button.stat-ribbon-item.clickable.accent:hover .stat-ribbon-label,
+button.stat-ribbon-item.clickable.accent:hover .stat-ribbon-value,
+button.stat-ribbon-item.clickable.accent:hover .stat-ribbon-icon {
+  color: var(--mettle-accent-hover);
+}
+
+/* Divider for combat section */
+.stat-ribbon-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-default);
+  margin: 0 var(--space-2);
+}
+
+/* Critical pulse animation */
+@keyframes pulse-critical {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Level-up ready state - glowing effect */
+button.stat-ribbon-item.level-up-ready {
+  animation: level-up-pulse 2s ease-in-out infinite;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+button.stat-ribbon-item.level-up-ready .stat-ribbon-label,
+button.stat-ribbon-item.level-up-ready .stat-ribbon-value {
+  color: var(--status-success);
+}
+
+button.stat-ribbon-item.level-up-ready:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+@keyframes level-up-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 0 rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: inset 0 0 8px 2px rgba(34, 197, 94, 0.4);
+  }
+}
+
+/* Spacer to push dice controls right */
+.stat-ribbon-spacer {
+  flex: 1;
+  min-width: var(--space-4);
+}
+
+/* Dice controls container */
+.stat-ribbon-dice-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  height: 100%;
+}
+
+/* Roll history toggle button */
+.stat-ribbon-history-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  height: 24px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stat-ribbon-history-toggle:hover {
+  background: var(--bg-surface);
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.stat-ribbon-history-toggle.active {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-elevated));
+  border-color: var(--accent);
+  color: var(--accent);
+}

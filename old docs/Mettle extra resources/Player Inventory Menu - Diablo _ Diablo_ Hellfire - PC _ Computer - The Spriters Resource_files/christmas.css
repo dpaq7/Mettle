@@ -1,0 +1,74 @@
+/* Base Theme: light.css */
+@import url('/includes/css/themes/light.css?v=christmas');
+
+/* Theme Additions */
+body {
+    background-image: url('/images/themes/christmas/bg.png');
+    background-attachment: fixed;
+}
+#header {
+    background-image: url('/images/themes/christmas/snow.gif');
+    background-size: contain;
+}
+#navigation a.logo::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 179px;
+    height: 46px;
+    background-image: url('/images/themes/christmas/logo-decoration.png');
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 179px 46px;
+}
+.iconbody {
+    background-size: cover, var(--icon-bg-size);
+    background-position: center, var(--icon-bg-position);
+    background-image: url('/images/themes/christmas/iconfrost.png'), var(--bg-icon-body);
+}
+.section {
+    background-image: url('/images/themes/christmas/bar-snow.png');
+    background-position: top;
+    background-repeat: repeat-x;
+}
+@media screen and (max-width: 1067px) {
+    body {
+        background-color: var(--bg-content);
+        background-image: none;
+    }
+    #navigation a.logo::after {
+        scale: 83%;
+        transform-origin: top left;
+    }
+}
+@media screen and (min-width: 1871px) {
+    body {
+        background-image: url('/images/themes/christmas/tree.png'), url('/images/themes/christmas/bg.png');
+        background-position: right 10px bottom, center;
+        background-repeat: no-repeat, repeat;
+    }
+    body:not(.wide) #zoomdisplay.zoomed, body:not(.wide) #zoom-controls.zoomed {
+        max-width: calc(85% - 600px);
+    }
+    .wrap {
+        width: 85%;
+    }
+}
+@media screen and (min-width: 2950px) {
+    body {
+        background-image: url('/images/themes/christmas/santa.png'), url('/images/themes/christmas/tree.png'), url('/images/themes/christmas/bg.png');
+        background-position: left 10px bottom, right 10px bottom, center;
+        background-repeat: no-repeat, no-repeat, repeat;
+    }
+}
+@media screen and (min-width: 3058px) {
+    body:not(.wide) #zoomdisplay.zoomed, body:not(.wide) #zoom-controls.zoomed {
+        max-width: 2000px;
+    }
+}
+@media screen and (min-resolution: 1.5dppx) and (min-width: 1851px) {
+    body:not(.wide) #zoomdisplay.zoomed, body:not(.wide) #zoom-controls.zoomed {
+        max-width: 1000px;
+    }
+}

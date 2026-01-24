@@ -132,8 +132,10 @@ const AncestryTraitSelector: React.FC<AncestryTraitSelectorProps> = ({
     );
   };
 
+  const budgetExhausted = remainingPoints === 0;
+
   return (
-    <div className={`ancestry-traits ${showQuickBuildFlash ? 'ancestry-traits--flash' : ''}`}>
+    <div className={`ancestry-traits ${showQuickBuildFlash ? 'ancestry-traits--flash' : ''} ${budgetExhausted ? 'ancestry-traits--budget-exhausted' : ''}`}>
       {/* Header with points tracker */}
       <div className="ancestry-traits__header">
         <h3 className="ancestry-traits__title">

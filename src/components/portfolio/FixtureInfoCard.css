@@ -1,0 +1,232 @@
+/* ============================================
+   FIXTURE INFO CARD - Full information display
+   ============================================ */
+
+.fixture-info-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+/* Header */
+.fixture-info-header {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fixture-info-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.fixture-info-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.fixture-info-type-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.fixture-info-role {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+/* Flavor Text */
+.fixture-info-flavor {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.fixture-info-flavor p {
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* Stats */
+.fixture-info-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fixture-info-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.fixture-info-stat:last-child {
+  border-right: none;
+}
+
+.fixture-info-stat-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.fixture-info-stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.fixture-info-stat-formula {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.fixture-info-stat-bonus {
+  font-size: var(--text-xs);
+  color: var(--status-success);
+  margin-top: 2px;
+}
+
+/* Traits */
+.fixture-info-traits {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fixture-info-section-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.fixture-info-trait {
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+}
+
+.fixture-info-trait:last-child {
+  margin-bottom: 0;
+}
+
+.fixture-info-trait .trait-name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.fixture-info-trait .trait-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* Level Features */
+.fixture-info-level-feature {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: opacity 0.2s ease;
+}
+
+.fixture-info-level-feature:last-child {
+  border-bottom: none;
+}
+
+.fixture-info-level-feature.locked {
+  opacity: 0.5;
+}
+
+.level-feature-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.level-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--bg-void);
+}
+
+.fixture-info-level-feature.locked .level-badge {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.unlock-note {
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--status-warning);
+}
+
+.level-feature-content {
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  margin-bottom: var(--space-2);
+}
+
+.level-feature-content:last-child {
+  margin-bottom: 0;
+}
+
+.fixture-info-level-feature.locked .level-feature-content {
+  border-left-color: var(--text-muted);
+}
+
+.level-feature-content .feature-name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.level-feature-content .feature-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}

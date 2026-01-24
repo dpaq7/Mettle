@@ -5,3 +5,4 @@ export * from './augmentations';
 export * from './enhancements';
 export * from './features';
 export * from './psi-boost';
+export * from './abilities';

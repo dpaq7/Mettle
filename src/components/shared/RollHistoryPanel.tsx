@@ -4,7 +4,7 @@ import { getTierColor } from '../../utils/dice';
 import './RollHistoryPanel.css';
 
 const RollHistoryPanel: React.FC = () => {
-  const { history, clearHistory, isHistoryOpen, toggleHistory } = useRollHistory();
+  const { history, clearHistory, isHistoryOpen } = useRollHistory();
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -20,8 +20,19 @@ const RollHistoryPanel: React.FC = () => {
       case 'hero':
         return 'H';
       default:
-        return '?';
+        return 'D';
     }
+  };
+
+  // Check if this is a simple dice roll (d6, d3, etc.) vs power roll
+  const isSimpleRoll = (entry: RollHistoryEntry) => {
+    // Simple rolls have dice[1] === 0 (we use [result, 0] for non-2d10 rolls)
+    return entry.result.dice[1] === 0;
+  };
+
+  // Check if this is a Save roll
+  const isSaveRoll = (entry: RollHistoryEntry) => {
+    return entry.source.toLowerCase().includes('save');
   };
 
   return (
@@ -38,51 +49,73 @@ const RollHistoryPanel: React.FC = () => {
           <div className="history-list">
             {history.length === 0 ? (
               <div className="history-empty">
-                No rolls yet. Use abilities or minion attacks to start rolling!
+                No rolls yet. Use the dice popover or abilities to roll!
               </div>
             ) : (
-              history.map((entry) => (
-                <div
-                  key={entry.id}
-                  className={`history-entry tier-${entry.result.tier}`}
-                >
-                  <div className="entry-header">
-                    <span
-                      className="source-icon"
-                      title={entry.sourceType}
-                    >
-                      {getSourceIcon(entry.sourceType)}
-                    </span>
-                    <span className="source-name">{entry.source}</span>
-                    <span className="entry-time">{formatTime(entry.timestamp)}</span>
-                  </div>
-                  <div className="entry-result">
-                    <span
-                      className="result-total"
-                      style={{ color: getTierColor(entry.result.tier) }}
-                    >
-                      {entry.result.total}
-                    </span>
-                    <span className="result-details">
-                      [{entry.result.dice[0]}+{entry.result.dice[1]}]
-                      {entry.result.edgeBaneBonus !== 0 && (
-                        <span className={entry.result.edgeBaneBonus > 0 ? 'edge-bonus' : 'bane-penalty'}>
-                          {entry.result.edgeBaneBonus > 0 ? '+' : ''}{entry.result.edgeBaneBonus}
-                        </span>
+              history.map((entry) => {
+                const simple = isSimpleRoll(entry);
+                const isSave = isSaveRoll(entry);
+
+                return (
+                  <div
+                    key={entry.id}
+                    className={`history-entry ${simple ? 'simple-roll' : `tier-${entry.result.tier}`} ${isSave ? 'save-roll' : ''}`}
+                  >
+                    <div className="entry-header">
+                      <span
+                        className="source-icon"
+                        title={entry.sourceType}
+                      >
+                        {getSourceIcon(entry.sourceType)}
+                      </span>
+                      <span className="source-name">{entry.source}</span>
+                      <span className="entry-time">{formatTime(entry.timestamp)}</span>
+                    </div>
+                    <div className="entry-result">
+                      {simple ? (
+                        // Simple dice roll display (d6, d3, etc.)
+                        <>
+                          <span className={`result-total ${isSave && entry.result.dice[0] >= 6 ? 'save-success' : isSave ? 'save-fail' : ''}`}>
+                            {entry.result.dice[0]}
+                          </span>
+                          {isSave && (
+                            <span className={`result-save-status ${entry.result.dice[0] >= 6 ? 'success' : 'fail'}`}>
+                              {entry.result.dice[0] >= 6 ? 'Success' : 'Fail'}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        // Power roll display
+                        <>
+                          <span
+                            className="result-total"
+                            style={{ color: getTierColor(entry.result.tier) }}
+                          >
+                            {entry.result.total}
+                          </span>
+                          <span className="result-details">
+                            [{entry.result.dice[0]}+{entry.result.dice[1]}]
+                            {entry.result.edgeBaneBonus !== 0 && (
+                              <span className={entry.result.edgeBaneBonus > 0 ? 'edge-bonus' : 'bane-penalty'}>
+                                {entry.result.edgeBaneBonus > 0 ? '+' : ''}{entry.result.edgeBaneBonus}
+                              </span>
+                            )}
+                            {entry.result.modifier !== 0 && (
+                              <> {entry.result.modifier >= 0 ? '+' : ''}{entry.result.modifier}</>
+                            )}
+                          </span>
+                          <span
+                            className="result-tier"
+                            style={{ background: getTierColor(entry.result.tier) }}
+                          >
+                            T{entry.result.tier}
+                          </span>
+                        </>
                       )}
-                      {entry.result.modifier !== 0 && (
-                        <> {entry.result.modifier >= 0 ? '+' : ''}{entry.result.modifier}</>
-                      )}
-                    </span>
-                    <span
-                      className="result-tier"
-                      style={{ background: getTierColor(entry.result.tier) }}
-                    >
-                      T{entry.result.tier}
-                    </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

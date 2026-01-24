@@ -1,5 +1,7 @@
 // Project and Inventory type definitions
 
+import type { Characteristic } from './common';
+
 export type ProjectType = 'research' | 'crafting' | 'other';
 
 export type ProjectStatus = 'not_started' | 'in_progress' | 'completed';
@@ -14,6 +16,8 @@ export interface ProjectTemplate {
   applicableSkills: string[]; // Skills that grant +2 bonus
   prerequisites?: string; // Description of required items/sources
   outcome: string; // What completing the project grants
+  characteristic?: Characteristic | Characteristic[]; // Which characteristic to roll
+  variableGoalFormula?: string; // e.g., "50 x creature level" for Find a Cure
 }
 
 export interface ActiveProject {
@@ -28,6 +32,14 @@ export interface ActiveProject {
   rollHistory: ProjectRoll[];
   createdAt: number;
   completedAt?: number;
+  customName?: string; // User-defined name override
+  selectedCharacteristic?: Characteristic; // For multi-characteristic projects
+}
+
+export interface AppliedModifier {
+  type: 'skill' | 'edge' | 'doubleEdge' | 'bane' | 'doubleBane' | 'languageBarrier';
+  name: string;
+  value: number;
 }
 
 export interface ProjectRoll {
@@ -37,6 +49,7 @@ export interface ProjectRoll {
   total: number;
   isBreakthrough: boolean; // Natural 19 or 20
   bonusRollTotal?: number; // If breakthrough, the second roll
+  appliedModifiers?: AppliedModifier[]; // Track what contributed to modifier
 }
 
 // Inventory types

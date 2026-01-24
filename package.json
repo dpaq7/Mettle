@@ -1,7 +1,7 @@
 {
   "name": "mettle",
   "private": true,
-  "version": "0.5.2",
+  "version": "0.54.0",
   "description": "Mettle - A Draw Steel TTRPG Character Manager",
   "author": "Dan Paquin",
   "license": "GPL-3.0",
@@ -64,6 +64,7 @@
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "sass": "^1.94.2",
+    "shadcn": "^3.7.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "~5.9.3",

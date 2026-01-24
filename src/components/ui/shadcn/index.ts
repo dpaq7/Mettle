@@ -85,3 +85,11 @@ export {
 } from './dropdown-menu';
 export { ScrollArea, ScrollBar } from './scroll-area';
 export { Separator } from './separator';
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+  PopoverClose,
+  type PopoverContentProps,
+} from './popover';

@@ -1,6 +1,6 @@
 /* ============================================
-   FORGE STEEL SUMMONER - App Styles
-   Using theme.css design tokens
+   METTLE - Anvil VTT Companion App Styles
+   Using Anvil design system tokens
    ============================================ */
 
 /* Root Styles - Fixed viewport height approach */
@@ -26,14 +26,22 @@ html, body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg-dark);
+  background: var(--bg-deep);
   color: var(--text-primary);
   overflow: hidden;
 }
 
 .app.dark-mode {
-  background: var(--bg-dark);
+  background: var(--bg-deep);
   color: var(--text-primary);
+}
+
+/* Character creation mode - full height, no padding (handled by CreatorShell) */
+.app-main-creation {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ============================================

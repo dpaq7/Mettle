@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #09090b; /* bg-void as default background for dark theme feel */
+  --foreground: #fafafa; /* text-primary */
+  --card: #18181b; /* bg-surface */
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --secondary: #27272a; /* bg-elevated */
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa; /* text-secondary */
+  --accent: #f59e0b;
+  --accent-foreground: #09090b;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #27272a; /* border-subtle */
+  --input: #3f3f46; /* border-default */
+  --input-background: #0f0f12; /* bg-deep */
+  --switch-background: #3f3f46;
+  --ring: #f59e0b; /* border-focus */
+  
+  --radius: 0.25rem; /* radii-sm/md approx */
+
+  /* Mettle Specific Tokens */
+  --bg-void: #09090b;
+  --bg-deep: #0f0f12;
+  --bg-surface: #18181b;
+  --bg-elevated: #27272a;
+  --bg-overlay: #3f3f46;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+
+  --border-subtle: #27272a;
+  --border-default: #3f3f46;
+  --border-focus: #f59e0b;
+
+  --mettle-accent: #f59e0b;
+  --mettle-accent-hover: #fbbf24;
+  --mettle-accent-muted: #92400e;
+
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+  --status-info: #3b82f6;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  /* Chart colors placeholder */
+  --chart-1: #f59e0b;
+  --chart-2: #3b82f6;
+  --chart-3: #22c55e;
+  --chart-4: #ef4444;
+  --chart-5: #a1a1aa;
+}
+
+.dark {
+  /* Inherits from root since we are enforcing dark mode look by default, 
+     but keeping variable structure for ShadCN compatibility */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #f59e0b;
+  --accent-foreground: #09090b;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #3f3f46;
+  --ring: #f59e0b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  
+  --color-bg-void: var(--bg-void);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-overlay: var(--bg-overlay);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-focus: var(--border-focus);
+
+  --color-mettle-accent: var(--mettle-accent);
+  --color-mettle-accent-hover: var(--mettle-accent-hover);
+  --color-mettle-accent-muted: var(--mettle-accent-muted);
+
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-danger: var(--status-danger);
+  --color-status-info: var(--status-info);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-bg-deep text-text-primary font-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-text-primary;
+  }
+}

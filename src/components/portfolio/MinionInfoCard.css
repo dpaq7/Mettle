@@ -1,0 +1,476 @@
+/* ============================================
+   MINION INFO CARD - Full information display
+   ============================================ */
+
+.minion-info-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+  transition: opacity 0.2s ease;
+}
+
+.minion-info-card.locked {
+  opacity: 0.5;
+}
+
+/* Header */
+.minion-info-header {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.minion-info-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.minion-info-essence-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  background: var(--bg-void);
+  border: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 50%;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--accent);
+}
+
+.minion-info-role {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+/* Role-specific colors */
+.minion-info-role.role-artillery {
+  background: color-mix(in srgb, #f97316 15%, transparent);
+  color: #f97316;
+}
+
+.minion-info-role.role-ambusher {
+  background: color-mix(in srgb, #8b5cf6 15%, transparent);
+  color: #8b5cf6;
+}
+
+.minion-info-role.role-brute {
+  background: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #ef4444;
+}
+
+.minion-info-role.role-controller {
+  background: color-mix(in srgb, #3b82f6 15%, transparent);
+  color: #3b82f6;
+}
+
+.minion-info-role.role-defender {
+  background: color-mix(in srgb, #6366f1 15%, transparent);
+  color: #6366f1;
+}
+
+.minion-info-role.role-harrier {
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #22c55e;
+}
+
+.minion-info-role.role-hexer {
+  background: color-mix(in srgb, #a855f7 15%, transparent);
+  color: #a855f7;
+}
+
+.minion-info-role.role-support {
+  background: color-mix(in srgb, #06b6d4 15%, transparent);
+  color: #06b6d4;
+}
+
+.minion-info-locked-badge {
+  display: inline-block;
+  margin-left: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--status-warning);
+  background: color-mix(in srgb, var(--status-warning) 15%, transparent);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+/* Stats Grid */
+.minion-info-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.minion-info-stat:nth-child(3n) {
+  border-right: none;
+}
+
+.minion-info-stat:nth-child(n+4) {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.minion-info-stat-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.minion-info-stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Keywords */
+.minion-info-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-keyword {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.minion-info-keyword.movement {
+  color: var(--status-info);
+  background: color-mix(in srgb, var(--status-info) 15%, transparent);
+}
+
+/* Characteristics */
+.minion-info-characteristics {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-char-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.minion-info-char-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.minion-info-char {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.minion-info-char .char-name {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.minion-info-char .char-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Immunities & Weaknesses */
+.minion-info-resistances {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-immunity-row,
+.minion-info-weakness-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.minion-info-immunity-row:last-child,
+.minion-info-weakness-row:last-child {
+  margin-bottom: 0;
+}
+
+.resistance-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 75px;
+}
+
+.resistance-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.resistance-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.resistance-badge.immunity {
+  color: var(--status-success);
+  background: color-mix(in srgb, var(--status-success) 15%, transparent);
+}
+
+.resistance-badge.weakness {
+  color: var(--status-danger);
+  background: color-mix(in srgb, var(--status-danger) 15%, transparent);
+}
+
+/* Traits */
+.minion-info-traits {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minion-info-traits-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.minion-info-trait {
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+}
+
+.minion-info-trait:last-child {
+  margin-bottom: 0;
+}
+
+.minion-info-trait .trait-name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.minion-info-trait .trait-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* Signature Ability */
+.minion-info-ability {
+  padding: var(--space-3);
+}
+
+.minion-info-ability-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.minion-ability-card {
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent);
+}
+
+.minion-ability-card .ability-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.minion-ability-card .ability-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.minion-ability-card .ability-action {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.minion-ability-card .ability-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.minion-ability-card .ability-keyword {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.minion-ability-card .ability-meta {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.minion-ability-card .ability-distance::before {
+  content: 'Distance: ';
+  color: var(--text-muted);
+}
+
+.minion-ability-card .ability-target::before {
+  content: 'Target: ';
+  color: var(--text-muted);
+}
+
+/* Power Roll */
+.minion-ability-card .ability-power-roll {
+  margin-bottom: var(--space-2);
+}
+
+.minion-ability-card .power-roll-header {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  padding: var(--space-2);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  text-transform: capitalize;
+}
+
+.minion-ability-card .power-roll-tiers {
+  display: flex;
+  flex-direction: column;
+}
+
+.minion-ability-card .tier {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+}
+
+.minion-ability-card .tier:last-child {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.minion-ability-card .tier-1 {
+  border-left: 3px solid var(--text-muted);
+}
+
+.minion-ability-card .tier-2 {
+  border-left: 3px solid var(--status-warning);
+}
+
+.minion-ability-card .tier-3 {
+  border-left: 3px solid var(--status-success);
+}
+
+.minion-ability-card .tier-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.minion-ability-card .tier-effect {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+/* Ability Effect */
+.minion-ability-card .ability-effect {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.minion-ability-card .effect-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-right: var(--space-1);
+}

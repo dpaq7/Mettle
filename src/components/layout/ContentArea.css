@@ -1,0 +1,222 @@
+/* ============================================
+   CONTENT AREA - Master-Detail split pane
+   ============================================ */
+
+.content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Master Pane - Left list */
+.master-pane {
+  width: var(--master-pane-width);
+  min-width: var(--master-pane-width);
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+.master-pane::-webkit-scrollbar {
+  width: 6px;
+}
+
+.master-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.master-pane::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+.master-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-overlay);
+}
+
+/* Detail Pane - Right content */
+.detail-pane {
+  flex: 1;
+  background: var(--bg-surface);
+  overflow-y: auto;
+  padding: var(--space-4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+.detail-pane::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.detail-pane::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+.detail-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-overlay);
+}
+
+/* Secondary Pane - Right side rules detail */
+.secondary-pane {
+  width: var(--secondary-pane-width);
+  min-width: var(--secondary-pane-width);
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  overflow: hidden;
+  transition: width var(--duration-normal) var(--ease-out),
+              min-width var(--duration-normal) var(--ease-out);
+}
+
+.secondary-pane.collapsed {
+  width: 0;
+  min-width: 0;
+  border-left: none;
+}
+
+.secondary-pane.open {
+  width: var(--secondary-pane-width);
+  min-width: var(--secondary-pane-width);
+}
+
+/* Full Width Layout */
+.content-area-full {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.full-width-pane {
+  flex: 1;
+  background: var(--bg-surface);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+.full-width-pane::-webkit-scrollbar {
+  width: 6px;
+}
+
+.full-width-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.full-width-pane::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+.full-width-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-overlay);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-area {
+    flex-direction: column;
+    padding-bottom: 56px; /* Space for bottom command bar */
+  }
+
+  .master-pane {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .master-pane.hidden {
+    display: none;
+  }
+
+  .detail-pane {
+    position: absolute;
+    inset: 0;
+    bottom: 56px;
+    transform: translateX(100%);
+    transition: transform var(--duration-normal) ease;
+    z-index: 50;
+  }
+
+  .detail-pane.visible {
+    transform: translateX(0);
+  }
+
+  /* Secondary pane as overlay on mobile */
+  .secondary-pane {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    width: 90vw;
+    max-width: 400px;
+    min-width: 0;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .secondary-pane.collapsed {
+    transform: translateX(100%);
+  }
+
+  .secondary-pane.open {
+    transform: translateX(0);
+    width: 90vw;
+    min-width: 0;
+  }
+}
+
+/* Tablet: Secondary pane as overlay */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .secondary-pane {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .secondary-pane.collapsed {
+    transform: translateX(100%);
+  }
+
+  .secondary-pane.open {
+    transform: translateX(0);
+  }
+}
+
+/* Overlay backdrop for mobile/tablet when secondary pane is open */
+.secondary-pane-backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .secondary-pane-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .secondary-pane-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

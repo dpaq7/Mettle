@@ -1,85 +1,229 @@
 /* ============================================
-   METTLE - Design System
-   Default theme: Midnight Ink
-   Colors are overridden by ThemeProvider
+   METTLE - Anvil VTT Design System
+   Unified dark theme for Anvil ecosystem
    ============================================ */
 
 :root {
-  /* === BACKGROUNDS === */
-  /* Midnight Ink: Cool blue/slate with warm eggshell accents */
-  --bg-darkest: #0a0f1a;      /* Deepest shadows, inputs */
-  --bg-dark: #0f1524;         /* Main app background */
-  --bg-medium: #1d2a49;       /* Cards, panels */
-  --bg-light: #2c3f6d;        /* Hover states, elevated elements */
-  --bg-hover: #3a4d7a;        /* Active hover */
-  --bg-card: #1f3047;         /* Card backgrounds */
+  /* ═══════════════════════════════════════════
+     SIMPLIFIED PALETTE - 4 Colors
+     #30364F - Navy (dark)
+     #ACBAC4 - Grey (mid)
+     #E1D9BC - Beige (accent)
+     #F0F0DB - Cream (light)
+     ═══════════════════════════════════════════ */
 
-  /* === ACCENT COLORS === */
-  /* Eggshell (warm gold) */
-  --accent-bright: #c6b26c;   /* Primary accent, active states */
-  --accent-glow: #d4c691;     /* Glowing effects */
-  --accent-soft: #e2d9b8;     /* Subtle highlights */
-  --accent-dim: #6e602b;      /* Secondary/muted accent */
+  /* ═══════════════════════════════════════════
+     BACKGROUNDS - Elevation via color
+     ═══════════════════════════════════════════ */
+  --bg-void:      #1a1d2e;    /* Darker navy - header, command bar */
+  --bg-deep:      #252a3d;    /* Dark navy - main background */
+  --bg-surface:   #30364f;    /* Navy - cards, panels */
+  --bg-elevated:  #3d445c;    /* Lighter navy - hover states */
+  --bg-overlay:   #4a526a;    /* Lightest navy - dropdowns, modals */
 
-  /* === TEXT === */
-  /* Blue Slate lights */
-  --text-primary: #eef3f6;    /* Main text */
-  --text-secondary: #9bb4ca;  /* Secondary text */
-  --text-bone: #d4e0eb;       /* Labels, parchment feel */
-  --text-muted: #5882a7;      /* Disabled, hints */
+  /* Legacy mappings for compatibility */
+  --bg-darkest: var(--bg-void);
+  --bg-dark: var(--bg-deep);
+  --bg-medium: var(--bg-surface);
+  --bg-light: var(--bg-elevated);
+  --bg-hover: var(--bg-elevated);
+  --bg-card: var(--bg-surface);
+  --bg-input: var(--bg-void);
+  --bg-card-hover: var(--bg-elevated);
 
-  /* === BORDERS === */
-  /* Dusty Denim */
-  --border-glow: rgba(198, 178, 108, 0.25);
-  --border-solid: #394a60;
-  --border-bright: #c6b26c;
+  /* ═══════════════════════════════════════════
+     TEXT COLORS - Three levels only
+     ═══════════════════════════════════════════ */
+  --text-primary:   #F0F0DB;  /* Cream - main content, headings */
+  --text-secondary: #ACBAC4;  /* Grey - supporting text, labels */
+  --text-muted:     #6b7280;  /* Dimmed grey - disabled, hints */
 
-  /* === STATUS COLORS === */
-  --success: #4caf50;
-  --success-dim: rgba(76, 175, 80, 0.15);
-  --success-dark: #1a2a2a;
-  --danger: #ef5350;
-  --danger-dim: rgba(239, 83, 80, 0.15);
+  /* Legacy mappings */
+  --text-bone: var(--text-secondary);
+  --text-dim: var(--text-muted);
+
+  /* ═══════════════════════════════════════════
+     ACCENT COLORS - Warm Beige
+     ═══════════════════════════════════════════ */
+  --accent:         #E1D9BC;  /* Beige - primary interactive */
+  --accent-hover:   #F0F0DB;  /* Cream - hover state */
+  --accent-muted:   #a89f87;  /* Muted beige - subtle accent */
+
+  /* Legacy mappings */
+  --accent-bright: var(--accent);
+  --accent-primary: var(--accent);
+  --accent-dim: var(--accent-muted);
+  /* Removed: --accent-glow, --accent-soft (no glow effects) */
+
+  /* ═══════════════════════════════════════════
+     BORDER COLORS
+     ═══════════════════════════════════════════ */
+  --border-subtle:  #3d445c;  /* Navy border - dividers */
+  --border-default: #4a526a;  /* Lighter navy - interactive borders */
+  --border-focus:   #E1D9BC;  /* Beige - focus rings */
+
+  /* Legacy mappings */
+  --border-solid: var(--border-subtle);
+  --border-dark: var(--border-subtle);
+  --border-light: var(--border-default);
+  --border-bright: var(--accent);
+  /* Removed: --border-glow (no glow effects) */
+
+  /* ═══════════════════════════════════════════
+     STATUS COLORS - Semantic meaning only
+     ═══════════════════════════════════════════ */
+  --status-success:   #22c55e;  /* Confirmations, positive outcomes */
+  --status-warning:   #f59e0b;  /* Attention needed (same as accent) */
+  --status-danger:    #ef4444;  /* Errors, destructive actions, damage */
+  --status-info:      #3b82f6;  /* Informational, essence/power */
+
+  /* Legacy mappings */
+  --success: var(--status-success);
+  --success-dim: rgba(34, 197, 94, 0.15);
+  --success-dark: #1a2a1a;
+  --danger: var(--status-danger);
+  --danger-dim: rgba(239, 68, 68, 0.15);
   --danger-dark: #2a1a1a;
-  --warning: #ff9800;
-  --warning-dim: rgba(255, 152, 0, 0.15);
-  --info: #496ab6;
-  --essence: #496ab6;
-  --essence-dim: rgba(73, 106, 182, 0.15);
-  --xp: #b89f47;
-  --xp-dim: rgba(184, 159, 71, 0.15);
+  --warning: var(--status-warning);
+  --warning-dim: rgba(245, 158, 11, 0.15);
+  --info: var(--status-info);
+  --essence: var(--status-info);
+  --essence-dim: rgba(59, 130, 246, 0.15);
+  --xp: var(--accent);
+  --xp-dim: rgba(245, 158, 11, 0.15);
+  --color-danger: var(--status-danger);
+  --color-danger-dim: var(--danger-dim);
+  --color-warning: var(--status-warning);
+  --color-warning-dim: var(--warning-dim);
+  --color-success: var(--status-success);
+  --color-success-dim: var(--success-dim);
+  --color-essence: var(--status-info);
+  --color-essence-dim: var(--essence-dim);
+  --color-xp: var(--accent);
+  --color-xp-dim: var(--xp-dim);
 
-  /* === EFFECTS === */
-  --shadow-glow: 0 0 10px rgba(198, 178, 108, 0.3), 0 0 20px rgba(198, 178, 108, 0.15);
-  --shadow-glow-strong: 0 0 15px rgba(198, 178, 108, 0.5), 0 0 30px rgba(198, 178, 108, 0.25);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.5);
-  --inner-glow: inset 0 0 20px rgba(198, 178, 108, 0.1);
-  --text-glow: 0 0 10px rgba(198, 178, 108, 0.5);
+  /* ═══════════════════════════════════════════
+     ACTION TYPE COLORS - Semantic for abilities
+     ═══════════════════════════════════════════ */
+  /* Main Actions - Blue */
+  --action-main:        #3b82f6;
+  --action-main-bg:     rgba(59, 130, 246, 0.1);
+  --action-main-border: #3b82f6;
 
-  /* === SPACING === */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
+  /* Maneuvers - Green */
+  --action-maneuver:        #22c55e;
+  --action-maneuver-bg:     rgba(34, 197, 94, 0.1);
+  --action-maneuver-border: #22c55e;
 
-  /* === TYPOGRAPHY === */
+  /* Triggered Actions - Orange */
+  --action-triggered:        #f97316;
+  --action-triggered-bg:     rgba(249, 115, 22, 0.1);
+  --action-triggered-border: #f97316;
 
+  /* Free Triggered - Pink */
+  --action-free:        #ec4899;
+  --action-free-bg:     rgba(236, 72, 153, 0.1);
+  --action-free-border: #ec4899;
+
+  /* Heroic/Class Abilities - Purple */
+  --action-heroic:        #a855f7;
+  --action-heroic-bg:     rgba(168, 85, 247, 0.1);
+  --action-heroic-border: #a855f7;
+
+  /* Signature Abilities - Cyan */
+  --action-signature:        #06b6d4;
+  --action-signature-bg:     rgba(6, 182, 212, 0.1);
+  --action-signature-border: #06b6d4;
+
+  /* Villain Actions - Red */
+  --action-villain:        #ef4444;
+  --action-villain-bg:     rgba(239, 68, 68, 0.1);
+  --action-villain-border: #ef4444;
+
+  /* Utility/General - Gray */
+  --action-utility:        #6b7280;
+  --action-utility-bg:     rgba(107, 114, 128, 0.1);
+  --action-utility-border: #6b7280;
+
+  /* Legacy action mappings */
+  --action-main-accent: var(--action-main);
+  --action-main-header: var(--action-main-bg);
+  --action-maneuver-accent: var(--action-maneuver);
+  --action-maneuver-header: var(--action-maneuver-bg);
+  --action-triggered-accent: var(--action-triggered);
+  --action-triggered-header: var(--action-triggered-bg);
+  --action-free-accent: var(--action-free);
+  --action-free-header: var(--action-free-bg);
+  --action-heroic-accent: var(--action-heroic);
+  --action-heroic-header: var(--action-heroic-bg);
+  --action-signature-accent: var(--action-signature);
+  --action-signature-header: var(--action-signature-bg);
+  --action-villain-accent: var(--action-villain);
+  --action-villain-header: var(--action-villain-bg);
+  --action-utility-accent: var(--action-utility);
+  --action-utility-header: var(--action-utility-bg);
+  /* Removed: --action-*-glow (no glow effects) */
+
+  /* ═══════════════════════════════════════════
+     SHADOWS - Minimal, focus-only
+     ═══════════════════════════════════════════ */
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:    0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg:    0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px rgba(225, 217, 188, 0.3);
+
+  /* Legacy mappings - map glow to minimal shadows */
+  --shadow-card: var(--shadow-sm);
+  --shadow-glow: none;
+  --shadow-glow-strong: none;
+  --inner-glow: none;
+  --text-glow: none;
+  --accent-border: var(--border-focus);
+
+  /* ═══════════════════════════════════════════
+     SPACING - 4px grid for information density
+     ═══════════════════════════════════════════ */
+  --space-1:   0.25rem;   /*  4px - Default tight spacing */
+  --space-2:   0.5rem;    /*  8px - Standard gap */
+  --space-3:   0.75rem;   /* 12px - Comfortable spacing */
+  --space-4:   1rem;      /* 16px - Section padding */
+  --space-6:   1.5rem;    /* 24px - Major sections */
+  --space-8:   2rem;      /* 32px - Page-level spacing */
+
+  /* Legacy mappings */
+  --space-xs: var(--space-1);
+  --space-sm: var(--space-2);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-6);
+  --space-xl: var(--space-8);
+
+  /* ═══════════════════════════════════════════
+     TYPOGRAPHY
+     ═══════════════════════════════════════════ */
   /* Font Families */
   --font-display: 'Cinzel', 'Times New Roman', Georgia, serif;
   --font-body: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* Legacy variable for compatibility */
+  /* Legacy variable */
   --font-family: var(--font-body);
 
-  /* Font Sizes - Minimum readable size is 0.8rem (12.8px) */
-  --font-size-xs: 0.8rem;
-  --font-size-sm: 0.875rem;
-  --font-size-md: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 2rem;
+  /* Font Sizes - Type scale */
+  --text-xs:    0.75rem;   /* 12px - Timestamps, badges */
+  --text-sm:    0.875rem;  /* 14px - Secondary text, labels */
+  --text-base:  1rem;      /* 16px - Body text, default */
+  --text-lg:    1.25rem;   /* 20px - Emphasis, subheadings */
+  --text-xl:    1.5rem;    /* 24px - Section headings */
+  --text-2xl:   2rem;      /* 32px - Hero name, page titles */
+
+  /* Legacy mappings */
+  --font-size-xs: var(--text-xs);
+  --font-size-sm: var(--text-sm);
+  --font-size-md: var(--text-base);
+  --font-size-lg: var(--text-lg);
+  --font-size-xl: var(--text-xl);
+  --font-size-2xl: var(--text-xl);
+  --font-size-3xl: var(--text-2xl);
 
   /* Font Weights */
   --font-weight-normal: 400;
@@ -98,105 +242,84 @@
   --letter-spacing-wide: 0.05em;
   --letter-spacing-wider: 0.1em;
 
-  /* === BORDERS/RADIUS === */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  /* ═══════════════════════════════════════════
+     BORDERS/RADIUS
+     ═══════════════════════════════════════════ */
+  --radius-sm:    4px;     /* Small elements, badges */
+  --radius-md:    8px;     /* Buttons, inputs, cards */
+  --radius-lg:    12px;    /* Panels, dialogs */
+  --radius-full:  9999px;  /* Pills, avatars */
 
-  /* === TRANSITIONS === */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.2s ease;
-  --transition-slow: 0.3s ease;
+  /* Legacy mappings */
+  --radius-xl: var(--radius-lg);
+
+  /* ═══════════════════════════════════════════
+     TRANSITIONS - Professional, no bounce
+     ═══════════════════════════════════════════ */
+  --duration-fast:   150ms;
+  --duration-normal: 200ms;
+  --duration-slow:   300ms;
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+
+  /* Legacy mappings */
+  --transition-fast: var(--duration-fast) ease;
+  --transition-normal: var(--duration-normal) ease;
+  --transition-slow: var(--duration-slow) ease;
+
+  /* ═══════════════════════════════════════════
+     LAYOUT DIMENSIONS
+     ═══════════════════════════════════════════ */
+  --header-height: 48px;
+  --stat-ribbon-height: 32px;
+  --command-bar-width: 72px;
+  --master-pane-width: 280px;
+  --secondary-pane-width: 320px;
+
+  /* ═══════════════════════════════════════════
+     CHAMFER (Anvil visual signature)
+     ═══════════════════════════════════════════ */
+  --chamfer-sm:  8px;
+  --chamfer-md:  12px;
+  --chamfer-lg:  16px;
 }
 
 /* ============================================
-   LEGACY VARIABLE MAPPINGS
-   Map old variable names to new system
+   UTILITY CLASSES
    ============================================ */
-:root {
-  /* Background mappings */
-  --bg-card: var(--bg-medium);
-  --bg-card-hover: var(--bg-light);
-  --bg-input: var(--bg-darkest);
 
-  /* Accent mappings */
-  --accent-primary: var(--accent-bright);
-  --accent-border: var(--border-glow);
+/* Chamfered elements */
+.chamfered {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-md)),
+    calc(100% - var(--chamfer-md)) 100%,
+    0 100%
+  );
+}
 
-  /* Border mappings */
-  --border-dark: var(--border-solid);
-  --border-light: var(--border-bright);
+.chamfered-sm {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-sm)),
+    calc(100% - var(--chamfer-sm)) 100%,
+    0 100%
+  );
+}
 
-  /* Text mappings - keep some for compatibility */
-  --text-dim: var(--text-muted);
+.chamfered-lg {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-lg)),
+    calc(100% - var(--chamfer-lg)) 100%,
+    0 100%
+  );
+}
 
-  /* Color mappings */
-  --color-danger: var(--danger);
-  --color-danger-dim: var(--danger-dim);
-  --color-warning: var(--warning);
-  --color-warning-dim: var(--warning-dim);
-  --color-success: var(--success);
-  --color-success-dim: var(--success-dim);
-  --color-essence: var(--essence);
-  --color-essence-dim: var(--essence-dim);
-  --color-xp: var(--xp);
-  --color-xp-dim: var(--xp-dim);
-
-  /* === ACTION CARD COLORS === */
-  /* Main Actions - Blue */
-  --action-main-bg: #1a2a3a;
-  --action-main-border: #4a90c2;
-  --action-main-accent: #64b5f6;
-  --action-main-glow: rgba(100, 181, 246, 0.3);
-  --action-main-header: #2a4a6a;
-
-  /* Maneuvers - Green */
-  --action-maneuver-bg: #2a3a1a;
-  --action-maneuver-border: #7cb342;
-  --action-maneuver-accent: #9ccc65;
-  --action-maneuver-glow: rgba(156, 204, 101, 0.3);
-  --action-maneuver-header: #3a5a2a;
-
-  /* Triggered Actions - Orange */
-  --action-triggered-bg: #3a2a1a;
-  --action-triggered-border: #ff9800;
-  --action-triggered-accent: #ffb74d;
-  --action-triggered-glow: rgba(255, 183, 77, 0.3);
-  --action-triggered-header: #5a3a1a;
-
-  /* Free Strikes - Pink */
-  --action-free-bg: #3a1a2a;
-  --action-free-border: #e91e63;
-  --action-free-accent: #f06292;
-  --action-free-glow: rgba(240, 98, 146, 0.3);
-  --action-free-header: #5a2a3a;
-
-  /* Heroic/Class Abilities - Purple */
-  --action-heroic-bg: #2a1a3a;
-  --action-heroic-border: #9c27b0;
-  --action-heroic-accent: #ba68c8;
-  --action-heroic-glow: rgba(186, 104, 200, 0.3);
-  --action-heroic-header: #3a2a5a;
-
-  /* Signature Abilities - Cyan */
-  --action-signature-bg: #1a3a3a;
-  --action-signature-border: #00bcd4;
-  --action-signature-accent: #4dd0e1;
-  --action-signature-glow: rgba(77, 208, 225, 0.3);
-  --action-signature-header: #1a4a4a;
-
-  /* Villain Actions - Red */
-  --action-villain-bg: #2a1a1a;
-  --action-villain-border: #b71c1c;
-  --action-villain-accent: #ef5350;
-  --action-villain-glow: rgba(239, 83, 80, 0.3);
-  --action-villain-header: #4a1a1a;
-
-  /* Utility/General - Gray */
-  --action-utility-bg: #1a2a2a;
-  --action-utility-border: #607d8b;
-  --action-utility-accent: #90a4ae;
-  --action-utility-glow: rgba(144, 164, 174, 0.3);
-  --action-utility-header: #2a3a3a;
+/* Focus visible utility */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
 }

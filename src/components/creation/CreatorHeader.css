@@ -1,0 +1,80 @@
+/* CreatorHeader - Character Creation Header */
+
+.creator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height, 48px);
+  padding: 0 var(--space-4);
+  background: var(--bg-void);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.creator-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.creator-header-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.creator-header-name {
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.creator-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.creator-header-respec-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--accent-muted);
+  border-radius: var(--radius-md);
+}
+
+.respec-label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.respec-value {
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.creator-header-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.creator-header-cancel:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}

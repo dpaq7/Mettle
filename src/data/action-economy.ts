@@ -1,19 +1,22 @@
-// Standard action economy options from Draw Steel
+/**
+ * Standard action economy options from Draw Steel Heroes v1
+ * Synced with canonical rules from data-rules-md
+ */
 import { Ability } from '../types';
 
 // Standard Maneuvers available to all heroes
 export const standardManeuvers: Ability[] = [
   {
-    id: 'aid_attack',
+    id: 'aid-attack',
     name: 'Aid Attack',
     actionType: 'maneuver',
     keywords: [],
-    distance: 'Reach 1',
+    distance: 'Melee 1',
     target: 'One ally',
-    effect: 'The target gains an Edge on their next attack roll before the end of their next turn.',
+    effect: 'The target gains an edge on their next attack roll before the end of their next turn.',
   },
   {
-    id: 'catch_breath',
+    id: 'catch-breath',
     name: 'Catch Breath',
     actionType: 'maneuver',
     keywords: [],
@@ -22,22 +25,35 @@ export const standardManeuvers: Ability[] = [
     effect: 'Spend one Recovery to regain Stamina equal to your Recovery Value.',
   },
   {
-    id: 'drink_potion',
-    name: 'Drink a Potion',
+    id: 'escape-grab',
+    name: 'Escape Grab',
     actionType: 'maneuver',
     keywords: [],
     distance: 'Self',
     target: 'Self',
-    effect: 'Consume a potion you are carrying and gain its effects.',
+    powerRoll: {
+      characteristic: 'might',
+      alternativeCharacteristics: ['agility'],
+      tier1: 'No effect.',
+      tier2: 'You can escape the grab, but if you do, a creature who has you grabbed can make a melee free strike against you before you are no longer grabbed.',
+      tier3: 'You are no longer grabbed.',
+    },
+    effect: 'You take a bane on this maneuver if your size is smaller than the size of the creature, object, or effect that has you grabbed.',
   },
   {
     id: 'grab',
     name: 'Grab',
     actionType: 'maneuver',
-    keywords: [],
-    distance: 'Reach 1',
-    target: 'One creature your size or smaller',
-    effect: 'Make a Might test vs the target\'s Might. On success, the target is grabbed (restrained until they escape or you release them).',
+    keywords: ['Melee', 'Weapon'],
+    distance: 'Melee 1',
+    target: 'One creature',
+    powerRoll: {
+      characteristic: 'might',
+      tier1: 'No effect.',
+      tier2: 'You can grab the target, but if you do, the target can make a melee free strike against you before they are grabbed.',
+      tier3: 'The target is grabbed by you.',
+    },
+    effect: 'You can usually target only creatures of your size or smaller. If your Might score is 2 or higher, you can target any creature with a size equal to or less than your Might score.',
   },
   {
     id: 'hide',
@@ -49,17 +65,32 @@ export const standardManeuvers: Ability[] = [
     effect: 'Make an Agility test to become hidden if you are concealed or behind cover. Enemies cannot target you with abilities that require line of sight until you attack or move into the open.',
   },
   {
-    id: 'make_assist_test',
+    id: 'knockback',
+    name: 'Knockback',
+    actionType: 'maneuver',
+    keywords: ['Melee', 'Weapon'],
+    distance: 'Melee 1',
+    target: 'One creature',
+    powerRoll: {
+      characteristic: 'might',
+      tier1: 'Push 1',
+      tier2: 'Push 2',
+      tier3: 'Push 3',
+    },
+    effect: 'You can usually target only creatures of your size or smaller. If your Might score is 2 or higher, you can target any creature with a size equal to or less than your Might score.',
+  },
+  {
+    id: 'make-assist-test',
     name: 'Make or Assist a Test',
     actionType: 'maneuver',
     keywords: [],
     distance: 'Varies',
     target: 'Varies',
-    effect: 'Make a skill test (climbing, jumping, etc.) or assist an ally with their test, granting them an Edge.',
+    effect: 'Make a skill test (climbing, jumping, etc.) or assist an ally with their test, granting them an edge.',
   },
   {
     id: 'search',
-    name: 'Search',
+    name: 'Search for Hidden Creatures',
     actionType: 'maneuver',
     keywords: [],
     distance: 'Self',
@@ -67,13 +98,22 @@ export const standardManeuvers: Ability[] = [
     effect: 'Make an Intuition test to search for hidden creatures or objects in the area.',
   },
   {
-    id: 'stand_up',
+    id: 'stand-up',
     name: 'Stand Up',
     actionType: 'maneuver',
     keywords: [],
     distance: 'Self',
     target: 'Self',
     effect: 'If you are prone, you stand up.',
+  },
+  {
+    id: 'use-consumable',
+    name: 'Use Consumable',
+    actionType: 'maneuver',
+    keywords: [],
+    distance: 'Self',
+    target: 'Self',
+    effect: 'Consume a potion or other consumable you are carrying and gain its effects.',
   },
 ];
 
@@ -120,6 +160,46 @@ export const moveActions: Ability[] = [
     distance: 'Self',
     target: 'Self',
     effect: 'Shift 1 square. This movement does not provoke opportunity attacks.',
+  },
+  {
+    id: 'ride',
+    name: 'Ride',
+    actionType: 'action',
+    keywords: ['Move'],
+    distance: 'Self',
+    target: 'Self',
+    effect: 'While mounted, cause your mount to move up to their speed, taking you with them. Alternatively, have your mount use the Disengage move action as a free triggered action. You can use the Ride move action only once per round.',
+  },
+];
+
+// Main actions available to all heroes
+export const mainActions: Ability[] = [
+  {
+    id: 'defend',
+    name: 'Defend',
+    actionType: 'action',
+    keywords: [],
+    distance: 'Self',
+    target: 'Self',
+    effect: 'Ability rolls made against you have a double bane until the start of your next turn. Additionally, you have a double edge on tests to resist environmental effects or a creature\'s traits or abilities. You gain no benefit from this action while another creature is taunted by you.',
+  },
+  {
+    id: 'heal',
+    name: 'Heal',
+    actionType: 'action',
+    keywords: [],
+    distance: 'Melee 1',
+    target: 'One adjacent creature',
+    effect: 'The target can spend a Recovery to regain Stamina, or can make a saving throw against one effect they are suffering that is ended by a saving throw.',
+  },
+  {
+    id: 'charge',
+    name: 'Charge',
+    actionType: 'action',
+    keywords: ['Charge', 'Move'],
+    distance: 'Self',
+    target: 'Self',
+    effect: 'Move up to your speed in a straight line, then make a melee free strike against a target when you end your move. If you have an ability with the Charge keyword, you can use that ability instead of a free strike. You can\'t move through difficult terrain or shift when you charge.',
   },
 ];
 
@@ -197,6 +277,7 @@ export const quickCommands: QuickCommand[] = [
 
 // All action economy options grouped
 export const actionEconomy = {
+  mainActions,
   moveActions,
   standardManeuvers,
   standardTriggeredActions,

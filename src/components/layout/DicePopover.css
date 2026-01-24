@@ -1,0 +1,263 @@
+/* ============================================
+   DICE POPOVER - Styling
+   ============================================ */
+
+.dice-popover-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  height: 24px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dice-popover-trigger:hover {
+  background: var(--bg-surface);
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.dice-popover-content {
+  width: 280px;
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border-color: var(--border-default);
+}
+
+.dice-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.dice-popover-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Edge/Bane Toggle */
+.edge-bane-toggle {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.edge-bane-toggle:hover {
+  border-color: var(--accent-dim);
+}
+
+.edge-bane-toggle.edge {
+  background: color-mix(in srgb, var(--success) 20%, transparent);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.edge-bane-toggle.bane {
+  background: color-mix(in srgb, var(--error) 20%, transparent);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.edge-bane-toggle.double-edge {
+  background: color-mix(in srgb, var(--success) 35%, transparent);
+  border-color: var(--success);
+  color: var(--success);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--success) 40%, transparent);
+}
+
+.edge-bane-toggle.double-bane {
+  background: color-mix(in srgb, var(--error) 35%, transparent);
+  border-color: var(--error);
+  color: var(--error);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--error) 40%, transparent);
+}
+
+/* Characteristic Grid */
+.dice-char-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+}
+
+.dice-char-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dice-char-button:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-dim);
+  transform: translateY(-1px);
+}
+
+.dice-char-button:active {
+  transform: translateY(0);
+}
+
+.dice-char-button.selected {
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg-surface));
+  border-color: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.dice-char-button.selected .dice-char-abbr {
+  color: var(--accent);
+}
+
+.dice-char-abbr {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+}
+
+.dice-char-mod {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Main Roll Button */
+.dice-roll-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+  background: var(--accent);
+  border: none;
+  color: var(--bg-void);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  /* Anvil chamfer shape */
+  clip-path: polygon(
+    4px 0, calc(100% - 4px) 0,
+    100% 4px, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%,
+    0 calc(100% - 4px), 0 4px
+  );
+}
+
+.dice-roll-button:hover:not(.disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.dice-roll-button:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+.dice-roll-button.disabled {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.dice-roll-button svg {
+  flex-shrink: 0;
+}
+
+/* Divider */
+.dice-popover-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--space-3) 0;
+}
+
+/* Quick Dice Section */
+.dice-quick-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dice-quick-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+}
+
+.dice-quick-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dice-quick-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dice-quick-button:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-dim);
+}
+
+.dice-quick-button.save {
+  background: color-mix(in srgb, var(--warning) 10%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--border-subtle));
+}
+
+.dice-quick-button.save:hover {
+  background: color-mix(in srgb, var(--warning) 20%, var(--bg-surface));
+  border-color: var(--warning);
+}
+
+.dice-icon {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+.dice-quick-button:hover .dice-icon {
+  color: var(--text-primary);
+}

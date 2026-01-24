@@ -1,0 +1,143 @@
+/* ============================================
+   CreatorShell - Character Creation Layout
+   Follows AppShell pattern: Header > Ribbon > CommandBar|Master|Detail
+   ============================================ */
+
+.creator-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* Body - CommandBar + Master + Detail */
+.creator-shell-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Master Pane */
+.creator-master-pane {
+  width: var(--master-pane-width, 280px);
+  flex-shrink: 0;
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Detail Pane */
+.creator-detail-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+.creator-detail-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* Step content wrapper */
+.creator-step-content {
+  min-height: 100%;
+}
+
+.creator-step-content .creation-step {
+  min-height: auto;
+}
+
+/* Navigation Footer */
+.creator-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-6);
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border-subtle);
+  gap: var(--space-4);
+}
+
+.creator-nav-progress {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.creator-nav-btn {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) ease;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.creator-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.creator-nav-back {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.creator-nav-back:hover:not(:disabled) {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+.creator-nav-next {
+  background: var(--accent);
+  color: var(--bg-void);
+  border: none;
+  font-weight: var(--font-weight-semibold);
+}
+
+.creator-nav-next:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+  .creator-master-pane {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .creator-shell-body {
+    flex-direction: column;
+  }
+
+  .creator-master-pane {
+    width: 100%;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .creator-detail-content {
+    padding: var(--space-4);
+  }
+
+  .creator-navigation {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .creator-nav-btn {
+    min-width: 100px;
+    padding: var(--space-2) var(--space-3);
+  }
+}

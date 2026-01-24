@@ -193,3 +193,7 @@ export interface Weakness {
   type: DamageType;
   value: number;
 }
+
+// Re-export inciting incident and complication types from data
+export type { IncitingIncident } from '../data/inciting-incidents';
+export type { Complication } from '../data/complications';

@@ -48,13 +48,13 @@ describe('Stamina Calculations', () => {
 
     it('calculates stamina bonus for level 2+', () => {
       const hero = createHeroForStamina(2);
-      expect(calculateMaxStamina(hero)).toBe(27); // 15 + (2 * 6)
+      expect(calculateMaxStamina(hero)).toBe(21); // 15 + ((2-1) * 6) = 21
     });
 
     it('calculates stamina for level 5 with kit', () => {
       const hero = createHeroForStamina(5, 3);
-      // Base 15 + kit (3 * 2 echelons) + level bonus (5 * 6)
-      expect(calculateMaxStamina(hero)).toBe(15 + 6 + 30);
+      // Base 15 + kit (3 * 2 echelons) + level bonus ((5-1) * 6 = 24)
+      expect(calculateMaxStamina(hero)).toBe(15 + 6 + 24); // = 45
     });
 
     it('handles missing level by defaulting to 1', () => {

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Ability, Characteristic, DamageBonus } from '../../types';
 import { PowerRollResult, getTierColor, performPowerRoll, RollModifier } from '../../utils/dice';
+import { RulesLink } from './RulesLink';
 import './AbilityCard.css';
 
 interface AbilityCardProps {
@@ -223,9 +224,14 @@ const AbilityCard: React.FC<AbilityCardProps> = ({
             {ability.keywords.length > 0 && (
               <div className="ability-keywords">
                 {ability.keywords.map((keyword) => (
-                  <span key={keyword} className="keyword-tag">
-                    {keyword}
-                  </span>
+                  <RulesLink
+                    key={keyword}
+                    type="keyword"
+                    id={keyword.toLowerCase()}
+                    className="keyword-tag-link"
+                  >
+                    <span className="keyword-tag">{keyword}</span>
+                  </RulesLink>
                 ))}
               </div>
             )}

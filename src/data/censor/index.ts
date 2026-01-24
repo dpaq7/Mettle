@@ -2,3 +2,4 @@
 
 export * from './orders';
 export * from './features';
+export * from './abilities';

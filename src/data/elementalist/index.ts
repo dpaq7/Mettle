@@ -2,3 +2,4 @@
 
 export * from './elements';
 export * from './features';
+export * from './abilities';

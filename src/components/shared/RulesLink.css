@@ -1,0 +1,86 @@
+/* ============================================
+   RULES LINK - Clickable link for opening secondary detail pane
+   ============================================ */
+
+.rules-link {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+
+  /* Link styling */
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px dotted var(--accent-muted);
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+
+  /* Inline display */
+  display: inline;
+  text-align: left;
+}
+
+.rules-link:hover {
+  border-bottom-style: solid;
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.rules-link:focus {
+  outline: none;
+}
+
+.rules-link:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-sm);
+  padding: 0 2px;
+  margin: 0 -2px;
+}
+
+.rules-link:active {
+  color: var(--accent);
+}
+
+/* Condition type - slightly different styling */
+.rules-link[data-type="condition"] {
+  color: var(--status-warning);
+  border-color: color-mix(in srgb, var(--status-warning) 50%, transparent);
+}
+
+.rules-link[data-type="condition"]:hover {
+  border-color: var(--status-warning);
+  color: var(--status-warning);
+}
+
+/* Skill type */
+.rules-link[data-type="skill"] {
+  color: var(--status-info);
+  border-color: color-mix(in srgb, var(--status-info) 50%, transparent);
+}
+
+.rules-link[data-type="skill"]:hover {
+  border-color: var(--status-info);
+}
+
+/* Ability type - heroic purple */
+.rules-link[data-type="ability"] {
+  color: var(--action-heroic);
+  border-color: color-mix(in srgb, var(--action-heroic) 50%, transparent);
+}
+
+.rules-link[data-type="ability"]:hover {
+  border-color: var(--action-heroic);
+}
+
+/* Perk type - success green */
+.rules-link[data-type="perk"] {
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 50%, transparent);
+}
+
+.rules-link[data-type="perk"]:hover {
+  border-color: var(--status-success);
+}

@@ -3,16 +3,11 @@ import { useSummonerContext } from '../../context/HeroContext';
 import { SummonerHero, SummonerCircle, Formation, Ancestry, Culture, Career, Kit, MinionTemplate, QuickCommand, HeroAncestry } from '../../types';
 import { HeroClass, Hero, SummonerHeroV2, TalentHero, CensorHero, ConduitHero, ElementalistHero, FuryHero, NullHero, ShadowHero, TacticianHero, TroubadourHero } from '../../types/hero';
 import { getAncestryById, isAncestryComplete } from '../../data/ancestries';
-import { cultures } from '../../data/reference-data';
-import { portfolios } from '../../data/portfolios';
-import { formations } from '../../data/formations';
 import { circleToPortfolio } from '../../types/summoner';
 import { summonerAbilitiesByLevel } from '../../data/abilities/summoner-abilities';
-import { NULL_TRADITIONS, TraditionData } from '../../data/null/traditions';
-import { PSIONIC_AUGMENTATIONS, AugmentationData, getAugmentationBonuses } from '../../data/null/augmentations';
 import { NullTradition, PsionicAugmentation } from '../../types/hero';
-import { skills, getSkillsByGroup, SkillGroup, Skill, isSkillGroup, findSkillByName } from '../../data/skills';
-import { GameData } from '@/lib/game-rules';
+import { SkillGroup } from '../../data/skills';
+import { GameData, type Skill, type TraditionData, type AugmentationData, type IncitingIncident, type Complication } from '@/lib/game-rules';
 import ClassSelector from './ClassSelector';
 import SubclassSelector from './SubclassSelector';
 import FuryAspectSelector from './FuryAspectSelector';
@@ -35,11 +30,11 @@ import {
   calculateEssencePerTurn,
 } from '../../utils/calculations';
 
-type Step = 'name' | 'class' | 'subclass' | 'furyAspect' | 'stormwightKit' | 'ancestry' | 'ancestryTraits' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'nullTradition' | 'psionicAugmentation' | 'kit' | 'characteristics';
+type Step = 'name' | 'class' | 'subclass' | 'furyAspect' | 'stormwightKit' | 'ancestry' | 'ancestryTraits' | 'culture' | 'cultureSkills' | 'career' | 'careerSkills' | 'incitingIncident' | 'complications' | 'languages' | 'circle' | 'signatureMinions' | 'formation' | 'nullTradition' | 'psionicAugmentation' | 'kit' | 'characteristics';
 
 // Base steps that all classes share
 // Note: ancestryTraits is conditionally shown only if the selected ancestry has trait data
-const BASE_STEPS: Step[] = ['name', 'class', 'ancestry', 'ancestryTraits', 'culture', 'cultureSkills', 'career', 'careerSkills', 'languages', 'kit', 'characteristics'];
+const BASE_STEPS: Step[] = ['name', 'class', 'ancestry', 'ancestryTraits', 'culture', 'cultureSkills', 'career', 'careerSkills', 'incitingIncident', 'complications', 'languages', 'kit', 'characteristics'];
 
 // Summoner-specific steps (inserted after languages)
 const SUMMONER_STEPS: Step[] = ['circle', 'signatureMinions', 'formation'];
@@ -104,6 +99,8 @@ const STEP_LABELS: Record<Step, string> = {
   cultureSkills: 'Culture Skills',
   career: 'Career',
   careerSkills: 'Career Skills',
+  incitingIncident: 'Inciting Incident',
+  complications: 'Complications',
   languages: 'Languages',
   circle: 'Circle',
   signatureMinions: 'Minions',
@@ -158,6 +155,10 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
   const [selectedSignatureMinions, setSelectedSignatureMinions] = useState<MinionTemplate[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
   const [selectedKit, setSelectedKit] = useState<Kit | null>(null);
+
+  // Inciting incident and complications state
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
+  const [selectedComplication, setSelectedComplication] = useState<Complication | null>(null);
 
   // Null-specific state
   const [selectedNullTradition, setSelectedNullTradition] = useState<NullTradition | null>(null);
@@ -322,9 +323,10 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
     return match ? parseInt(match[1], 10) : 0;
   };
 
-  // Reset language selections when career changes
+  // Reset language and incident selections when career changes
   useEffect(() => {
     setSelectedLanguages([]);
+    setSelectedIncidentId(null);
   }, [selectedCareer]);
 
   // Clear skill availability when culture changes
@@ -415,7 +417,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       // Environment skill (pick from one of two groups)
       selectedCulture.environment.skills.forEach((skillGroupStr, idx) => {
         const group = skillGroupStr.toLowerCase() as SkillGroup;
-        if (isSkillGroup(skillGroupStr)) {
+        if (GameData.isSkillGroup(skillGroupStr)) {
           selections.push({
             source: `environment-${idx}`,
             skillGroup: group,
@@ -428,7 +430,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       // Organization skill (pick from one of two groups)
       selectedCulture.organization.skills.forEach((skillGroupStr, idx) => {
         const group = skillGroupStr.toLowerCase() as SkillGroup;
-        if (isSkillGroup(skillGroupStr)) {
+        if (GameData.isSkillGroup(skillGroupStr)) {
           selections.push({
             source: `organization-${idx}`,
             skillGroup: group,
@@ -440,7 +442,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
 
       // Upbringing skill (might be specific or group)
       selectedCulture.upbringing.skills.forEach((skillStr, idx) => {
-        if (isSkillGroup(skillStr)) {
+        if (GameData.isSkillGroup(skillStr)) {
           selections.push({
             source: `upbringing-${idx}`,
             skillGroup: skillStr.toLowerCase() as SkillGroup,
@@ -449,7 +451,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
           });
         } else {
           // Check if it's a specific skill like "Music/Perform" or "Blacksmithing"
-          const specificSkill = findSkillByName(skillStr.split('/')[0]);
+          const specificSkill = GameData.findSkillByName(skillStr.split('/')[0]);
           selections.push({
             source: `upbringing-${idx}`,
             skillGroup: null,
@@ -479,7 +481,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
             selectedSkillId: null,
             isFixed: false,
           });
-        } else if (isSkillGroup(skillStr)) {
+        } else if (GameData.isSkillGroup(skillStr)) {
           // This is a skill group - user picks specific skill
           selections.push({
             source: `career-${idx}`,
@@ -489,7 +491,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
           });
         } else {
           // This is a specific skill
-          const specificSkill = findSkillByName(skillStr.split('/')[0]);
+          const specificSkill = GameData.findSkillByName(skillStr.split('/')[0]);
           selections.push({
             source: `career-${idx}`,
             skillGroup: specificSkill?.group || null,
@@ -538,6 +540,12 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       case 'careerSkills':
         // All non-fixed selections must have a skill selected
         return careerSkillSelections.every(s => s.isFixed || s.selectedSkillId !== null);
+      case 'incitingIncident':
+        // Inciting incident selection is required
+        return selectedIncidentId !== null;
+      case 'complications':
+        // Complications are optional - user can always proceed
+        return true;
       case 'languages':
         // Must select required number of languages (or 0 if career grants none)
         return selectedLanguages.length === getRequiredLanguageCount();
@@ -709,15 +717,22 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       activeProjects: [],
       inventory: [],
       equippedItems: [],
+      // Story elements - inciting incident and complications
+      selectedIncitingIncidentId: selectedIncidentId || undefined,
+      customIncitingIncident: selectedIncidentId && selectedCareer
+        ? GameData.getIncitingIncident(selectedCareer.id, selectedIncidentId)?.description
+        : undefined,
+      selectedComplication: selectedComplication || undefined,
     };
 
     // Create class-specific hero using proper Hero types
     if (selectedClass === 'summoner') {
       // Summoner-specific creation
       const portfolioType = circleToPortfolio[selectedCircle!];
-      const portfolio = portfolios[portfolioType];
+      const portfolio = GameData.getPortfolio(portfolioType);
       const maxEssencePerTurn = calculateEssencePerTurn(level);
-      const quickCommand = formations[selectedFormation!].quickCommands[0];
+      const formationData = GameData.getFormation(selectedFormation!);
+      const quickCommand = formationData?.quickCommands[0];
 
       const newHero: SummonerHeroV2 = {
         ...baseHeroData,
@@ -730,10 +745,10 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
         subclass: selectedCircle!,
         formation: selectedFormation!,
         quickCommand,
-        portfolio: {
+        portfolio: portfolio ? {
           ...portfolio,
           signatureMinions: selectedSignatureMinions,
-        },
+        } : { signatureMinions: selectedSignatureMinions, additionalMinions: [], championMinion: null },
         activeSquads: [],
         fixture: null,
         abilities: summonerAbilitiesByLevel[1] || [],
@@ -838,7 +853,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
 
         case 'null':
           // Apply psionic augmentation bonuses
-          const augBonuses = getAugmentationBonuses(selectedPsionicAugmentation ?? undefined, level);
+          const augBonuses = GameData.getAugmentationBonuses(selectedPsionicAugmentation ?? undefined, level);
           const nullMaxStamina = baseHeroData.stamina.max + augBonuses.stamina;
           const nullRecoveryValue = Math.floor(nullMaxStamina / 3);
           const nullStability = baseHeroData.stability + augBonuses.stability;
@@ -954,7 +969,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
     sourceLabel: string
   ) => {
     if (selection.isFixed && selection.selectedSkillId) {
-      const skill = skills.find(s => s.id === selection.selectedSkillId);
+      const skill = GameData.getAllSkills().find(s => s.id === selection.selectedSkillId);
       return (
         <div className="skill-selection fixed" key={selection.source}>
           <h4>{sourceLabel}</h4>
@@ -967,7 +982,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
     }
 
     if (selection.skillGroup) {
-      const availableSkills = getSkillsByGroup(selection.skillGroup);
+      const availableSkills = GameData.getSkillsByGroup(selection.skillGroup);
       return (
         <div className="skill-selection" key={selection.source}>
           <h4>{sourceLabel} ({selection.skillGroup.charAt(0).toUpperCase() + selection.skillGroup.slice(1)} Skill)</h4>
@@ -1210,7 +1225,7 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
           <div className="creation-step">
             <h2>Choose Your Culture</h2>
             <div className="options-grid">
-              {cultures.map((culture) => (
+              {GameData.getAllCultures().map((culture) => (
                 <div
                   key={culture.id}
                   className={`option-card ${selectedCulture?.id === culture.id ? 'selected' : ''}`}
@@ -1261,6 +1276,89 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
 
       case 'careerSkills':
         return renderCareerSkillsStep();
+
+      case 'incitingIncident':
+        if (!selectedCareer) return null;
+        const incidents = GameData.getIncitingIncidentsForCareer(selectedCareer.id);
+        return (
+          <div className="creation-step inciting-incident-step">
+            <h2>Choose Your Inciting Incident</h2>
+            <p className="step-description">
+              Something happened that set you on the path to becoming a hero.
+              Select the event that changed your life as a <strong>{selectedCareer.name}</strong>.
+            </p>
+            <div className="options-grid incident-options">
+              {incidents.map((incident) => (
+                <div
+                  key={incident.id}
+                  className={`option-card incident-card ${selectedIncidentId === incident.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedIncidentId(incident.id)}
+                >
+                  <h3>{incident.title}</h3>
+                  <p>{incident.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'complications':
+        const allComplications = GameData.getAllComplications();
+        return (
+          <div className="creation-step complications-step">
+            <h2>Choose a Complication (Optional)</h2>
+            <p className="step-description">
+              Complications add narrative depth to your character. Each has a <strong>benefit</strong> and
+              a <strong>drawback</strong>. You may skip this step if you prefer.
+            </p>
+
+            {selectedComplication && (
+              <div className="selected-complication-preview">
+                <div className="preview-header">
+                  <h3>Selected: {selectedComplication.name}</h3>
+                  <button
+                    className="clear-selection-btn"
+                    onClick={() => setSelectedComplication(null)}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <p className="complication-desc">{selectedComplication.description}</p>
+                <div className="complication-effects">
+                  <div className="benefit">
+                    <span className="effect-label">Benefit:</span>
+                    <span className="effect-text">{selectedComplication.benefit}</span>
+                  </div>
+                  {selectedComplication.drawback && (
+                    <div className="drawback">
+                      <span className="effect-label">Drawback:</span>
+                      <span className="effect-text">{selectedComplication.drawback}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="options-grid complication-options">
+              {allComplications.map((complication) => (
+                <div
+                  key={complication.id}
+                  className={`option-card complication-card ${selectedComplication?.id === complication.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedComplication(complication)}
+                >
+                  <h3>{complication.name}</h3>
+                  <p className="complication-desc-preview">{complication.description.slice(0, 100)}...</p>
+                  <div className="complication-preview">
+                    <span className="benefit-preview">✓ {complication.benefit.slice(0, 50)}...</span>
+                    {complication.drawback && (
+                      <span className="drawback-preview">✗ {complication.drawback.slice(0, 50)}...</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
 
       case 'languages':
         const requiredCount = getRequiredLanguageCount();
@@ -1374,8 +1472,9 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
 
       case 'signatureMinions':
         if (!selectedCircle) return null;
-        const portfolioType = circleToPortfolio[selectedCircle];
-        const availableSignature = portfolios[portfolioType].signatureMinions;
+        const sigMinionPortfolioType = circleToPortfolio[selectedCircle];
+        const sigMinionPortfolio = GameData.getPortfolio(sigMinionPortfolioType);
+        const availableSignature = sigMinionPortfolio?.signatureMinions ?? [];
         const maxMinionsReached = selectedSignatureMinions.length >= 2;
 
         return (
@@ -1409,35 +1508,35 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
         );
 
       case 'formation':
+        const allFormations = GameData.getAllFormations();
         return (
           <div className="creation-step">
             <h2>Choose Your Formation</h2>
             <p className="step-description">Formations determine how you command your minions</p>
             <div className="options-grid">
-              {(Object.keys(formations) as Formation[]).map((formationKey) => {
-                const formation = formations[formationKey];
-                return (
-                  <div
-                    key={formation.id}
-                    className={`option-card ${selectedFormation === formation.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedFormation(formation.id)}
-                  >
-                    <h3>{formation.name}</h3>
-                    <p>{formation.description}</p>
-                    <ul>
-                      {formation.benefits.map((benefit, idx) => (
-                        <li key={idx}>{benefit}</li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
+              {Object.values(allFormations).map((formation) => (
+                <div
+                  key={formation.id}
+                  className={`option-card ${selectedFormation === formation.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedFormation(formation.id)}
+                >
+                  <h3>{formation.name}</h3>
+                  <p>{formation.description}</p>
+                  <ul>
+                    {formation.benefits.map((benefit, idx) => (
+                      <li key={idx}>{benefit}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         );
 
       case 'nullTradition':
-        const traditions = Object.values(NULL_TRADITIONS);
+        const allTraditions = GameData.getAllNullTraditions();
+        const traditions = Object.values(allTraditions);
+        const selectedTraditionData = selectedNullTradition ? GameData.getNullTradition(selectedNullTradition) : null;
         return (
           <div className="creation-step null-tradition-step">
             <h2>Choose Your Null Tradition</h2>
@@ -1476,17 +1575,17 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
                 </div>
               ))}
             </div>
-            {selectedNullTradition && (
+            {selectedTraditionData && (
               <div className="selection-preview">
-                <h4>{NULL_TRADITIONS[selectedNullTradition].level5Feature.name} (Level 5)</h4>
-                <p>{NULL_TRADITIONS[selectedNullTradition].level5Feature.description}</p>
+                <h4>{selectedTraditionData.level5Feature.name} (Level 5)</h4>
+                <p>{selectedTraditionData.level5Feature.description}</p>
               </div>
             )}
           </div>
         );
 
       case 'psionicAugmentation':
-        const augmentations = Object.values(PSIONIC_AUGMENTATIONS);
+        const augmentations = Object.values(GameData.getAllPsionicAugmentations());
         return (
           <div className="creation-step augmentation-step">
             <h2>Choose Your Psionic Augmentation</h2>
@@ -1733,6 +1832,14 @@ const CharacterCreationInner: React.FC<CharacterCreationProps> = ({ onComplete, 
       case 'careerSkills':
         const careerSkillCount = careerSkillSelections.filter(s => s.selectedSkillId).length;
         return careerSkillCount > 0 ? `${careerSkillCount} skills` : null;
+      case 'incitingIncident':
+        if (selectedIncidentId && selectedCareer) {
+          const incident = GameData.getIncitingIncident(selectedCareer.id, selectedIncidentId);
+          return incident?.title || null;
+        }
+        return null;
+      case 'complications':
+        return selectedComplication?.name || 'None';
       case 'languages':
         return selectedLanguages.length > 0 ? `${selectedLanguages.length} languages` : null;
       case 'circle':

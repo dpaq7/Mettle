@@ -1,0 +1,742 @@
+/* ============================================
+   RESOURCE POPOVERS - Mettle Figma Design System
+   Uses tokens from design/Mettle VTT Companion App/
+   ============================================ */
+
+/* Base Popover Styles */
+.resource-popover {
+  width: 260px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface, #18181b);
+  color: var(--text-primary, #fafafa);
+}
+
+/* Header */
+.resource-popover-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle, #27272a);
+}
+
+.resource-popover-icon {
+  color: var(--text-muted, #52525b);
+  flex-shrink: 0;
+}
+
+.resource-popover-icon.heroic {
+  color: var(--resource-accent, var(--mettle-accent, #f59e0b));
+}
+
+.resource-popover-title {
+  margin: 0;
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #fafafa);
+}
+
+/* Value Display */
+.resource-value-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.resource-current-large {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary, #fafafa);
+}
+
+.resource-current-large.winded {
+  color: var(--status-warning, #f59e0b);
+}
+
+.resource-current-large.dying {
+  color: var(--status-danger, #ef4444);
+  animation: pulse-danger 1.5s ease-in-out infinite;
+}
+
+.resource-separator {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 18px;
+  color: var(--text-muted, #52525b);
+}
+
+.resource-max {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 18px;
+  color: var(--text-muted, #52525b);
+}
+
+/* Controls Grid (for -5, -1, +1, +5) */
+.resource-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+/* Controls Row (for just -1, +1) */
+.resource-controls-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Adjust Buttons - Figma style */
+.resource-adjust-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  background: var(--bg-elevated, #27272a);
+  border: 1px solid var(--border-subtle, #27272a);
+  border-radius: 4px;
+  color: var(--text-secondary, #a1a1aa);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.resource-adjust-btn:hover:not(:disabled) {
+  background: var(--bg-overlay, #3f3f46);
+  border-color: var(--mettle-accent, #f59e0b);
+  color: var(--text-primary, #fafafa);
+}
+
+.resource-adjust-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.resource-adjust-btn.large {
+  padding: 8px 12px;
+}
+
+.resource-adjust-btn.small {
+  padding: 4px;
+  min-width: 28px;
+}
+
+/* Footer */
+.resource-popover-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle, #27272a);
+  text-align: center;
+}
+
+.resource-info {
+  font-size: 11px;
+  color: var(--text-muted, #52525b);
+}
+
+.resource-warning {
+  font-size: 11px;
+  color: var(--status-danger, #ef4444);
+}
+
+/* ============================================
+   STAMINA POPOVER SPECIFIC
+   ============================================ */
+
+/* Progress Bar */
+.stamina-progress-container {
+  position: relative;
+  padding: 4px 0;
+}
+
+.stamina-progress-bar {
+  position: relative;
+  height: 8px;
+  background: var(--bg-elevated, #27272a);
+  border-radius: 4px;
+  overflow: visible;
+}
+
+.stamina-progress-fill {
+  height: 100%;
+  background: var(--status-success, #22c55e);
+  border-radius: 4px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.stamina-progress-fill.winded {
+  background: var(--status-warning, #f59e0b);
+}
+
+.stamina-progress-fill.dying {
+  background: var(--status-danger, #ef4444);
+}
+
+.stamina-winded-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--status-warning, #f59e0b);
+  transform: translateX(-50%);
+  opacity: 0.7;
+}
+
+/* Status Badges */
+.stamina-status-badges {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+.status-badge.winded {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--status-warning, #f59e0b);
+}
+
+.status-badge.dying {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--status-danger, #ef4444);
+  animation: pulse-danger 1.5s ease-in-out infinite;
+}
+
+.status-badge.dead {
+  background: var(--status-danger, #ef4444);
+  color: var(--bg-void, #09090b);
+}
+
+/* ============================================
+   RECOVERIES POPOVER SPECIFIC
+   ============================================ */
+
+/* Diamonds Row */
+.recoveries-diamonds-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.recovery-diamond {
+  font-size: 16px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.recovery-diamond.filled {
+  color: var(--mettle-accent, #f59e0b);
+}
+
+.recovery-diamond.empty {
+  color: var(--bg-elevated, #27272a);
+}
+
+/* Recovery Value Info */
+.recovery-value-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-elevated, #27272a);
+  border-radius: 4px;
+}
+
+.recovery-value-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #52525b);
+}
+
+.recovery-value-amount {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #fafafa);
+}
+
+/* Catch Breath Button - Figma style */
+.catch-breath-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: var(--mettle-accent, #f59e0b);
+  border: none;
+  color: var(--bg-void, #09090b);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+}
+
+.catch-breath-button:hover:not(.disabled) {
+  background: var(--mettle-accent-hover, #fbbf24);
+}
+
+.catch-breath-button.disabled {
+  background: var(--bg-elevated, #27272a);
+  color: var(--text-muted, #52525b);
+  cursor: not-allowed;
+}
+
+.catch-breath-heal {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  opacity: 0.8;
+}
+
+/* ============================================
+   HEROIC RESOURCE POPOVER SPECIFIC
+   ============================================ */
+
+.heroic-resource-popover {
+  --resource-accent: var(--mettle-accent, #f59e0b);
+}
+
+.heroic-value-display {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.heroic-value-input {
+  width: 80px;
+  padding: 8px;
+  background: var(--bg-deep, #0f0f12);
+  border: 2px solid var(--resource-accent, var(--mettle-accent, #f59e0b));
+  border-radius: 4px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--resource-accent, var(--mettle-accent, #f59e0b));
+  text-align: center;
+}
+
+.heroic-value-input:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+/* Remove number input spinners */
+.heroic-value-input::-webkit-inner-spin-button,
+.heroic-value-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.heroic-value-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.heroic-flavor-text {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-muted, #52525b);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Strained Warning (Talent class) */
+.strained-warning {
+  display: flex;
+  justify-content: center;
+}
+
+.strained-badge {
+  padding: 2px 12px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--status-danger, #ef4444);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--status-danger, #ef4444);
+  animation: pulse-danger 1.5s ease-in-out infinite;
+}
+
+.heroic-resource-popover.strained .heroic-value-input {
+  border-color: var(--status-danger, #ef4444);
+  color: var(--status-danger, #ef4444);
+}
+
+/* ============================================
+   SURGES POPOVER SPECIFIC
+   ============================================ */
+
+/* Hexagons Row */
+.surges-hexagons-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.surge-hexagon {
+  font-size: 20px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.surge-hexagon.filled {
+  color: var(--mettle-accent, #f59e0b);
+}
+
+.surge-hexagon.empty {
+  color: var(--bg-elevated, #27272a);
+}
+
+/* Has Surges Accent */
+.resource-current-large.has-surges {
+  color: var(--mettle-accent, #f59e0b);
+}
+
+/* Available Badge */
+.surges-available-badge {
+  display: flex;
+  justify-content: center;
+}
+
+.status-badge.surge-ready {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--mettle-accent, #f59e0b);
+  animation: pulse-accent 1.5s ease-in-out infinite;
+}
+
+/* Spend Surge Button */
+.spend-surge-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: var(--mettle-accent, #f59e0b);
+  border: none;
+  color: var(--bg-void, #09090b);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+}
+
+.spend-surge-button:hover:not(.disabled) {
+  background: var(--mettle-accent-hover, #fbbf24);
+}
+
+.spend-surge-button.disabled {
+  background: var(--bg-elevated, #27272a);
+  color: var(--text-muted, #52525b);
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes pulse-danger {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse-accent {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ============================================
+   VICTORIES POPOVER SPECIFIC
+   ============================================ */
+
+.victories-pending-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-elevated, #27272a);
+  border-radius: 4px;
+}
+
+.victories-pending-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted, #52525b);
+}
+
+.victories-pending-value {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mettle-accent, #f59e0b);
+}
+
+.convert-xp-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: var(--mettle-accent, #f59e0b);
+  border: none;
+  color: var(--bg-void, #09090b);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+}
+
+.convert-xp-button:hover:not(.disabled) {
+  background: var(--mettle-accent-hover, #fbbf24);
+}
+
+.convert-xp-button.disabled {
+  background: var(--bg-elevated, #27272a);
+  color: var(--text-muted, #52525b);
+  cursor: not-allowed;
+}
+
+.convert-xp-amount {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+.victories-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.victories-info-icon {
+  color: var(--text-muted, #52525b);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   XP POPOVER SPECIFIC
+   ============================================ */
+
+.xp-level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.xp-level-value {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #fafafa);
+}
+
+.xp-echelon-badge {
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--mettle-accent, #f59e0b) 20%, transparent);
+  border: 1px solid var(--mettle-accent, #f59e0b);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mettle-accent, #f59e0b);
+}
+
+/* XP Progress Bar */
+.xp-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.xp-progress-bar {
+  height: 8px;
+  background: var(--bg-elevated, #27272a);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.xp-progress-fill {
+  height: 100%;
+  background: var(--mettle-accent, #f59e0b);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.xp-progress-fill.ready {
+  background: var(--status-success, #22c55e);
+  animation: pulse-accent 1.5s ease-in-out infinite;
+}
+
+.xp-progress-text {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 11px;
+  color: var(--text-muted, #52525b);
+}
+
+/* XP Value Display */
+.xp-value-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+
+.xp-current {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary, #fafafa);
+}
+
+.xp-current.ready {
+  color: var(--status-success, #22c55e);
+}
+
+.xp-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted, #52525b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* XP to next level */
+.xp-to-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-elevated, #27272a);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.xp-to-next svg {
+  color: var(--text-muted, #52525b);
+}
+
+/* Level Up Ready Badge */
+.xp-ready-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid var(--status-success, #22c55e);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--status-success, #22c55e);
+  animation: pulse-accent 1.5s ease-in-out infinite;
+}
+
+.xp-ready-badge svg {
+  color: var(--status-success, #22c55e);
+}
+
+/* Max Level Badge */
+.xp-max-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--mettle-accent, #f59e0b) 20%, transparent);
+  border: 1px solid var(--mettle-accent, #f59e0b);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mettle-accent, #f59e0b);
+}
+
+/* Level Up Button */
+.level-up-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: var(--status-success, #22c55e);
+  border: none;
+  color: var(--bg-void, #09090b);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+}
+
+.level-up-button:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.level-up-button svg {
+  animation: sparkle 1s ease-in-out infinite;
+}
+
+.level-up-button.view-details {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+.level-up-button.view-details:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+}

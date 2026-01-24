@@ -1,17 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useHeroContext } from './context/HeroContext';
 import { useCombatContext } from './context/CombatContext';
+import { NavigationProvider, useNavigation } from './context/NavigationContext';
+import { SecondaryDetailProvider } from './context/SecondaryDetailContext';
 import { useDiceRolling } from './hooks/useDiceRolling';
-import type { TurnPhaseId, CharacteristicId } from './components/ui/StatsDashboard/types';
+import { useCombatMinionManager } from './hooks/useCombatMinionManager';
 import CharacterCreation from './components/creation/CharacterCreation';
 import CharacterManager from './components/character/CharacterManager';
-import CharacterDetailsView from './components/character/CharacterDetailsView';
 import LevelUpWizard from './components/character/LevelUpWizard';
-import CombatView from './components/combat/CombatView';
-import AbilitiesView from './components/abilities/AbilitiesView';
-import ProjectsView from './components/projects/ProjectsView';
-import MagicItemsView from './components/items/MagicItemsView';
-import InventoryView from './components/inventory/InventoryView';
 import RollHistoryPanel from './components/shared/RollHistoryPanel';
 import LegalModal from './components/shared/LegalModal';
 import { ImportCharacterDialog } from './components/shared/ImportCharacterDialog';
@@ -26,21 +22,21 @@ import {
   getAllCharacters,
 } from './utils/storage';
 import type { Hero } from './types';
-import { StatsDashboard } from './components/ui/StatsDashboard';
-import { StrainView } from './components/classDetails/TalentDetails/StrainView';
-import { NullFieldView } from './components/classDetails/NullDetails/NullFieldView';
-import { RoutinesView } from './components/classDetails/TroubadourDetails';
-import { FerocityTrackerView } from './components/classDetails/FuryDetails';
-import { InsightView } from './components/classDetails/ShadowDetails';
-import { JudgmentView } from './components/classDetails/CensorDetails';
-import { TacticsView } from './components/classDetails/TacticianDetails';
-import { PersistentMagicView } from './components/classDetails/ElementalistDetails';
-import { DomainView } from './components/classDetails/ConduitDetails';
-import { getTabsForClass, ViewType } from './data/class-tabs';
-import { getResourceConfig } from './data/class-resources';
-import { HeroClass } from './types/hero';
-import type { ConditionId, ConditionEndType } from './types/common';
-import { getDefaultEndType } from './data/conditions';
+
+// New layout components
+import { AppShell } from './components/layout';
+import {
+  CharacterMasterList,
+  CharacterDetailPane,
+  ActionsMasterList,
+  ActionsDetailPane,
+  ProjectsMasterList,
+  ProjectsDetailPane,
+  InventoryMasterList,
+  InventoryDetailPane,
+  SecondaryDetailPane,
+} from './components/sections';
+
 import {
   AlertDialog,
   AlertDialogContent,
@@ -50,20 +46,52 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
-  Button,
-  RadixTabs,
-  RadixTabsList,
-  RadixTabsTrigger,
-  RadixTabsContent,
 } from '@/components/ui/shadcn';
 import './App.css';
 
-type View = ViewType;
+// Content renderer based on active section
+function SectionContent() {
+  const { activeSection } = useNavigation();
 
-function App() {
+  const masterPane = (() => {
+    switch (activeSection) {
+      case 'character':
+        return <CharacterMasterList />;
+      case 'actions':
+        return <ActionsMasterList />;
+      case 'projects':
+        return <ProjectsMasterList />;
+      case 'inventory':
+        return <InventoryMasterList />;
+      default:
+        return <CharacterMasterList />;
+    }
+  })();
+
+  const detailPane = (() => {
+    switch (activeSection) {
+      case 'character':
+        return <CharacterDetailPane />;
+      case 'actions':
+        return <ActionsDetailPane />;
+      case 'projects':
+        return <ProjectsDetailPane />;
+      case 'inventory':
+        return <InventoryDetailPane />;
+      default:
+        return <CharacterDetailPane />;
+    }
+  })();
+
+  // Secondary detail pane for rules information
+  const secondaryPane = <SecondaryDetailPane />;
+
+  return { masterPane, detailPane, secondaryPane, fullWidthPane: undefined };
+}
+
+function AppContent() {
   const { hero, setHero, updateHero } = useHeroContext();
-  const { isInCombat, startCombat, endCombat, setOnCombatStartCallback, essenceState } = useCombatContext();
-  const [activeView, setActiveView] = useState<View>('character');
+  const { endCombat } = useCombatContext();
   const [showCharacterManager, setShowCharacterManager] = useState(false);
   const [showCharacterCreation, setShowCharacterCreation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -76,30 +104,10 @@ function App() {
   const [respecXpToPreserve, setRespecXpToPreserve] = useState<number>(0);
 
   // Use centralized dice rolling hook
-  const {
-    rollHistory,
-    currentEdgeBane,
-    handleRoll,
-    handleRollCharacteristic,
-    handleClearRollHistory,
-    cycleEdgeBane,
-  } = useDiceRolling();
+  const { rollHistory } = useDiceRolling();
 
-  // Turn tracking state
-  const [turnNumber, setTurnNumber] = useState(1);
-  const [completedPhases, setCompletedPhases] = useState<Set<TurnPhaseId>>(new Set());
-
-  // Register callback to switch to minions tab when combat starts (Summoner only)
-  useEffect(() => {
-    // Only switch to minions tab for Summoners
-    const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
-    if (heroClass === 'summoner') {
-      setOnCombatStartCallback(() => setActiveView('minions'));
-    } else {
-      setOnCombatStartCallback(null);
-    }
-    return () => setOnCombatStartCallback(null);
-  }, [setOnCombatStartCallback, hero]);
+  // Auto-open Combat Minion Manager for Summoners entering combat
+  useCombatMinionManager();
 
   const handleCreateNew = () => {
     setHero(null);
@@ -107,37 +115,28 @@ function App() {
     setShowCharacterCreation(true);
   };
 
-  // Handler for when a character is loaded from the manager dialog
-  // This exits both the dialog AND the character creation view
   const handleCharacterLoaded = () => {
     setShowCharacterManager(false);
     setShowCharacterCreation(false);
   };
 
-  // ════════════════════════════════════════════════════════════════
-  // CHARACTER MANAGEMENT HANDLERS
-  // ════════════════════════════════════════════════════════════════
-
-  // Export current character to JSON file
+  // Character management handlers
   const handleExportCharacter = useCallback(() => {
     if (hero) {
       downloadCharacterJSON(hero);
     }
   }, [hero]);
 
-  // Import character - opens the import dialog
   const handleImportCharacter = useCallback(() => {
     setShowImportDialog(true);
   }, []);
 
-  // Handle imported character - save and switch to it
   const handleImportComplete = useCallback((importedHero: Hero) => {
     setHero(importedHero);
     setShowCharacterCreation(false);
     setShowCharacterManager(false);
   }, [setHero]);
 
-  // Duplicate current character
   const handleDuplicateCharacter = useCallback(() => {
     if (hero) {
       const duplicate = duplicateCharacter(hero);
@@ -146,7 +145,6 @@ function App() {
     }
   }, [hero, setHero]);
 
-  // Delete character - opens confirmation dialog
   const handleDeleteCharacterClick = useCallback(() => {
     if (hero) {
       setCharacterToDelete(hero);
@@ -154,53 +152,37 @@ function App() {
     }
   }, [hero]);
 
-  // Confirm delete - remove character and switch to another
   const handleConfirmDelete = useCallback(() => {
     if (!characterToDelete) return;
-
-    // Get all characters to find another one to switch to
     const allCharacters = getAllCharacters();
     const remainingCharacters = allCharacters.filter(c => c.id !== characterToDelete.id);
-
-    // Delete the character
     deleteCharacter(characterToDelete.id);
-
-    // Switch to another character or show creation
     if (remainingCharacters.length > 0) {
       setHero(remainingCharacters[0].data);
     } else {
       setHero(null);
       setShowCharacterCreation(true);
     }
-
-    // Close dialog and clear state
     setShowDeleteDialog(false);
     setCharacterToDelete(null);
   }, [characterToDelete, setHero]);
 
-  // Re-spec character - opens confirmation dialog
   const handleRespecCharacterClick = useCallback(() => {
     if (hero) {
       setShowRespecDialog(true);
     }
   }, [hero]);
 
-  // Confirm re-spec - preserve XP and enter creation wizard
   const handleConfirmRespec = useCallback(() => {
     if (!hero) return;
-
-    // Calculate total XP to preserve (current XP + pending victories)
     const totalXp = (hero.xp || 0) + (hero.victories || 0);
     setRespecXpToPreserve(totalXp);
-
-    // Close dialog and enter character creation mode
     setShowRespecDialog(false);
     setHero(null);
     setShowCharacterCreation(true);
   }, [hero, setHero]);
 
   const handleCreationComplete = () => {
-    // Clear the re-spec XP state (XP was already applied during character creation)
     if (respecXpToPreserve > 0) {
       setRespecXpToPreserve(0);
     }
@@ -209,122 +191,35 @@ function App() {
 
   const handleRespite = () => {
     if (!hero) return;
-    // Convert victories to XP and reset resources
     const xpGained = hero.victories;
     const newXp = (hero.xp || 0) + xpGained;
-
     updateHero({
       xp: newXp,
       victories: 0,
       stamina: { ...hero.stamina, current: hero.stamina.max },
       recoveries: { ...hero.recoveries, current: hero.recoveries.max },
       surges: 0,
-      activeSquads: [], // Dismiss all minions during respite
-      activeConditions: [], // Clear all conditions during respite
+      activeSquads: [],
+      activeConditions: [],
     });
-
     setShowRespiteConfirm(false);
   };
 
-  const handleAddCondition = (conditionId: ConditionId) => {
-    if (!hero) return;
-    // Check if condition already exists
-    if (hero.activeConditions.some((c) => c.conditionId === conditionId)) return;
-
-    updateHero({
-      activeConditions: [
-        ...hero.activeConditions,
-        {
-          conditionId,
-          appliedAt: Date.now(),
-          endType: getDefaultEndType(conditionId),
-        },
-      ],
-    });
-  };
-
-  const handleRemoveCondition = (conditionId: ConditionId) => {
-    if (!hero) return;
-    updateHero({
-      activeConditions: hero.activeConditions.filter((c) => c.conditionId !== conditionId),
-    });
-  };
-
-  const handleUpdateConditionEndType = (conditionId: ConditionId, endType: ConditionEndType) => {
-    if (!hero) return;
-    updateHero({
-      activeConditions: hero.activeConditions.map((c) =>
-        c.conditionId === conditionId ? { ...c, endType } : c
-      ),
-    });
-  };
-
-  // Turn tracking handlers
-  const handleTogglePhase = useCallback((phaseId: TurnPhaseId) => {
-    setCompletedPhases((prev) => {
-      const next = new Set(prev);
-      if (next.has(phaseId)) {
-        next.delete(phaseId);
-      } else {
-        next.add(phaseId);
-      }
-      return next;
-    });
-  }, []);
-
-  // End turn - called after processing conditions
-  const handleEndTurn = useCallback(() => {
-    setTurnNumber((prev) => prev + 1);
-    setCompletedPhases(new Set());
-  }, []);
-
-  // Reset current turn (don't advance turn number)
-  const handleResetTurn = useCallback(() => {
-    setCompletedPhases(new Set());
-  }, []);
-
-  // Reset turn tracking when combat ends
   const handleEndCombatWithTurnReset = useCallback(() => {
     endCombat();
-    setTurnNumber(1);
-    setCompletedPhases(new Set());
   }, [endCombat]);
 
-  // Portrait change handler
-  const handlePortraitChange = useCallback((portraitUrl: string | null) => {
-    updateHero({ portraitUrl });
-  }, [updateHero]);
+  // Check if can level up
+  const canLevelUp = hero ? (hero.xp || 0) >= (hero.level * 3) : false;
 
+  // Get section content - must be called unconditionally (uses hooks)
+  const { masterPane, detailPane, secondaryPane, fullWidthPane } = SectionContent();
+
+  // Show character creation if no hero
   if (!hero || showCharacterCreation) {
     return (
       <div className="app dark-mode">
-        <StatsDashboard
-          hero={null}
-          isInCombat={false}
-          onStartCombat={() => {}}
-          onEndCombat={() => {}}
-          onRespite={() => {}}
-          onManageCharacters={() => setShowCharacterManager(true)}
-          onCreateCharacter={handleCreateNew}
-          onShowAbout={() => setShowLegalModal(true)}
-          onLevelUp={() => {}}
-          onCatchBreath={() => {}}
-          onStaminaChange={() => {}}
-          onRecoveriesChange={() => {}}
-          onVictoriesChange={() => {}}
-          onSurgesChange={() => {}}
-          onAddCondition={() => {}}
-          onRemoveCondition={() => {}}
-          onUpdateConditionEndType={() => {}}
-          onImportCharacter={handleImportCharacter}
-          resourceConfig={{
-            name: 'Resource',
-            abbreviation: 'RES',
-            color: 'var(--accent-primary)',
-            minValue: 0,
-          }}
-        />
-        <main className="app-main">
+        <main className="app-main-creation">
           <ErrorBoundary componentName="CharacterCreation">
             <CharacterCreation
               onComplete={handleCreationComplete}
@@ -353,226 +248,24 @@ function App() {
     );
   }
 
-  // Type guard for hero
-  if (!hero) return null;
-
-  // Get hero class (handle both old SummonerHero and new Hero types)
-  const heroClass: HeroClass = hero?.heroClass ?? 'summoner';
-
-  // Get dynamic tabs based on hero's class
-  const tabs = getTabsForClass(heroClass);
-
-  // Check if hero is a Summoner
-  const isSummoner = heroClass === 'summoner';
-
-  // Get resource config for current hero
-  const resourceConfig = getResourceConfig(hero.heroClass);
-
   return (
     <div className="app dark-mode">
-      {/* StatsDashboard - Unified Pinnable Stats Dashboard */}
-      <StatsDashboard
-        hero={hero}
-        isInCombat={isInCombat}
-        onStartCombat={startCombat}
-        onEndCombat={handleEndCombatWithTurnReset}
-        onRespite={() => setShowRespiteConfirm(true)}
+      <AppShell
         onManageCharacters={() => setShowCharacterManager(true)}
         onCreateCharacter={handleCreateNew}
-        onShowAbout={() => setShowLegalModal(true)}
-        onLevelUp={() => setShowLevelUp(true)}
-        resourceConfig={resourceConfig}
-        onResourceChange={(newValue: number) => {
-          const updatedResource = {
-            ...hero.heroicResource,
-            current: Math.max(resourceConfig.minValue, newValue),
-          };
-          updateHero({ heroicResource: updatedResource } as Partial<typeof hero>);
-        }}
-        onCatchBreath={(healAmount: number) => {
-          if (hero.recoveries.current > 0) {
-            const newStamina = Math.min(hero.stamina.current + healAmount, hero.stamina.max);
-            updateHero({
-              stamina: { ...hero.stamina, current: newStamina },
-              recoveries: { ...hero.recoveries, current: hero.recoveries.current - 1 },
-            });
-          }
-        }}
-        onStaminaChange={(newValue: number) => {
-          // Calculate death threshold (negative half max stamina)
-          const deathThreshold = -Math.floor(hero.stamina.max / 2);
-
-          // Clamp stamina to not go below death threshold
-          const clampedValue = Math.max(deathThreshold, newValue);
-
-          // Check stamina state changes
-          const wasAboveZero = hero.stamina.current > 0;
-          const isNowBelowZero = clampedValue <= 0;
-          const wasNotDying = !hero.activeConditions.some(c => c.conditionId === 'dying');
-
-          // Build updates object
-          const updates: Partial<Hero> = {
-            stamina: { ...hero.stamina, current: clampedValue },
-          };
-
-          // Add dying condition when stamina drops to 0 or below
-          if (wasAboveZero && isNowBelowZero && wasNotDying) {
-            // Add both dying and bleeding conditions
-            const newConditions = [...hero.activeConditions];
-
-            // Add dying if not already present
-            if (!newConditions.some(c => c.conditionId === 'dying')) {
-              newConditions.push({
-                conditionId: 'dying',
-                appliedAt: Date.now(),
-                endType: 'manual',
-              });
-            }
-
-            // Add bleeding if not already present
-            if (!newConditions.some(c => c.conditionId === 'bleeding')) {
-              newConditions.push({
-                conditionId: 'bleeding',
-                appliedAt: Date.now(),
-                endType: 'manual', // Dying bleeding doesn't save-end normally
-              });
-            }
-
-            updates.activeConditions = newConditions;
-          }
-
-          // Remove dying condition when stamina goes above 0
-          if (!wasAboveZero && clampedValue > 0) {
-            updates.activeConditions = hero.activeConditions.filter(
-              c => c.conditionId !== 'dying'
-            );
-          }
-
-          updateHero(updates);
-        }}
-        onRecoveriesChange={(newValue: number) => {
-          updateHero({ recoveries: { ...hero.recoveries, current: newValue } });
-        }}
-        onVictoriesChange={(newValue: number) => {
-          updateHero({ victories: newValue });
-        }}
-        onSurgesChange={(newValue: number) => {
-          updateHero({ surges: newValue });
-        }}
-        onAddCondition={handleAddCondition}
-        onRemoveCondition={handleRemoveCondition}
-        onUpdateConditionEndType={handleUpdateConditionEndType}
-        rollHistory={rollHistory}
-        currentEdgeBane={currentEdgeBane}
-        onRoll={handleRoll}
-        onClearRollHistory={handleClearRollHistory}
-        onCycleEdgeBane={cycleEdgeBane}
-        onRollCharacteristic={handleRollCharacteristic}
-        // Turn tracking
-        turnNumber={turnNumber}
-        completedPhases={completedPhases}
-        pendingFreeMinions={essenceState.pendingFreeMinions}
-        onTogglePhase={handleTogglePhase}
-        onEndTurn={handleEndTurn}
-        onResetTurn={handleResetTurn}
-        // Portrait
-        onPortraitChange={handlePortraitChange}
-        // Character management
-        onExportCharacter={handleExportCharacter}
         onImportCharacter={handleImportCharacter}
+        onExportCharacter={handleExportCharacter}
         onDuplicateCharacter={handleDuplicateCharacter}
         onRespecCharacter={handleRespecCharacterClick}
+        onRespite={() => setShowRespiteConfirm(true)}
+        onLevelUp={() => setShowLevelUp(true)}
+        onShowAbout={() => setShowLegalModal(true)}
+        canLevelUp={canLevelUp}
+        masterPane={masterPane}
+        detailPane={detailPane}
+        secondaryPane={secondaryPane}
+        fullWidthPane={fullWidthPane}
       />
-
-      {/* Navigation Tabs - Dynamic based on hero class */}
-      <RadixTabs
-        value={activeView}
-        onValueChange={(value) => setActiveView(value as View)}
-        className="view-tabs-container"
-      >
-        <RadixTabsList variant="fantasy" className="view-tabs">
-          {tabs.map((tab) => (
-            <RadixTabsTrigger key={tab.id} value={tab.id}>
-              {tab.label}
-            </RadixTabsTrigger>
-          ))}
-        </RadixTabsList>
-
-        {/* Main Content */}
-        <main className="app-main">
-          <RadixTabsContent value="character">
-            <ErrorBoundary componentName="CharacterDetailsView">
-              <CharacterDetailsView />
-            </ErrorBoundary>
-          </RadixTabsContent>
-
-          <RadixTabsContent value="abilities">
-            <ErrorBoundary componentName="AbilitiesView">
-              <AbilitiesView />
-            </ErrorBoundary>
-          </RadixTabsContent>
-
-          {/* Summoner-specific: Minions tab */}
-          <RadixTabsContent value="minions">
-            <ErrorBoundary componentName="CombatView">
-              <CombatView />
-            </ErrorBoundary>
-          </RadixTabsContent>
-
-          <RadixTabsContent value="projects">
-            <ProjectsView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="items">
-            <MagicItemsView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="inventory">
-            <InventoryView />
-          </RadixTabsContent>
-
-          {/* Talent Strain View */}
-          <RadixTabsContent value="strain">
-            <StrainView />
-          </RadixTabsContent>
-
-          {/* Null Field View */}
-          <RadixTabsContent value="nullfield">
-            <NullFieldView />
-          </RadixTabsContent>
-
-          {/* Troubadour Routines View */}
-          <RadixTabsContent value="routines">
-            <RoutinesView />
-          </RadixTabsContent>
-
-          {/* Fury Ferocity View */}
-          <RadixTabsContent value="ferocity">
-            <FerocityTrackerView />
-          </RadixTabsContent>
-
-          {/* Class-specific views */}
-          <RadixTabsContent value="judgment">
-            <JudgmentView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="domain">
-            <DomainView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="persistent">
-            <PersistentMagicView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="college">
-            <InsightView />
-          </RadixTabsContent>
-
-          <RadixTabsContent value="tactics">
-            <TacticsView />
-          </RadixTabsContent>
-        </main>
-      </RadixTabs>
 
       {/* Modals */}
       {showCharacterManager && (
@@ -598,14 +291,14 @@ function App() {
                   During a respite, you rest and recover. This will:
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-[var(--text-secondary)] mb-3">
-                  <li>Convert <strong className="text-[var(--accent-bright)]">{hero.victories} victories</strong> to <strong className="text-[var(--xp)]">{hero.victories} XP</strong></li>
+                  <li>Convert <strong className="text-[var(--accent)]">{hero.victories} victories</strong> to <strong className="text-[var(--accent)]">{hero.victories} XP</strong></li>
                   <li>Restore stamina to maximum ({hero.stamina.max})</li>
                   <li>Restore all recoveries ({hero.recoveries.max})</li>
                   <li>Reset surges to 0</li>
-                  {isSummoner && <li>Dismiss all active minions</li>}
+                  <li>Dismiss all active minions</li>
                 </ul>
                 {hero.victories > 0 && (
-                  <p className="text-[var(--xp)] font-medium">
+                  <p className="text-[var(--accent)] font-medium">
                     New XP total: {(hero.xp || 0) + hero.victories}
                   </p>
                 )}
@@ -621,7 +314,7 @@ function App() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Roll History Panel - Available globally */}
+      {/* Roll History Panel */}
       <RollHistoryPanel />
 
       {/* Legal/About Modal */}
@@ -655,6 +348,16 @@ function App() {
         onConfirm={handleConfirmRespec}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <NavigationProvider>
+      <SecondaryDetailProvider>
+        <AppContent />
+      </SecondaryDetailProvider>
+    </NavigationProvider>
   );
 }
 

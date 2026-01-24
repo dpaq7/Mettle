@@ -12,6 +12,8 @@ import {
   Maximize2,
   Minimize2,
   ArrowUp,
+  MoreVertical,
+  UserCog,
 } from 'lucide-react';
 
 import { canLevelUp, MAX_LEVEL } from '@/utils/levelProgression';
@@ -297,6 +299,24 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
                     </Tooltip>
                   )}
 
+                  {/* Respite Button - full button next to Draw Steel */}
+                  {hero && !isInCombat && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={onRespite}
+                          className="header-action-btn respite-btn"
+                        >
+                          <Tent className="w-4 h-4" />
+                          <span>Respite</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Take a Respite - Rest and recover</TooltipContent>
+                    </Tooltip>
+                  )}
+
                   {/* Level Up Button - shown when level up is available */}
                   {hero && isLevelUpAvailable && !isInCombat && (
                     <Tooltip>
@@ -317,37 +337,20 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
                     </Tooltip>
                   )}
 
-                  {/* Respite Button */}
-                  {hero && !isInCombat && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={onRespite}
-                          className="header-icon-btn respite-btn"
-                        >
-                          <Tent className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">Take a Respite</TooltipContent>
-                    </Tooltip>
-                  )}
-
                   <Separator orientation="vertical" className="header-separator" />
 
-                  {/* Characters Dropdown */}
+                  {/* Character Button - Character Management */}
                   <DropdownMenu>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="header-action-btn">
-                            <Users className="w-4 h-4" />
-                            <span>Characters</span>
+                            <UserCog className="w-4 h-4" />
+                            <span>Character</span>
                           </Button>
                         </DropdownMenuTrigger>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom">Manage Characters</TooltipContent>
+                      <TooltipContent side="bottom">Character Management</TooltipContent>
                     </Tooltip>
                     <DropdownMenuContent align="end" className="dropdown-fantasy">
                       <DropdownMenuItem onClick={onManageCharacters}>
@@ -373,16 +376,25 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
                   {/* Theme Selector */}
                   <ThemeSelector />
 
-                  {/* About Button */}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" onClick={onShowAbout} className="header-action-btn">
-                        <Info className="w-4 h-4" />
-                        <span>About</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">About Mettle</TooltipContent>
-                  </Tooltip>
+                  {/* More Menu (3-dot) - About only */}
+                  <DropdownMenu>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="header-icon-btn">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More Options</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="end" className="dropdown-fantasy">
+                      <DropdownMenuItem onClick={onShowAbout}>
+                        <Info className="w-4 h-4 mr-2" />
+                        About Mettle
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   {/* Expand Button (only when hero exists) */}
                   {hero && (
@@ -440,11 +452,11 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
 
                 {/* Utility actions only - NO combat/respite */}
                 <div className="expanded-header-actions">
-                  {/* Characters Dropdown */}
+                  {/* Character Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="header-icon-btn" aria-label="Characters menu">
-                        <Users className="w-4 h-4" />
+                      <Button variant="ghost" size="icon" className="header-icon-btn" aria-label="Character menu">
+                        <UserCog className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="dropdown-fantasy">
@@ -470,20 +482,25 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
 
                   <ThemeSelector />
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                  {/* More Menu (3-dot) - About only */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onShowAbout}
                         className="header-icon-btn"
-                        aria-label="About"
+                        aria-label="More options"
                       >
-                        <Info className="w-4 h-4" />
+                        <MoreVertical className="w-4 h-4" />
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">About Mettle</TooltipContent>
-                  </Tooltip>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="dropdown-fantasy">
+                      <DropdownMenuItem onClick={onShowAbout}>
+                        <Info className="w-4 h-4 mr-2" />
+                        About Mettle
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   {/* Minimize Button - same position as expand button in collapsed state */}
                   <Tooltip>
@@ -525,18 +542,18 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
             </div>
 
             <div className="header-right">
-              {/* Characters Dropdown */}
+              {/* Character Dropdown */}
               <DropdownMenu>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="header-action-btn">
-                        <Users className="w-4 h-4" />
-                        <span>Characters</span>
+                        <UserCog className="w-4 h-4" />
+                        <span>Character</span>
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom">Manage Characters</TooltipContent>
+                  <TooltipContent side="bottom">Character Management</TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent align="end" className="dropdown-fantasy">
                   <DropdownMenuItem onClick={onManageCharacters}>
@@ -562,16 +579,25 @@ export const SmartHeader: React.FC<SmartHeaderProps> = ({
               {/* Theme Selector */}
               <ThemeSelector />
 
-              {/* About Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="sm" onClick={onShowAbout} className="header-action-btn">
-                    <Info className="w-4 h-4" />
-                    <span>About</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">About Mettle</TooltipContent>
-              </Tooltip>
+              {/* More Menu (3-dot) - About only */}
+              <DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="header-icon-btn">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">More Options</TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="end" className="dropdown-fantasy">
+                  <DropdownMenuItem onClick={onShowAbout}>
+                    <Info className="w-4 h-4 mr-2" />
+                    About Mettle
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         )}

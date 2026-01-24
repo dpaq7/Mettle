@@ -1,7 +1,7 @@
 // Generalized Hero type for all Draw Steel classes
 // Supports all 10 classes via discriminated unions
 
-import { Ancestry, Career, Culture, Kit, Item, Characteristics, ActiveCondition } from './common';
+import { Ancestry, Career, Culture, Kit, Item, Characteristics, ActiveCondition, IncitingIncident, Complication } from './common';
 import { Ability, Feature } from './abilities';
 import { HeroAncestry } from './ancestry';
 import { Portfolio, Squad, Fixture, Champion } from './minion';
@@ -286,6 +286,11 @@ export interface HeroBase {
   activeConditions: ActiveCondition[];
   notes: string;
   portraitUrl: string | null;
+
+  // Story elements (user-editable lore)
+  customIncitingIncident?: string; // The selected or custom inciting incident description
+  selectedIncitingIncidentId?: string; // ID of the selected incident from career options
+  selectedComplication?: Complication | null; // Selected complication from rules (optional)
 
   // Progression tracking
   progressionChoices: ProgressionChoices;

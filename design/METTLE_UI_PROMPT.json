@@ -1,0 +1,511 @@
+{
+  "project": {
+    "name": "Mettle - Anvil VTT Companion App",
+    "description": "A utilitarian, information-dense character management app for the Draw Steel TTRPG, designed as a companion to Anvil VTT",
+    "style": "Professional dark mode UI, inspired by Linear, Slack, and Figma"
+  },
+  "design_system": {
+    "colors": {
+      "backgrounds": {
+        "bg-void": "#09090b",
+        "bg-deep": "#0f0f12",
+        "bg-surface": "#18181b",
+        "bg-elevated": "#27272a",
+        "bg-overlay": "#3f3f46"
+      },
+      "text": {
+        "text-primary": "#fafafa",
+        "text-secondary": "#a1a1aa",
+        "text-muted": "#52525b"
+      },
+      "borders": {
+        "border-subtle": "#27272a",
+        "border-default": "#3f3f46",
+        "border-focus": "#f59e0b"
+      },
+      "accent": {
+        "accent": "#f59e0b",
+        "accent-hover": "#fbbf24",
+        "accent-muted": "#92400e"
+      },
+      "status": {
+        "success": "#22c55e",
+        "warning": "#f59e0b",
+        "danger": "#ef4444",
+        "info": "#3b82f6"
+      }
+    },
+    "typography": {
+      "fonts": {
+        "display": "Cinzel",
+        "body": "Source Sans 3",
+        "mono": "JetBrains Mono"
+      },
+      "sizes": {
+        "xs": "12px",
+        "sm": "14px",
+        "base": "16px",
+        "lg": "20px",
+        "xl": "24px",
+        "2xl": "32px"
+      }
+    },
+    "spacing": {
+      "space-1": "4px",
+      "space-2": "8px",
+      "space-3": "12px",
+      "space-4": "16px",
+      "space-6": "24px",
+      "space-8": "32px"
+    },
+    "radii": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "12px"
+    }
+  },
+  "layout": {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "structure": {
+      "title_header": {
+        "height": 48,
+        "background": "bg-void",
+        "border_bottom": "border-subtle"
+      },
+      "stat_ribbon": {
+        "height": 32,
+        "background": "bg-deep",
+        "border_bottom": "border-subtle"
+      },
+      "command_bar": {
+        "width": 72,
+        "background": "bg-void",
+        "border_right": "border-subtle"
+      },
+      "master_pane": {
+        "width": 280,
+        "background": "bg-deep",
+        "border_right": "border-subtle"
+      },
+      "detail_pane": {
+        "flex": 1,
+        "background": "bg-surface",
+        "padding": 16
+      }
+    }
+  },
+  "screens": [
+    {
+      "id": "character-ancestry",
+      "name": "Character Section - Ancestry Selected",
+      "description": "Main app view with Character section active and Ancestry item selected in master list",
+      "components": {
+        "title_header": {
+          "left": [
+            {
+              "type": "logo",
+              "content": "M",
+              "style": "accent color, 24px"
+            },
+            {
+              "type": "text",
+              "content": "Valeria the Bold",
+              "font": "Cinzel",
+              "size": "xl",
+              "color": "text-primary"
+            }
+          ],
+          "right": [
+            {
+              "type": "button",
+              "content": "Combat",
+              "variant": "ghost",
+              "icon": "sword"
+            },
+            {
+              "type": "button",
+              "content": "menu",
+              "variant": "ghost",
+              "icon": "more-vertical"
+            }
+          ]
+        },
+        "stat_ribbon": {
+          "items": [
+            { "label": "MGT", "value": "+2" },
+            { "label": "AGI", "value": "+1" },
+            { "label": "REA", "value": "+3" },
+            { "label": "INT", "value": "+2" },
+            { "label": "PRS", "value": "+0" },
+            { "label": "SPD", "value": "5" },
+            { "label": "STM", "value": "28/42" },
+            { "label": "REC", "value": "6" },
+            { "label": "Focus", "value": "12", "icon": "zap" }
+          ],
+          "style": {
+            "font": "JetBrains Mono",
+            "size": "sm",
+            "separator": "1px solid border-subtle"
+          }
+        },
+        "command_bar": {
+          "items": [
+            {
+              "id": "character",
+              "icon": "user",
+              "label": "Char",
+              "active": true
+            },
+            {
+              "id": "actions",
+              "icon": "swords",
+              "label": "Acts",
+              "active": false
+            },
+            {
+              "id": "projects",
+              "icon": "clipboard-list",
+              "label": "Proj",
+              "active": false
+            },
+            {
+              "id": "inventory",
+              "icon": "backpack",
+              "label": "Inv",
+              "active": false
+            }
+          ]
+        },
+        "master_pane": {
+          "items": [
+            { "type": "item", "label": "Ancestry", "value": "Human", "selected": true },
+            { "type": "item", "label": "Culture", "value": "Cosmopolitan" },
+            { "type": "item", "label": "Career", "value": "Soldier" },
+            { "type": "item", "label": "Class", "value": "Tactician" },
+            { "type": "item", "label": "Subclass", "value": "Vanguard" },
+            { "type": "item", "label": "Kit", "value": "Shining Armor" },
+            { "type": "item", "label": "Inciting Incident", "value": "" },
+            { "type": "item", "label": "Complications", "badge": "2" },
+            { "type": "item", "label": "Titles", "badge": "1" },
+            { "type": "item", "label": "Languages", "badge": "3" },
+            { "type": "item", "label": "Perks", "badge": "4" }
+          ]
+        },
+        "detail_pane": {
+          "title": "Human",
+          "subtitle": "Ancestry",
+          "content": {
+            "sections": [
+              {
+                "heading": "Traits",
+                "items": [
+                  "Size: Medium (1M)",
+                  "Speed: 5",
+                  "Languages: Common + 1 additional"
+                ]
+              },
+              {
+                "heading": "Ancestry Features",
+                "items": [
+                  {
+                    "name": "Adaptable",
+                    "description": "You gain one additional skill from your career."
+                  },
+                  {
+                    "name": "Determined",
+                    "description": "When you fail a power roll, you can spend a Recovery to reroll. You must use the new result."
+                  }
+                ]
+              },
+              {
+                "heading": "Lore",
+                "text": "Humans are the most widespread ancestry in the world, found in every climate and culture..."
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "actions-ability",
+      "name": "Actions Section - Ability Selected",
+      "description": "Actions section with grouped abilities and Power Strike selected",
+      "components": {
+        "command_bar": {
+          "active": "actions"
+        },
+        "master_pane": {
+          "sections": [
+            {
+              "header": "Main Actions",
+              "items": [
+                { "label": "Melee Attack", "selected": false },
+                { "label": "Ranged Attack", "selected": false },
+                { "label": "Power Strike", "selected": true },
+                { "label": "Tactical Assault", "selected": false }
+              ]
+            },
+            {
+              "header": "Maneuvers",
+              "items": [
+                { "label": "Defend", "selected": false },
+                { "label": "Hide", "selected": false },
+                { "label": "Advance", "selected": false }
+              ]
+            },
+            {
+              "header": "Triggered Actions",
+              "items": [
+                { "label": "Opportunity Attack", "selected": false },
+                { "label": "Parry", "selected": false }
+              ]
+            },
+            {
+              "header": "Free Actions",
+              "items": [
+                { "label": "Mark Target", "selected": false }
+              ]
+            }
+          ]
+        },
+        "detail_pane": {
+          "type": "action_card",
+          "content": {
+            "name": "Power Strike",
+            "type": "Main Action",
+            "type_color": "#3b82f6",
+            "cost": "1 Focus",
+            "keywords": ["Attack", "Melee", "Weapon"],
+            "distance": "Reach 1",
+            "target": "1 creature",
+            "power_roll": {
+              "characteristic": "MGT or AGI",
+              "tiers": [
+                { "tier": "11-", "result": "5 damage" },
+                { "tier": "12-16", "result": "9 damage" },
+                { "tier": "17+", "result": "12 damage; push 1" }
+              ]
+            },
+            "effect": "You strike with extra force, pushing your enemy back on a strong hit.",
+            "roll_button": true
+          }
+        }
+      }
+    },
+    {
+      "id": "projects-active",
+      "name": "Projects Section",
+      "description": "Projects section showing active and completed projects",
+      "components": {
+        "command_bar": {
+          "active": "projects"
+        },
+        "master_pane": {
+          "sections": [
+            {
+              "header": "Active",
+              "items": [
+                { "label": "Research Ancient Texts", "progress": "3/5", "selected": true },
+                { "label": "Build Reputation", "progress": "1/3", "selected": false }
+              ]
+            },
+            {
+              "header": "Completed",
+              "items": [
+                { "label": "Find the Lost Temple", "completed": true, "selected": false }
+              ]
+            }
+          ]
+        },
+        "detail_pane": {
+          "type": "project",
+          "content": {
+            "name": "Research Ancient Texts",
+            "progress": {
+              "current": 3,
+              "total": 5,
+              "bar": true
+            },
+            "description": "Delving into the forbidden archives to uncover the truth about the Sundering.",
+            "skill": "Reason (Lore)",
+            "difficulty": 12,
+            "roll_history": [
+              { "result": 14, "outcome": "success", "date": "Session 4" },
+              { "result": 8, "outcome": "failure", "date": "Session 3" },
+              { "result": 16, "outcome": "success", "date": "Session 2" }
+            ],
+            "roll_button": true
+          }
+        }
+      }
+    },
+    {
+      "id": "inventory-equipped",
+      "name": "Inventory Section",
+      "description": "Inventory section showing equipped items, carried items, and currency",
+      "components": {
+        "command_bar": {
+          "active": "inventory"
+        },
+        "master_pane": {
+          "sections": [
+            {
+              "header": "Equipped",
+              "items": [
+                { "label": "Longsword", "selected": true },
+                { "label": "Chain Mail", "selected": false },
+                { "label": "Shield", "selected": false }
+              ]
+            },
+            {
+              "header": "Carried",
+              "items": [
+                { "label": "Healing Potion", "quantity": 3, "selected": false },
+                { "label": "Rope (50ft)", "selected": false },
+                { "label": "Torch", "quantity": 5, "selected": false }
+              ]
+            },
+            {
+              "header": "Currency",
+              "items": [
+                { "label": "Gold", "value": "150" }
+              ]
+            }
+          ]
+        },
+        "detail_pane": {
+          "type": "item",
+          "content": {
+            "name": "Longsword",
+            "category": "Weapon (Martial, Heavy)",
+            "equipped": true,
+            "stats": [
+              { "label": "Damage", "value": "1d10 + MGT" },
+              { "label": "Range", "value": "Reach 1" },
+              { "label": "Keywords", "value": "Heavy, Versatile" }
+            ],
+            "description": "A well-balanced blade suitable for both one and two-handed use.",
+            "actions": [
+              { "label": "Unequip", "variant": "ghost" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "combat-mode",
+      "name": "Combat Mode Active",
+      "description": "UI state when combat is active, showing enhanced stat ribbon and combat controls",
+      "modifiers": {
+        "title_header": {
+          "combat_button": {
+            "active": true,
+            "label": "End Combat",
+            "color": "danger"
+          },
+          "border_bottom": "danger"
+        },
+        "stat_ribbon": {
+          "highlight": ["STM", "REC"],
+          "additional_items": [
+            { "label": "Turn", "value": "3" },
+            { "label": "Surges", "value": "2", "highlight": true }
+          ],
+          "border_bottom": "danger with subtle glow"
+        }
+      }
+    }
+  ],
+  "component_specs": {
+    "command_bar_item": {
+      "width": 72,
+      "padding": "12px 8px",
+      "icon_size": 20,
+      "label_size": 10,
+      "label_transform": "uppercase",
+      "label_tracking": "0.05em",
+      "states": {
+        "default": {
+          "color": "text-muted",
+          "background": "transparent",
+          "border_left": "2px solid transparent"
+        },
+        "hover": {
+          "color": "text-secondary",
+          "background": "bg-surface"
+        },
+        "active": {
+          "color": "accent",
+          "background": "bg-surface",
+          "border_left": "2px solid accent"
+        }
+      }
+    },
+    "master_list_item": {
+      "padding": "8px 12px",
+      "font_size": 16,
+      "states": {
+        "default": {
+          "color": "text-secondary",
+          "background": "transparent",
+          "border_left": "2px solid transparent"
+        },
+        "hover": {
+          "color": "text-primary",
+          "background": "bg-surface"
+        },
+        "selected": {
+          "color": "text-primary",
+          "background": "bg-surface",
+          "border_left": "2px solid accent"
+        }
+      }
+    },
+    "master_list_section": {
+      "padding": "8px 12px",
+      "font_size": 12,
+      "font_weight": 600,
+      "text_transform": "uppercase",
+      "letter_spacing": "0.1em",
+      "color": "text-muted",
+      "border_bottom": "1px solid border-subtle"
+    },
+    "stat_ribbon_item": {
+      "padding": "0 12px",
+      "font_family": "JetBrains Mono",
+      "font_size": 14,
+      "border_right": "1px solid border-subtle",
+      "label_color": "text-muted",
+      "value_color": "text-primary",
+      "value_weight": 600
+    },
+    "detail_section": {
+      "heading": {
+        "font_size": 12,
+        "font_weight": 600,
+        "text_transform": "uppercase",
+        "letter_spacing": "0.05em",
+        "color": "text-muted",
+        "margin_bottom": 8
+      },
+      "content": {
+        "font_size": 16,
+        "color": "text-secondary",
+        "line_height": 1.5
+      }
+    }
+  },
+  "interaction_notes": [
+    "Command bar items show tooltip on hover with full section name",
+    "Master list items show subtle left border accent when selected",
+    "Detail pane scrolls independently from master pane",
+    "Stat ribbon values update in real-time without animation",
+    "Combat mode adds subtle red tint to borders, not backgrounds",
+    "All interactive elements have 150ms transition",
+    "Focus states use accent color ring (3px)",
+    "No glow effects, no gradients, no decorative elements"
+  ]
+}

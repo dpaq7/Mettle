@@ -1,0 +1,83 @@
+/* ============================================
+   TITLE HEADER - Hero name + controls
+   ============================================ */
+
+.title-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding: 0 var(--space-4);
+  background: var(--bg-void);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.title-header.combat {
+  border-bottom-color: var(--status-danger);
+}
+
+/* Left side */
+.title-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.title-header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  color: var(--bg-void);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sm);
+}
+
+.title-header-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1;
+}
+
+/* Right side */
+.title-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.combat-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.combat-toggle span {
+  font-size: var(--text-sm);
+}
+
+.header-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header-action-btn span {
+  font-size: var(--text-sm);
+}
+
+.menu-trigger {
+  padding: var(--space-2);
+}
+
+/* Menu styling */
+.title-header-menu {
+  min-width: 180px;
+}

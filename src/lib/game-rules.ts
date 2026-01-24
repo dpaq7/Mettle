@@ -26,18 +26,45 @@ import skillsJson from '@/data/generated/skills.json';
 // Existing structured data (richer than MD)
 import { ALL_CONDITIONS, type ConditionDefinition as SourceCondition } from '@/data/conditions';
 import {
-  ancestries as sourceAncestries,
   careers as sourceCareers,
   kits as sourceKits,
   languages as sourceLanguages,
   environmentOptions,
   organizationOptions,
   upbringingOptions,
+  cultures as prebuiltCultures,
 } from '@/data/reference-data';
-import { CLASS_RESOURCE_CONFIG } from '@/data/class-resources';
+// JSON-backed ancestries (canonical source)
+import { ANCESTRIES as sourceAncestries } from '@/data/ancestries/ancestries';
+import { CLASS_RESOURCE_CONFIG, type HeroicResourceConfig } from '@/data/class-resources';
 import { PERKS } from '@/data/perks/perks-data';
 import { classDefinitions as sourceClassDefinitions, ClassDefinition } from '@/data/classes/class-definitions';
+// Summoner data
+import { portfolios, type Portfolio } from '@/data/portfolios';
+import { formations, type FormationData } from '@/data/formations';
+// Null data
+import { NULL_TRADITIONS, type TraditionData } from '@/data/null/traditions';
+import { PSIONIC_AUGMENTATIONS, getAugmentationBonuses, type AugmentationData } from '@/data/null/augmentations';
+// Skills helpers
+import { isSkillGroup as isSkillGroupFn, findSkillByName as findSkillByNameFn, getSkillById as getSkillByIdFn, skillGroups as skillGroupsData, type Skill, type SkillGroup as SkillGroupType, type SkillGroupInfo } from '@/data/skills';
+// Progression data
+import { levelProgressions as summonerProgressions } from '@/data/progression';
+import { furyProgressions } from '@/data/fury/progression';
+import type { LevelProgression } from '@/types/progression';
+// Inciting incidents and complications
+import {
+  getIncitingIncidentsForCareer as getIncidentsForCareer,
+  getIncitingIncident as getIncident,
+  type IncitingIncident,
+} from '@/data/inciting-incidents';
+import {
+  getAllComplications as getComplicationsData,
+  getComplication as getComplicationById,
+  searchComplications as searchComplicationsData,
+  type Complication,
+} from '@/data/complications';
 
+import type { Culture } from '@/types';
 import type {
   DrawSteelData,
   Feature,
@@ -83,29 +110,14 @@ import {
 // ============================================
 
 /**
- * Class stamina configuration.
- * Each class has a base stamina at level 1 and gains per level after.
- */
-const CLASS_STAMINA_CONFIG: Record<HeroClass, { level1: number; perLevel: number; recoveries: number }> = {
-  censor: { level1: 21, perLevel: 9, recoveries: 8 },
-  conduit: { level1: 18, perLevel: 9, recoveries: 8 },
-  elementalist: { level1: 15, perLevel: 6, recoveries: 8 },
-  fury: { level1: 21, perLevel: 9, recoveries: 8 },
-  null: { level1: 18, perLevel: 9, recoveries: 8 },
-  shadow: { level1: 18, perLevel: 9, recoveries: 8 },
-  summoner: { level1: 15, perLevel: 6, recoveries: 8 },
-  tactician: { level1: 21, perLevel: 9, recoveries: 10 },
-  talent: { level1: 18, perLevel: 9, recoveries: 8 },
-  troubadour: { level1: 18, perLevel: 9, recoveries: 8 },
-};
-
-/**
  * Build HeroClassDefinition array from existing class-definitions.ts data.
  * Converts the ClassDefinition format to HeroClassDefinition.
+ *
+ * Note: Stamina values are sourced directly from class-definitions.ts
+ * (startingStamina, staminaPerLevel, startingRecoveries) to avoid duplication.
  */
 function buildClassDefinitions(): HeroClassDefinition[] {
   return Object.values(sourceClassDefinitions).map((source: ClassDefinition): HeroClassDefinition => {
-    const staminaConfig = CLASS_STAMINA_CONFIG[source.id];
 
     // Convert subclasses from SubclassOption to SubclassDefinition
     const subclasses: SubclassDefinition[] = source.subclasses.map((sub) => ({
@@ -140,10 +152,10 @@ function buildClassDefinitions(): HeroClassDefinition[] {
       potencyCharacteristic: source.potencyCharacteristic as Characteristic,
       baseStats: {
         stamina: {
-          level1: staminaConfig.level1,
-          perLevel: staminaConfig.perLevel,
+          level1: source.startingStamina,
+          perLevel: source.staminaPerLevel,
         },
-        recoveries: staminaConfig.recoveries,
+        recoveries: source.startingRecoveries,
       },
       potency: { weak: -2, average: -1, strong: 0 },
       startingCharacteristics,
@@ -236,6 +248,7 @@ function initializeData(): DrawSteelData {
 
   // Map parsed skills to SkillDefinition format
   const skills: SkillDefinition[] = skillsData.skills.map((s) => ({
+    id: s.name.toLowerCase().replace(/\s+/g, '-'),
     name: s.name,
     group: s.group as SkillGroup,
     description: s.use,
@@ -297,7 +310,7 @@ function initializeData(): DrawSteelData {
     traps: trapsData.traps,
 
     // From existing reference data + parsed MD
-    ancestries: sourceAncestries as AncestryDefinition[],
+    ancestries: sourceAncestries,
     careers,
     cultures,
     kits: sourceKits as KitDefinition[],
@@ -602,10 +615,10 @@ export const GameData = {
   // ═══════════════════════════════════════════
 
   /**
-   * Get all culture benefits.
-   * @returns Array of all culture benefit definitions
+   * Get all pre-built cultures for character creation.
+   * @returns Array of pre-built Culture objects with environment, organization, and upbringing
    */
-  getAllCultures: (): CultureBenefit[] => getData().cultures,
+  getAllCultures: (): Culture[] => prebuiltCultures,
 
   /**
    * Get culture benefits filtered by type.
@@ -752,6 +765,40 @@ export const GameData = {
   getSkill: (name: string): SkillDefinition | undefined =>
     getData().skills.find((s) => s.name.toLowerCase() === name.toLowerCase()),
 
+  /**
+   * Find a skill by name or id (case-insensitive).
+   * @param name - Skill name or id
+   * @returns The skill definition or undefined
+   */
+  findSkillByName: (name: string): Skill | undefined => findSkillByNameFn(name),
+
+  /**
+   * Check if a string is a skill group name.
+   * @param skillStr - String to check
+   * @returns True if the string is a valid skill group
+   */
+  isSkillGroup: (skillStr: string): boolean => isSkillGroupFn(skillStr),
+
+  /**
+   * Get a skill by ID.
+   * @param id - Skill ID (e.g., 'alchemy', 'climb')
+   * @returns The skill or undefined
+   */
+  getSkillById: (id: string): Skill | undefined => getSkillByIdFn(id),
+
+  /**
+   * Get skill group metadata.
+   * @param group - Skill group name
+   * @returns Skill group info (name, description, rewards, consequences)
+   */
+  getSkillGroupInfo: (group: SkillGroup): SkillGroupInfo => skillGroupsData[group],
+
+  /**
+   * Get all skill groups with their metadata.
+   * @returns Record of all skill group info
+   */
+  getAllSkillGroups: () => skillGroupsData,
+
   // ═══════════════════════════════════════════
   // CONDITIONS (from MD)
   // ═══════════════════════════════════════════
@@ -797,6 +844,51 @@ export const GameData = {
     getData().perks.find((p) => p.id === id),
 
   // ═══════════════════════════════════════════
+  // INCITING INCIDENTS & COMPLICATIONS
+  // Reference: rules-md/Careers/ and rules-md/Complications/
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get inciting incidents for a specific career.
+   * Each career has 6 pre-defined inciting incident options (d6 table).
+   * @param careerId - Career identifier (e.g., 'agent', 'soldier')
+   * @returns Array of inciting incidents for that career
+   */
+  getIncitingIncidentsForCareer: (careerId: string): IncitingIncident[] =>
+    getIncidentsForCareer(careerId),
+
+  /**
+   * Get a specific inciting incident by career and incident id.
+   * @param careerId - Career identifier
+   * @param incidentId - Incident identifier within that career
+   * @returns The inciting incident or undefined
+   */
+  getIncitingIncident: (careerId: string, incidentId: string): IncitingIncident | undefined =>
+    getIncident(careerId, incidentId),
+
+  /**
+   * Get all complications.
+   * Complications are optional story elements with benefits and drawbacks.
+   * @returns Array of all 100 complication definitions
+   */
+  getAllComplications: (): Complication[] => getComplicationsData(),
+
+  /**
+   * Find a complication by id.
+   * @param id - Complication identifier (kebab-case)
+   * @returns The complication or undefined
+   */
+  getComplication: (id: string): Complication | undefined => getComplicationById(id),
+
+  /**
+   * Search complications by text query.
+   * Searches name, description, benefit, and drawback fields.
+   * @param query - Search text
+   * @returns Array of matching complications
+   */
+  searchComplications: (query: string): Complication[] => searchComplicationsData(query),
+
+  // ═══════════════════════════════════════════
   // LANGUAGES
   // ═══════════════════════════════════════════
 
@@ -815,12 +907,19 @@ export const GameData = {
     getData().languages.find((l) => l.id === id),
 
   /**
-   * Find a language by name (case-insensitive).
-   * @param name - Language display name
+   * Find a language by name or ID (case-insensitive).
+   * Tries ID match first, then falls back to name match.
+   * @param nameOrId - Language display name or identifier
    * @returns The language definition or undefined
    */
-  getLanguageByName: (name: string): LanguageDefinition | undefined =>
-    getData().languages.find((l) => l.name.toLowerCase() === name.toLowerCase()),
+  getLanguageByName: (nameOrId: string): LanguageDefinition | undefined => {
+    const languages = getData().languages;
+    const lower = nameOrId.toLowerCase();
+    // Try ID match first (exact, case-insensitive)
+    return languages.find((l) => l.id.toLowerCase() === lower)
+      // Fall back to name match (case-insensitive)
+      ?? languages.find((l) => l.name.toLowerCase() === lower);
+  },
 
   /**
    * Get languages that heroes can select (excludes default and dead languages).
@@ -1214,6 +1313,235 @@ export const GameData = {
   },
 
   // ═══════════════════════════════════════════
+  // SUMMONER: PORTFOLIOS & FORMATIONS
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get all summoner portfolios.
+   * @returns Record of all portfolios keyed by type
+   */
+  getAllPortfolios: () => portfolios,
+
+  /**
+   * Get a specific portfolio by type.
+   * @param type - Portfolio type (demon, elemental, fey, undead)
+   * @returns The portfolio or undefined
+   */
+  getPortfolio: (type: string): Portfolio | undefined =>
+    portfolios[type as keyof typeof portfolios],
+
+  /**
+   * Get all formations.
+   * @returns Record of all formations keyed by id
+   */
+  getAllFormations: () => formations,
+
+  /**
+   * Get a specific formation by id.
+   * @param id - Formation id (horde, platoon, elite, leader)
+   * @returns The formation data or undefined
+   */
+  getFormation: (id: string): FormationData | undefined =>
+    formations[id as keyof typeof formations],
+
+  // ═══════════════════════════════════════════
+  // NULL: TRADITIONS & AUGMENTATIONS
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get all Null traditions (subclasses).
+   * @returns Record of all traditions keyed by id
+   */
+  getAllNullTraditions: () => NULL_TRADITIONS,
+
+  /**
+   * Get a specific Null tradition.
+   * @param id - Tradition id (chronokinetic, cryokinetic, metakinetic)
+   * @returns The tradition data or undefined
+   */
+  getNullTradition: (id: string): TraditionData | undefined =>
+    NULL_TRADITIONS[id as keyof typeof NULL_TRADITIONS],
+
+  /**
+   * Get all psionic augmentations.
+   * @returns Record of all augmentations keyed by id
+   */
+  getAllPsionicAugmentations: () => PSIONIC_AUGMENTATIONS,
+
+  /**
+   * Get a specific psionic augmentation.
+   * @param id - Augmentation id (density, force, speed)
+   * @returns The augmentation data or undefined
+   */
+  getPsionicAugmentation: (id: string): AugmentationData | undefined =>
+    PSIONIC_AUGMENTATIONS[id as keyof typeof PSIONIC_AUGMENTATIONS],
+
+  /**
+   * Calculate stat bonuses from a psionic augmentation at a given level.
+   * @param augmentation - Augmentation id or undefined
+   * @param level - Hero level
+   * @returns Object with stamina, stability, and speed bonuses
+   */
+  getAugmentationBonuses: (augmentation: string | undefined, level: number) =>
+    getAugmentationBonuses(augmentation, level),
+
+  // ═══════════════════════════════════════════
+  // CULTURE OPTIONS
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get all environment options for culture building.
+   * @returns Array of environment options
+   */
+  getEnvironmentOptions: () => environmentOptions,
+
+  /**
+   * Get all organization options for culture building.
+   * @returns Array of organization options
+   */
+  getOrganizationOptions: () => organizationOptions,
+
+  /**
+   * Get all upbringing options for culture building.
+   * @returns Array of upbringing options
+   */
+  getUpbringingOptions: () => upbringingOptions,
+
+  /**
+   * Build a custom culture from component selections.
+   * @param environmentType - Environment type id
+   * @param organizationType - Organization type id
+   * @param upbringingType - Upbringing type id
+   * @returns A culture object with combined skills, or undefined if invalid
+   */
+  buildCustomCulture: (
+    environmentType: string,
+    organizationType: string,
+    upbringingType: string
+  ) => {
+    const env = environmentOptions.find((o) => o.type === environmentType);
+    const org = organizationOptions.find((o) => o.type === organizationType);
+    const upb = upbringingOptions.find((o) => o.type === upbringingType);
+
+    if (!env || !org || !upb) return undefined;
+
+    return {
+      id: `custom-${environmentType}-${organizationType}-${upbringingType}`,
+      name: `${env.name} ${org.name} (${upb.name})`,
+      environment: env,
+      organization: org,
+      upbringing: upb,
+      language: 'Caelian',
+    };
+  },
+
+  // ═══════════════════════════════════════════
+  // CLASS RESOURCES
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get the heroic resource configuration for a class.
+   * @param heroClass - Class identifier
+   * @returns The resource config (name, abbreviation, color, etc.)
+   */
+  getClassResourceConfig: (heroClass: HeroClass): HeroicResourceConfig =>
+    CLASS_RESOURCE_CONFIG[heroClass],
+
+  /**
+   * Get the full CLASS_RESOURCE_CONFIG record.
+   * @returns Record of all class resource configurations
+   */
+  getAllClassResourceConfigs: () => CLASS_RESOURCE_CONFIG,
+
+  // ═══════════════════════════════════════════
+  // CLASS PROGRESSION
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get level progression data for a specific class and level.
+   * Currently supports: fury, summoner
+   * @param heroClass - Class identifier
+   * @param level - Level (2-10, level 1 has no progression features)
+   * @returns Level progression data or undefined
+   */
+  getProgressionForLevel: (heroClass: HeroClass, level: number): LevelProgression | undefined => {
+    if (level < 2 || level > 10) return undefined;
+
+    switch (heroClass) {
+      case 'fury':
+        return furyProgressions.find((p) => p.level === level);
+      case 'summoner':
+        return summonerProgressions.find((p) => p.level === level);
+      default:
+        // Other classes not yet implemented
+        return undefined;
+    }
+  },
+
+  /**
+   * Get all level progressions for a class.
+   * Currently supports: fury, summoner
+   * @param heroClass - Class identifier
+   * @returns Array of level progressions or empty array
+   */
+  getAllProgressions: (heroClass: HeroClass): LevelProgression[] => {
+    switch (heroClass) {
+      case 'fury':
+        return furyProgressions;
+      case 'summoner':
+        return summonerProgressions;
+      default:
+        return [];
+    }
+  },
+
+  /**
+   * Check if a class has progression data available.
+   * @param heroClass - Class identifier
+   * @returns True if progression data exists
+   */
+  hasProgressionData: (heroClass: HeroClass): boolean => {
+    return heroClass === 'fury' || heroClass === 'summoner';
+  },
+
+  // ═══════════════════════════════════════════
+  // ABILITY LEVEL REQUIREMENTS
+  // Reference: rules-md/Chapters/Classes.md
+  // ═══════════════════════════════════════════
+
+  /**
+   * Get the minimum character level required to use an ability with a given cost.
+   *
+   * Level requirements for heroic resource abilities:
+   * - 3-cost abilities: Level 1+
+   * - 5-cost abilities: Level 1+
+   * - 7-cost abilities: Level 3+
+   * - 9-cost abilities: Level 5+
+   * - 11-cost abilities: Level 8+
+   *
+   * @param cost - The heroic resource cost of the ability
+   * @returns The minimum level required (1-8)
+   */
+  getMinLevelForAbilityCost: (cost: number): number => {
+    if (cost <= 5) return 1;
+    if (cost <= 7) return 3;
+    if (cost <= 9) return 5;
+    return 8; // 11+ cost abilities
+  },
+
+  /**
+   * Check if a character can use an ability based on their level and the ability's cost.
+   *
+   * @param heroLevel - The character's current level
+   * @param abilityCost - The heroic resource cost of the ability
+   * @returns True if the character meets the level requirement
+   */
+  canUseAbilityAtLevel: (heroLevel: number, abilityCost: number): boolean => {
+    const minLevel = GameData.getMinLevelForAbilityCost(abilityCost);
+    return heroLevel >= minLevel;
+  },
+
+  // ═══════════════════════════════════════════
   // TYPE GUARDS (re-exported for convenience)
   // ═══════════════════════════════════════════
 
@@ -1276,3 +1604,16 @@ export {
   isPowerRollEffect,
   hasNestedFeatures,
 } from '@/types/game-data';
+
+// Re-export class-specific data types
+export type { Portfolio } from '@/data/portfolios';
+export type { FormationData } from '@/data/formations';
+export type { TraditionData } from '@/data/null/traditions';
+export type { AugmentationData } from '@/data/null/augmentations';
+export type { HeroicResourceConfig } from '@/data/class-resources';
+export type { LevelProgression, LevelFeature, FeatureChoice } from '@/types/progression';
+export type { Skill, SkillGroup as SkillGroupData, SkillGroupInfo } from '@/data/skills';
+
+// Re-export inciting incidents and complications types
+export type { IncitingIncident } from '@/data/inciting-incidents';
+export type { Complication } from '@/data/complications';

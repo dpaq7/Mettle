@@ -1,0 +1,395 @@
+/* ============================================
+   INVENTORY DETAIL PANE - Item display styles
+   ============================================ */
+
+/* Item Header Meta */
+.item-header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.item-level-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.item-echelon-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+.item-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.item-equipped-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 2px var(--space-2);
+  background: color-mix(in srgb, var(--status-success) 20%, transparent);
+  border: 1px solid var(--status-success);
+  border-radius: var(--radius-sm);
+  color: var(--status-success);
+}
+
+/* Item Rarity Colors */
+.item-rarity {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  text-transform: capitalize;
+}
+
+.item-rarity.common {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.item-rarity.uncommon {
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  border: 1px solid #22c55e;
+  color: #22c55e;
+}
+
+.item-rarity.rare {
+  background: color-mix(in srgb, #3b82f6 15%, transparent);
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+
+.item-rarity.legendary {
+  background: color-mix(in srgb, #a855f7 15%, transparent);
+  border: 1px solid #a855f7;
+  color: #a855f7;
+}
+
+/* Keywords */
+.item-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-3) 0;
+}
+
+.item-keyword {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 2px var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+/* Flavor Text */
+.item-flavor {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* Item Bonuses Grid */
+.item-bonuses-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.item-bonus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--status-success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-success) 30%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.bonus-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--status-success);
+}
+
+.bonus-stat {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.bonus-condition {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Enhancements */
+.item-enhancements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.item-enhancement {
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.item-enhancement.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-elevated));
+}
+
+.item-enhancement.locked {
+  opacity: 0.6;
+}
+
+.item-enhancement-level {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.enhancement-active-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 1px var(--space-2);
+  background: color-mix(in srgb, var(--status-success) 20%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--status-success);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.item-enhancement-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.item-enhancement-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Craft Info */
+.item-craft-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.craft-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.craft-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--accent);
+}
+
+/* Item Actions */
+.item-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.item-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.item-action-btn.primary {
+  background: var(--accent);
+  border: none;
+  color: var(--bg-void);
+}
+
+.item-action-btn.primary:hover {
+  background: var(--accent-hover);
+}
+
+.item-action-btn.ghost {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.item-action-btn.ghost:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.item-action-btn.danger {
+  background: transparent;
+  border: 1px solid var(--status-danger);
+  color: var(--status-danger);
+}
+
+.item-action-btn.danger:hover {
+  background: color-mix(in srgb, var(--status-danger) 15%, transparent);
+}
+
+/* Quantity Controls */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.quantity-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.quantity-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quantity-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-value {
+  min-width: 40px;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+/* Gold Controls */
+.gold-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.gold-btn {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.gold-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Compendium Filter Buttons (in MasterList) */
+.compendium-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.compendium-filter-btn {
+  font-size: var(--text-xs);
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.compendium-filter-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+.compendium-filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-void);
+}
