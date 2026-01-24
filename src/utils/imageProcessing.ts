@@ -118,17 +118,3 @@ export function getBase64SizeKB(base64: string): number {
   // Base64 is ~4/3 the size of original binary
   return Math.round((data.length * 3) / 4 / 1024);
 }
-
-/**
- * Check if aspect ratio is portrait-oriented
- */
-export function checkAspectRatio(
-  width: number,
-  height: number
-): { isPortrait: boolean; ratio: number } {
-  const ratio = height / width;
-  return {
-    isPortrait: ratio >= 1,
-    ratio: Math.round(ratio * 100) / 100,
-  };
-}

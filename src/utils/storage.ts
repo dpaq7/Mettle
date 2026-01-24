@@ -1,5 +1,5 @@
 import { SummonerHero } from '../types';
-import { Hero, SummonerHeroV2, HeroClass, isSummonerHero } from '../types/hero';
+import { Hero, SummonerHeroV2, HeroClass } from '../types/hero';
 import { HeroAncestry } from '../types/ancestry';
 import { portfolios } from '../data/portfolios';
 import { circleToPortfolio } from '../types/summoner';
@@ -739,45 +739,4 @@ export const importCharacterFromJSON = (json: string): ImportValidationResult =>
  */
 export const autoSaveCharacter = (character: Hero): void => {
   saveCharacter(character);
-};
-
-/**
- * Get characters filtered by class
- */
-export const getCharactersByClass = (heroClass: HeroClass): StoredCharacter[] => {
-  return getAllCharacters().filter(c => c.heroClass === heroClass || c.data.heroClass === heroClass);
-};
-
-/**
- * Clear all legacy storage (after confirmed successful migration)
- */
-export const clearLegacyStorage = (): void => {
-  localStorage.removeItem(LEGACY_STORAGE_KEY);
-  localStorage.removeItem(LEGACY_ACTIVE_KEY);
-};
-
-// ===============================
-// Legacy compatibility exports
-// These allow existing code to work while transitioning
-// ===============================
-
-/**
- * Save a SummonerHero (legacy compatibility)
- * @deprecated Use saveCharacter with Hero type instead
- */
-export const saveSummonerCharacter = (character: SummonerHero): void => {
-  const migratedHero = migrateCharacter(character);
-  saveCharacter(migratedHero);
-};
-
-/**
- * Load a SummonerHero by ID (legacy compatibility)
- * @deprecated Use loadCharacter with Hero type instead
- */
-export const loadSummonerCharacter = (id: string): SummonerHeroV2 | null => {
-  const hero = loadCharacter(id);
-  if (hero && isSummonerHero(hero)) {
-    return hero;
-  }
-  return null;
 };

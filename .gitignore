@@ -49,3 +49,13 @@ titles perks projects imbue treasure.md
 # Large source files
 src-tauri/Draw Steel Summoner Icon.png
 fixture header.png
+
+# Recursive OS files (subdirectories)
+**/.DS_Store
+
+# Test coverage output (Vitest)
+coverage/
+
+# Claude Code settings and assets
+.claude/settings.json
+.claude/*.png

@@ -111,11 +111,3 @@ export function useDerivedStats(): UseDerivedStatsResult {
     };
   }, [hero, derivedStats]);
 }
-
-/**
- * Calculate derived stats for a hero (without hook)
- * Useful for one-off calculations or passing to child components
- */
-export function getDerivedStatsForHero(hero: Hero): DerivedStats {
-  return calculateDerivedStats(hero);
-}
