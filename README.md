@@ -2,7 +2,6 @@
 
 A character creation and management tool for the **Draw Steel** TTRPG by MCDM Productions.
 
-![Mettle App Icon](src-tauri/icons/icon.png)
 
 ## Features
 
@@ -64,8 +63,6 @@ Mettle is a fork of [Forge Steel](https://github.com/andyaiken/forgesteel) by An
 
 - [MCDM Productions](https://mcdm.gg/) for creating Draw Steel
 - [Andy Aiken](https://github.com/andyaiken) for the original Forge Steel project
-- The Draw Steel community for feedback and support
 
-## Contributing
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+
