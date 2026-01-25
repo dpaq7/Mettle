@@ -127,9 +127,20 @@ function parseMarkdownTable(body, headerRow = 0) {
 function parseSkills() {
   console.log('Parsing skills...');
   const skillsDir = join(RULES_MD_ROOT, 'Skills');
+  const outputFile = join(OUTPUT_DIR, 'skills.json');
 
   if (!existsSync(skillsDir)) {
     console.log('  Skills directory not found, skipping');
+    // Preserve existing data if available
+    if (existsSync(outputFile)) {
+      try {
+        const existing = JSON.parse(readFileSync(outputFile, 'utf-8'));
+        if (existing.skills && existing.skills.length > 0) {
+          console.log(`  Preserving existing data (${existing.skills.length} skills)`);
+          return existing;
+        }
+      } catch { /* ignore parse errors */ }
+    }
     return { skillGroups: [], skills: [] };
   }
 
@@ -179,9 +190,20 @@ function parseSkills() {
 function parseConditions() {
   console.log('Parsing conditions...');
   const conditionsDir = join(RULES_MD_ROOT, 'Conditions');
+  const outputFile = join(OUTPUT_DIR, 'conditions-md.json');
 
   if (!existsSync(conditionsDir)) {
     console.log('  Conditions directory not found, skipping');
+    // Preserve existing data if available
+    if (existsSync(outputFile)) {
+      try {
+        const existing = JSON.parse(readFileSync(outputFile, 'utf-8'));
+        if (existing.conditions && existing.conditions.length > 0) {
+          console.log(`  Preserving existing data (${existing.conditions.length} conditions)`);
+          return existing;
+        }
+      } catch { /* ignore parse errors */ }
+    }
     return { conditions: [] };
   }
 
@@ -220,9 +242,20 @@ function parseConditions() {
 function parseAncestries() {
   console.log('Parsing ancestries...');
   const ancestriesDir = join(RULES_MD_ROOT, 'Ancestries');
+  const outputFile = join(OUTPUT_DIR, 'ancestries-raw.json');
 
   if (!existsSync(ancestriesDir)) {
     console.log('  Ancestries directory not found, skipping');
+    // Preserve existing data if available
+    if (existsSync(outputFile)) {
+      try {
+        const existing = JSON.parse(readFileSync(outputFile, 'utf-8'));
+        if (existing.ancestries && existing.ancestries.length > 0) {
+          console.log(`  Preserving existing data (${existing.ancestries.length} ancestries)`);
+          return existing;
+        }
+      } catch { /* ignore parse errors */ }
+    }
     return { ancestries: [] };
   }
 
