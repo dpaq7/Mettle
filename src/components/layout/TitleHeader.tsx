@@ -18,7 +18,6 @@ interface TitleHeaderProps {
   onImportCharacter: () => void;
   onExportCharacter: () => void;
   onDuplicateCharacter: () => void;
-  onFullRebuild: () => void;
   onRespite: () => void;
   onShowAbout: () => void;
   canRespec?: boolean;
@@ -30,7 +29,6 @@ export function TitleHeader({
   onImportCharacter,
   onExportCharacter,
   onDuplicateCharacter,
-  onFullRebuild,
   onRespite,
   onShowAbout,
   canRespec = false,
@@ -131,9 +129,6 @@ export function TitleHeader({
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onDuplicateCharacter}>
                   Duplicate Character
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onFullRebuild}>
-                  Full Rebuild
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -137,21 +137,30 @@ export function DicePopover({ open, onOpenChange }: DicePopoverProps) {
           <div className="dice-quick-buttons">
             <button
               className="dice-quick-button"
-              onClick={() => handleRoll('d6', 'Damage')}
+              onClick={() => {
+                handleRoll('d6', 'Damage');
+                if (!isHistoryOpen) toggleHistory();
+              }}
               title="Roll d6"
             >
               <span className="dice-icon">d6</span>
             </button>
             <button
               className="dice-quick-button"
-              onClick={() => handleRoll('d3', 'Random')}
+              onClick={() => {
+                handleRoll('d3', 'Random');
+                if (!isHistoryOpen) toggleHistory();
+              }}
               title="Roll d3"
             >
               <span className="dice-icon">d3</span>
             </button>
             <button
               className="dice-quick-button save"
-              onClick={() => handleRoll('d10', 'Save')}
+              onClick={() => {
+                handleRoll('d10', 'Save');
+                if (!isHistoryOpen) toggleHistory();
+              }}
               title="Roll d10 Save (6+ success)"
             >
               <span className="dice-icon">Save</span>

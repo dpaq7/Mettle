@@ -14,7 +14,6 @@ interface AppShellProps {
   onImportCharacter: () => void;
   onExportCharacter: () => void;
   onDuplicateCharacter: () => void;
-  onFullRebuild: () => void;
   onRespite: () => void;
   onShowAbout: () => void;
   canRespec?: boolean;
@@ -33,7 +32,6 @@ export function AppShell({
   onImportCharacter,
   onExportCharacter,
   onDuplicateCharacter,
-  onFullRebuild,
   onRespite,
   onShowAbout,
   canRespec = false,
@@ -54,7 +52,6 @@ export function AppShell({
           onImportCharacter={onImportCharacter}
           onExportCharacter={onExportCharacter}
           onDuplicateCharacter={onDuplicateCharacter}
-          onFullRebuild={onFullRebuild}
           onRespite={onRespite}
           onShowAbout={onShowAbout}
           canRespec={canRespec}

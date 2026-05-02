@@ -12,7 +12,6 @@ import RollHistoryPanel from './components/shared/RollHistoryPanel';
 import LegalModal from './components/shared/LegalModal';
 import { ImportCharacterDialog } from './components/shared/ImportCharacterDialog';
 import { DeleteCharacterDialog } from './components/shared/DeleteCharacterDialog';
-import { RespecConfirmDialog } from './components/shared/RespecConfirmDialog';
 import ErrorBoundary from './components/shared/ErrorBoundary';
 import {
   downloadCharacterJSON,
@@ -100,8 +99,6 @@ function AppContent() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Hero | null>(null);
-  const [showFullRebuildDialog, setShowFullRebuildDialog] = useState(false);
-  const [respecXpToPreserve, setRespecXpToPreserve] = useState<number>(0);
 
   // Use centralized dice rolling hook
   const { rollHistory } = useDiceRolling();
@@ -167,26 +164,7 @@ function AppContent() {
     setCharacterToDelete(null);
   }, [characterToDelete, setHero]);
 
-  // Full Rebuild (dropdown menu) - rebuilds entire character from scratch
-  const handleFullRebuildClick = useCallback(() => {
-    if (hero) {
-      setShowFullRebuildDialog(true);
-    }
-  }, [hero]);
-
-  const handleConfirmFullRebuild = useCallback(() => {
-    if (!hero) return;
-    const totalXp = (hero.xp || 0) + (hero.victories || 0);
-    setRespecXpToPreserve(totalXp);
-    setShowFullRebuildDialog(false);
-    setHero(null);
-    setShowCharacterCreation(true);
-  }, [hero, setHero]);
-
   const handleCreationComplete = () => {
-    if (respecXpToPreserve > 0) {
-      setRespecXpToPreserve(0);
-    }
     setShowCharacterCreation(false);
   };
 
@@ -224,7 +202,6 @@ function AppContent() {
           <ErrorBoundary componentName="CharacterCreation">
             <CharacterCreation
               onComplete={handleCreationComplete}
-              respecXp={respecXpToPreserve}
             />
           </ErrorBoundary>
         </main>
@@ -257,7 +234,6 @@ function AppContent() {
         onImportCharacter={handleImportCharacter}
         onExportCharacter={handleExportCharacter}
         onDuplicateCharacter={handleDuplicateCharacter}
-        onFullRebuild={handleFullRebuildClick}
         onRespite={() => setShowRespiteConfirm(true)}
         onShowAbout={() => setShowLegalModal(true)}
         canRespec={canRespec}
@@ -338,14 +314,6 @@ function AppContent() {
         character={characterToDelete}
         onConfirm={handleConfirmDelete}
         isCurrentCharacter={characterToDelete?.id === hero?.id}
-      />
-
-      {/* Full Rebuild Character Confirmation Dialog */}
-      <RespecConfirmDialog
-        open={showFullRebuildDialog}
-        onOpenChange={setShowFullRebuildDialog}
-        character={hero}
-        onConfirm={handleConfirmFullRebuild}
       />
     </div>
   );
