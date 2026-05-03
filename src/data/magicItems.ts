@@ -2,6 +2,30 @@
 
 export type ItemCategory = 'consumable' | 'trinket' | 'leveled' | 'artifact';
 export type EquipmentSlot = 'head' | 'neck' | 'arms' | 'hands' | 'waist' | 'feet' | 'ring' | 'held' | 'mount' | 'armor' | 'weapon' | 'implement';
+export type MagicItemActionType =
+  | 'main'
+  | 'maneuver'
+  | 'triggered'
+  | 'free'
+  | 'freeManeuver'
+  | 'move'
+  | 'respite'
+  | 'useConsumable';
+
+export interface MagicItemAction {
+  id: string;
+  label: string;
+  type: MagicItemActionType;
+  summary: string;
+  level?: number;
+  expendable: boolean;
+}
+
+export interface MagicItemStatRow {
+  label: string;
+  value: string;
+  tone?: 'default' | 'bonus' | 'locked';
+}
 
 export interface MagicItem {
   id: string;
@@ -21,6 +45,17 @@ export interface ItemEnhancement {
   level: number;
   effect: string;
 }
+
+const ACTION_LABELS: Record<MagicItemActionType, string> = {
+  main: 'Main Action',
+  maneuver: 'Maneuver',
+  triggered: 'Triggered Action',
+  free: 'Free Action',
+  freeManeuver: 'Free Maneuver',
+  move: 'Move Action',
+  respite: 'Respite',
+  useConsumable: 'Use Consumable',
+};
 
 export const CONSUMABLE_ITEMS: MagicItem[] = [
   // 1st Echelon Consumables
@@ -993,6 +1028,19 @@ export const getItemById = (id: string): MagicItem | undefined => {
   return ALL_MAGIC_ITEMS.find(item => item.id === id);
 };
 
+export const getItemRulesText = (item: MagicItem, heroLevel: number = 1): string => {
+  if (!item.enhancements || item.category !== 'leveled') {
+    return item.effect;
+  }
+
+  const activeEnhancements = item.enhancements.filter((enhancement) => heroLevel >= enhancement.level);
+  const enhancements = activeEnhancements.length > 0 ? activeEnhancements : item.enhancements.slice(0, 1);
+
+  return enhancements
+    .map((enhancement) => `Level ${enhancement.level}: ${enhancement.effect}`)
+    .join('\n');
+};
+
 // Parsed bonus interface
 export interface ParsedBonus {
   stat: 'stamina' | 'stability' | 'speed' | 'damage' | 'savingThrow' | 'rangeDistance';
@@ -1008,7 +1056,7 @@ export const parseItemBonuses = (item: MagicItem, heroLevel: number = 1): Parsed
   const bonuses: ParsedBonus[] = [];
 
   // For leveled items, find the appropriate enhancement based on hero level
-  let effectText = item.effect;
+  let effectText = getItemRulesText(item, heroLevel);
   if (item.enhancements && item.category === 'leveled') {
     // Find highest applicable enhancement
     const applicable = item.enhancements.filter(enh => heroLevel >= enh.level);
@@ -1077,4 +1125,119 @@ export const getEnhancementTier = (item: MagicItem, heroLevel: number): number =
   if (heroLevel >= 9) return 9;
   if (heroLevel >= 5) return 5;
   return 1;
+};
+
+const findActionType = (text: string, item: MagicItem): MagicItemActionType | null => {
+  const effect = text.toLowerCase();
+
+  if (effect.includes('triggered action')) return 'triggered';
+  if (effect.includes('free maneuver')) return 'freeManeuver';
+  if (effect.includes('free action')) return 'free';
+  if (effect.includes('main action')) return 'main';
+  if (effect.includes('move action')) return 'move';
+  if (effect.includes('as a maneuver') || effect.includes('use a maneuver') || effect.includes('maneuver:')) {
+    return 'maneuver';
+  }
+  if (effect.includes('during a respite') || effect.includes('end of your next respite')) return 'respite';
+  if (item.category === 'consumable') return 'useConsumable';
+
+  return null;
+};
+
+const getActionSummaryCandidates = (item: MagicItem, heroLevel: number): Array<{ text: string; level?: number }> => {
+  if (item.enhancements && item.category === 'leveled') {
+    const visibleEnhancements = item.enhancements.filter((enhancement) => heroLevel >= enhancement.level);
+    const enhancements = visibleEnhancements.length > 0 ? visibleEnhancements : item.enhancements.slice(0, 1);
+
+    return enhancements.map((enhancement) => ({
+      text: enhancement.effect,
+      level: enhancement.level,
+    }));
+  }
+
+  return item.effect
+    .split(/\n{2,}/)
+    .map((text) => ({ text: text.trim() }))
+    .filter(({ text }) => text.length > 0);
+};
+
+export const getItemActions = (item: MagicItem, heroLevel: number = 1): MagicItemAction[] => {
+  const actions = getActionSummaryCandidates(item, heroLevel)
+    .map(({ text, level }, index): MagicItemAction | null => {
+      const type = findActionType(text, item);
+      if (!type) return null;
+
+      const sectionMatch = text.match(/^([A-Z][A-Z0-9' -]+):\s*(.+)$/);
+      const summary = (sectionMatch?.[2] ?? text).replace(/\s+/g, ' ').trim();
+      const sectionLabel = sectionMatch?.[1]
+        ? sectionMatch[1]
+            .toLowerCase()
+            .replace(/\b\w/g, (letter) => letter.toUpperCase())
+            .replace(/'S\b/g, "'s")
+        : ACTION_LABELS[type];
+
+      return {
+        id: `${item.id}-${level ?? 'base'}-${index}`,
+        label: level ? `Level ${level} ${sectionLabel}` : sectionLabel,
+        type,
+        summary,
+        level,
+        expendable: item.category === 'consumable',
+      };
+    })
+    .filter((action): action is MagicItemAction => action !== null);
+
+  if (actions.length === 0 && item.category === 'consumable') {
+    return [
+      {
+        id: `${item.id}-use-consumable`,
+        label: ACTION_LABELS.useConsumable,
+        type: 'useConsumable',
+        summary: item.effect.replace(/\s+/g, ' ').trim(),
+        expendable: true,
+      },
+    ];
+  }
+
+  return actions;
+};
+
+export const getItemStatBlock = (item: MagicItem, heroLevel: number = 1): MagicItemStatRow[] => {
+  const rows: MagicItemStatRow[] = [
+    { label: 'Type', value: item.category === 'leveled' ? 'Leveled Treasure' : item.category },
+    { label: 'Echelon', value: String(item.echelon) },
+  ];
+
+  if (item.slot) {
+    rows.push({ label: 'Slot', value: item.slot });
+  }
+
+  if (item.projectGoal) {
+    rows.push({ label: 'Craft Goal', value: `${item.projectGoal} PP` });
+  }
+
+  if (item.keywords?.length) {
+    rows.push({ label: 'Keywords', value: item.keywords.join(', ') });
+  }
+
+  if (item.prerequisite) {
+    rows.push({ label: 'Prerequisite', value: item.prerequisite });
+  }
+
+  if (item.category === 'leveled') {
+    rows.push({ label: 'Active Tier', value: `Level ${getEnhancementTier(item, heroLevel)}` });
+  }
+
+  parseItemBonuses(item, heroLevel).forEach((bonus) => {
+    const label = bonus.stat
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (letter) => letter.toUpperCase());
+    rows.push({
+      label,
+      value: `+${bonus.value}${bonus.conditional ? ` (${bonus.conditional})` : ''}`,
+      tone: 'bonus',
+    });
+  });
+
+  return rows;
 };

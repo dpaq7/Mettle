@@ -17,7 +17,7 @@ import { MinionTemplate, Squad, Minion } from '../types';
 import {
   generateId,
   calculateMinionBonusStamina,
-  calculateEssenceCost,
+  calculateEffectiveEssenceCost,
   calculateMinionLevelStaminaBonus,
 } from '../utils/calculations';
 import {
@@ -42,7 +42,7 @@ export interface SummonResult {
 
 export const useSummonMinion = () => {
   const { hero: genericHero, updateHero } = useSummonerContext();
-  const { spendEssence, essenceState } = useCombatContext();
+  const { spendEssence, essenceState, clearPendingSacrifices } = useCombatContext();
 
   const hero = genericHero && isSummonerHero(genericHero) ? genericHero : null;
 
@@ -85,6 +85,7 @@ export const useSummonMinion = () => {
       maxStamina: totalStamina,
       hasMoved: false,
       hasActed: false,
+      hasUsedManeuver: false,
     };
   }, []);
 
@@ -119,8 +120,14 @@ export const useSummonMinion = () => {
       };
     }
 
+    const pendingSacrificeCount = essenceState.pendingSacrificeCount ?? 0;
+    const validationOptions: SummonOptions = {
+      ...options,
+      sacrificeCount: options.sacrificeCount ?? pendingSacrificeCount,
+    };
+
     // Validate the summon
-    const validation = validateSummon(hero, template, options);
+    const validation = validateSummon(hero, template, validationOptions);
 
     if (!validation.canSummon) {
       return {
@@ -130,9 +137,14 @@ export const useSummonMinion = () => {
     }
 
     // Calculate actual cost
-    const { isFreeSummon = false, sacrificeCount = 0 } = options;
-    const formationAdjustedCost = calculateEssenceCost(template.essenceCost, hero.formation);
-    const adjustedCost = Math.max(0, formationAdjustedCost - sacrificeCount);
+    const { isFreeSummon = false } = options;
+    const sacrificeCount = validationOptions.sacrificeCount ?? 0;
+    const adjustedCost = calculateEffectiveEssenceCost(
+      template.essenceCost,
+      hero.formation,
+      hero.level,
+      sacrificeCount
+    );
     const effectiveCost = isFreeSummon ? 0 : adjustedCost;
 
     // Create minions
@@ -184,6 +196,10 @@ export const useSummonMinion = () => {
       spendEssence(effectiveCost);
     }
 
+    if (!isFreeSummon && sacrificeCount > 0) {
+      clearPendingSacrifices();
+    }
+
     // Update hero with new squads
     updateHero({
       activeSquads,
@@ -197,7 +213,7 @@ export const useSummonMinion = () => {
       essenceSpent: effectiveCost,
       wasFreeSummon: isFreeSummon,
     };
-  }, [hero, createMinion, createSquadFromMinions, spendEssence, updateHero]);
+  }, [hero, essenceState.pendingSacrificeCount, createMinion, createSquadFromMinions, spendEssence, clearPendingSacrifices, updateHero]);
 
   /**
    * Get summoning status for UI display
@@ -273,8 +289,11 @@ export const useSummonMinion = () => {
         },
       };
     }
-    return validateSummon(hero, template, options);
-  }, [hero]);
+    return validateSummon(hero, template, {
+      ...options,
+      sacrificeCount: options.sacrificeCount ?? (essenceState.pendingSacrificeCount ?? 0),
+    });
+  }, [hero, essenceState.pendingSacrificeCount]);
 
   return {
     summonMinion,

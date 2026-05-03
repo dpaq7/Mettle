@@ -223,6 +223,49 @@
   color: var(--bg-void, #09090b);
 }
 
+.status-badge.temp {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+}
+
+.temp-stamina-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg-elevated, #27272a);
+  border: 1px solid var(--border-subtle, #27272a);
+  border-radius: 6px;
+}
+
+.temp-stamina-panel.active {
+  border-color: rgba(59, 130, 246, 0.55);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.temp-stamina-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary, #a1a1aa);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.temp-stamina-header svg {
+  color: #93c5fd;
+}
+
+.temp-stamina-header strong {
+  color: #bfdbfe;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+.temp-controls {
+  gap: 6px;
+}
+
 /* ============================================
    RECOVERIES POPOVER SPECIFIC
    ============================================ */

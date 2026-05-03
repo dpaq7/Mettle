@@ -30,6 +30,7 @@ export interface StaminaPool {
   current: number;
   max: number;
   winded: number; // Half of max, rounded down
+  temporary?: number;
 }
 
 export interface RecoveryPool {

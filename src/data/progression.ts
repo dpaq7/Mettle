@@ -17,22 +17,22 @@ export const wards: Ward[] = [
   {
     id: 'conjured',
     name: 'Conjured Ward',
-    description: '+3 Stamina (scales with level). Your maximum stamina increases by 3, plus an additional 1 at levels 5 and 9.',
+    description: '+3 Stamina. This bonus increases by 3 at 4th, 7th, and 10th levels.',
   },
   {
     id: 'emergency',
     name: 'Emergency Ward',
-    description: 'When you take damage, you can use a triggered action to shift 1 square and summon a Signature Minion adjacent to you.',
+    description: 'The first time each round you take damage, you can use a free triggered action to shift 1 after the effect resolves and summon a signature minion into the square you left.',
   },
   {
     id: 'howling',
     name: 'Howling Ward',
-    description: 'Enemies that start their turn within 1 square of you take R damage.',
+    description: 'You create a 1-aura vortex when you enter combat. An enemy that starts their turn adjacent to you takes damage equal to your Reason.',
   },
   {
     id: 'snare',
     name: 'Snare Ward',
-    description: 'When you take melee damage, you can use a triggered action to pull the attacker R squares toward you.',
+    description: 'Whenever an adjacent creature deals damage to you, you can use a free triggered action to pull that creature toward one of your minions within Summoner\'s Range a number of squares equal to your Reason.',
   },
 ];
 
@@ -139,13 +139,13 @@ export const circleUpgrades: CircleUpgrade[] = [
     id: 'shaping',
     circle: 'blight',
     name: 'Shaping',
-    description: 'You can disguise your demon minions to appear as other creatures or objects. They retain their abilities but gain a mundane appearance.',
+    description: 'After a 1-minute ritual, one of your minions can fold their shape and disguise themself as a duplicate of you, including basic Caelian speech. You can disguise a number of minions equal to your Reason.',
   },
   {
     id: 'soul_flense',
     circle: 'blight',
     name: 'Soul Flense',
-    description: 'As a maneuver, you can have a demon minion deal damage to an adjacent ally to cleanse one condition from that ally.',
+    description: 'As a maneuver, command one or more demon minions to each deal irreducible free strike damage to an adjacent ally. The ally ends a condition and confers it to the demon. Death Snap can also pass a suffered condition to its target with Presence potency.',
   },
   // Graves (Undead)
   {
@@ -158,14 +158,14 @@ export const circleUpgrades: CircleUpgrade[] = [
     id: 'dread_march',
     circle: 'graves',
     name: 'Dread March',
-    description: 'Your undead minions ignore difficult terrain. When an undead minion would die, it instead remains at 1 HP until the end of your next turn.',
+    description: 'You and your undead minions don\'t spend extra speed in difficult terrain. If one or more undead minions would die while using their move action, they can choose not to die until the end of your turn.',
   },
   // Spring (Fey)
   {
     id: 'flash_powder',
     circle: 'spring',
     name: 'Flash Powder',
-    description: 'When you use Pixie Dust, allies also gain temporary flight and concealment until the start of your next turn.',
+    description: 'Each ally who gains temporary Stamina from Pixie Dust also gains one option until the end of their next turn, or 10 minutes outside combat: Flight, Vanish, Water Weird, or Panacea.',
   },
   {
     id: 'pixie_lift',
@@ -178,13 +178,13 @@ export const circleUpgrades: CircleUpgrade[] = [
     id: 'nature_watch',
     circle: 'storms',
     name: 'Nature Watch',
-    description: 'You can see through the senses of any elemental mote within 1 mile. The mote can scout ahead and report back.',
+    description: 'Once per day after a 1-minute ritual, summon a beacon elemental mote to patrol. It telepathically reports hostile creatures, hazards, or traps within 20 squares no matter how far away it is. You can have beacons active equal to your level.',
   },
   {
     id: 'split',
     circle: 'storms',
     name: 'Split',
-    description: 'As a maneuver, you can split an elemental minion into two copies, each with half the original HP. Both act on your turn.',
+    description: 'Once during your turn as a free maneuver, deal damage to one elemental minion equal to half its maximum Stamina to create one additional copy in an adjacent unoccupied space and add it to the squad, even at minion maximum. You can\'t use this if it would kill one or more minions in the squad.',
   },
 ];
 
@@ -266,6 +266,12 @@ export const levelProgressions: LevelProgression[] = [
         type: 'automatic',
       },
       {
+        id: 'minion_chain',
+        name: 'Minion Chain',
+        description: 'Your minions can form linked paths and battlefield connections as described by the level 4 Summoner feature.',
+        type: 'automatic',
+      },
+      {
         id: 'minion_stats',
         name: 'Minion Stat Boost',
         description: 'Signature minions gain +1 Stamina. 3-Essence minions gain +3 Stamina. 5-Essence minions gain +2 Stamina.',
@@ -312,9 +318,9 @@ export const levelProgressions: LevelProgression[] = [
         category: 'circle-upgrade',
       },
       {
-        id: 'minion_chain',
-        name: 'Minion Chain',
-        description: 'Your minions can grapple each other to form bridges across gaps.',
+        id: 'new_portfolio_minion_l5',
+        name: 'New Portfolio Minion',
+        description: 'Add a new portfolio minion option; your available minion cost tiers now include 7 essence.',
         type: 'automatic',
       },
     ],
@@ -338,8 +344,8 @@ export const levelProgressions: LevelProgression[] = [
       },
       {
         id: 'nine_essence_abilities',
-        name: '9-Essence Abilities (Champions)',
-        description: 'You can now summon a Champion (9 Essence, limit 1/encounter). Choose a Champion ability.',
+        name: '9-Essence Abilities',
+        description: 'Choose one 9-Essence champion-keyword ability. These call on your future champion\'s power before the Portfolio Champion feature unlocks at level 8.',
         type: 'choice',
         choices: nineEssenceAbilities.map(a => ({
           id: a.id,
@@ -388,7 +394,7 @@ export const levelProgressions: LevelProgression[] = [
       {
         id: 'their_life_for_mine',
         name: 'Their Life For Mine',
-        description: 'When you would die, you can sacrifice all your minions and essence to revive at 1 HP.',
+        description: 'When you or an ally within Summoner\'s Range would die from a non-age-related effect, sacrifice all active minions and all essence, minimum 1 each, to restore life with 1 Stamina per minion and essence spent.',
         type: 'automatic',
       },
     ],
@@ -402,6 +408,31 @@ export const levelProgressions: LevelProgression[] = [
       fiveEssenceStaminaBonus: 2,
       sevenEssenceStaminaBonus: 5,
     },
+  },
+
+  // Level 8
+  {
+    level: 8,
+    features: [
+      {
+        id: 'perk_level8',
+        name: 'Perk',
+        description: 'Gain any one Perk of your choice.',
+        type: 'automatic',
+      },
+      {
+        id: 'circle_feature_level8',
+        name: '8th-Level Circle Feature',
+        description: 'Gain your circle\'s 8th-level feature: Abyssal Evolution, Kill the Pain, Celestial Grace, or Control the Elements.',
+        type: 'automatic',
+      },
+      {
+        id: 'portfolio_champion',
+        name: 'Portfolio Champion',
+        description: 'Your portfolio gains its 9-Essence champion: Demon Lord\'s Aspect, Dragon\'s Portent, Celestial Attendant, or Avatar of Death. You can command one champion at a time and must earn a Victory before resummoning after it dies.',
+        type: 'automatic',
+      },
+    ],
   },
 
   // Level 9
@@ -422,8 +453,8 @@ export const levelProgressions: LevelProgression[] = [
       },
       {
         id: 'steward',
-        name: 'Steward',
-        description: 'You have advantage on diplomacy checks with creatures from your portfolio\'s home plane.',
+        name: 'Steward of Two Worlds',
+        description: 'You and your allies are welcome in your circle\'s source manifold. Negotiations with native denizens of that place have their patience increased by 2.',
         type: 'automatic',
       },
       {
@@ -478,7 +509,13 @@ export const levelProgressions: LevelProgression[] = [
       {
         id: 'no_matter_the_cost',
         name: 'No Matter the Cost',
-        description: 'When sacrificing minions to reduce ability cost, each minion reduces the cost by its full essence value instead of 1.',
+        description: 'Whenever you sacrifice minions, the cost reduction now equals the number of sacrificed minions, to a minimum final cost of 1, instead of reducing the cost by only 1 total.',
+        type: 'automatic',
+      },
+      {
+        id: 'among_our_ranks',
+        name: 'Among Our Ranks',
+        description: 'As a respite activity, summon a willing and not-restrained NPC or companion into your army as described by the level 10 Summoner feature.',
         type: 'automatic',
       },
     ],

@@ -29,7 +29,8 @@ interface CombatContextType {
   onMinionDeath: () => void; // Trigger essence gain from minion death
   setOnCombatStartCallback: (callback: (() => void) | null) => void;
   hasSacrificedThisTurn: boolean;
-  sacrificeMinion: () => boolean; // Sacrifice a signature minion for 1 essence (1/turn)
+  sacrificeMinion: () => boolean; // Queue a sacrificed minion to reduce the next summon/essence cost
+  clearPendingSacrifices: () => void;
   onEndTurn: () => void; // Generic end-of-turn callback for turn tracker
   selectFreeMinion: (templateId: string) => void; // Select a signature minion from pending free minions
 }
@@ -69,9 +70,8 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     signatureMinionsSpawnedThisTurn: false,
     minionDeathEssenceGainedThisRound: false,
     pendingFreeMinions: 0,
+    pendingSacrificeCount: 0,
   });
-
-  const [hasSacrificedThisTurn, setHasSacrificedThisTurn] = useState(false);
 
   const [turnState, setTurnState] = useState<TurnState>({
     currentPhase: 'collectResources',
@@ -131,6 +131,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       maxStamina: totalStamina,
       hasMoved: false,
       hasActed: false,
+      hasUsedManeuver: false,
     };
   }, [hero]);
 
@@ -193,6 +194,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
             maxStamina: minion.maxStamina,
             hasMoved: false,
             hasActed: false,
+            hasUsedManeuver: false,
           };
           newSquads.push(squad);
         }
@@ -212,7 +214,6 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     // Set combat state for ALL classes
     setIsInCombat(true);
     setCombatTurnNumber(1);
-    setHasSacrificedThisTurn(false);
     setTurnState({
       currentPhase: 'collectResources',
       roundNumber: 1,
@@ -270,6 +271,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         signatureMinionsSpawnedThisTurn: false, // Will be true after player selects
         minionDeathEssenceGainedThisRound: false,
         pendingFreeMinions: freeMinionCount, // Player will select these
+        pendingSacrificeCount: 0,
       });
     } else if (genericHero) {
       // Non-Summoner classes: reset their heroic resource at combat start if needed
@@ -283,6 +285,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         signatureMinionsSpawnedThisTurn: false,
         minionDeathEssenceGainedThisRound: false,
         pendingFreeMinions: 0,
+        pendingSacrificeCount: 0,
       });
     }
 
@@ -297,11 +300,39 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
 
     // Reset squads and increment victories by 1 (assuming combat victory)
     if (hero) {
+      const nextChampionState = hero.championState ? {
+        ...hero.championState,
+        canSummon: true,
+        requiresVictoryToResummon: false,
+        summonedThisEncounter: false,
+        championActionUsed: false,
+      } : hero.championState;
+
       updateHero({
         activeSquads: [],
         fixture: null,
+        activeChampion: null,
+        championState: nextChampionState,
+        heroicResource: {
+          ...hero.heroicResource,
+          current: 0,
+        },
+        outOfCombatState: hero.outOfCombatState ? {
+          ...hero.outOfCombatState,
+          usedAbilities: {},
+        } : hero.outOfCombatState,
         victories: (hero.victories || 0) + 1,
       });
+
+      setEssenceState(prev => ({
+        ...prev,
+        currentEssence: 0,
+        essenceGainedThisTurn: 0,
+        signatureMinionsSpawnedThisTurn: false,
+        minionDeathEssenceGainedThisRound: false,
+        pendingFreeMinions: 0,
+        pendingSacrificeCount: 0,
+      }));
     } else if (genericHero) {
       // Non-Summoner classes also get a victory
       updateHero({
@@ -316,7 +347,6 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     const newTurnNumber = turnState.roundNumber + 1;
     const currentEssence = hero.heroicResource?.current ?? essenceState.currentEssence;
 
-    setHasSacrificedThisTurn(false);
     setTurnState({
       currentPhase: 'collectResources',
       roundNumber: newTurnNumber,
@@ -340,6 +370,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       signatureMinionsSpawnedThisTurn: false, // Will be true after player selects
       minionDeathEssenceGainedThisRound: false, // Reset for new round
       pendingFreeMinions: freeMinionCount, // Player will select these
+      pendingSacrificeCount: 0,
     }));
 
     // Reset squad and minion action states (for sacrifice tracking)
@@ -347,6 +378,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
       ...squad,
       hasMoved: false,
       hasActed: false,
+      hasUsedManeuver: false,
       // Reset individual minion action states for sacrifice eligibility
       members: squad.members.map(minion => ({
         ...minion,
@@ -441,46 +473,24 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
   };
 
   /**
-   * Calculate sacrifice cost reduction for summoning.
-   * SRD: Sacrificing minions reduces the essence cost of summoning.
-   * - Base: Cost reduced by 1 per minion sacrificed
-   * - Level 10 (No Matter the Cost): Cost reduced by each minion's full essence value
-   *
-   * NOTE: This is NOT an action that grants essence - it's used when summoning.
-   * The old sacrificeMinion() function was incorrect.
-   *
-   * @param minionsToSacrifice - Number of minions being sacrificed
-   * @returns The cost reduction amount
-   */
-  const calculateSacrificeCostReduction = (minionsToSacrifice: number): number => {
-    if (!hero || minionsToSacrifice <= 0) return 0;
-
-    // Level 10 (No Matter the Cost): Each minion reduces cost by its essence value
-    // For signature minions (1 essence), this is the same as base
-    // For implementation, we'll treat each sacrifice as reducing cost by 1
-    // (since we sacrifice signature minions, which cost 1)
-    return minionsToSacrifice;
-  };
-
-  /**
-   * Legacy sacrifice function - grants 1 essence when sacrificing a minion.
-   *
-   * Note: Per official rules, sacrifice should reduce summoning costs rather than
-   * directly granting essence. This implementation is kept for backward compatibility
-   * with existing saved characters. The proper behavior is handled via
-   * calculateSacrificeCostReduction() in utils/calculations.ts.
-   *
-   * @returns true if sacrifice succeeded, false if already sacrificed this turn
+   * Queue a willing sacrifice to reduce the next essence cost.
+   * Removing the minion itself is handled by the caller so willing sacrifices
+   * don't trigger unwilling-death essence salvage.
    */
   const sacrificeMinion = (): boolean => {
-    if (hasSacrificedThisTurn) {
-      return false; // Already sacrificed this turn
-    }
-    setHasSacrificedThisTurn(true);
-    // Legacy behavior: grants 1 essence (kept for backward compatibility)
-    gainEssence(1);
+    setEssenceState(prev => ({
+      ...prev,
+      pendingSacrificeCount: (prev.pendingSacrificeCount ?? 0) + 1,
+    }));
     return true;
   };
+
+  const clearPendingSacrifices = useCallback(() => {
+    setEssenceState(prev => ({
+      ...prev,
+      pendingSacrificeCount: 0,
+    }));
+  }, []);
 
   // Generic end-of-turn handler for all classes (used by TurnCard in StatsDashboard)
   const onEndTurn = useCallback(() => {
@@ -518,6 +528,7 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
         maxStamina: minion.maxStamina,
         hasMoved: false,
         hasActed: false,
+        hasUsedManeuver: false,
       };
       existingSquads.push(squad);
     }
@@ -549,8 +560,9 @@ export const CombatProvider: React.FC<CombatProviderProps> = ({ children }) => {
     gainEssence,
     onMinionDeath,
     setOnCombatStartCallback,
-    hasSacrificedThisTurn,
+    hasSacrificedThisTurn: (essenceState.pendingSacrificeCount ?? 0) > 0,
     sacrificeMinion,
+    clearPendingSacrifices,
     onEndTurn,
     selectFreeMinion,
   };

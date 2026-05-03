@@ -50,6 +50,9 @@ titles perks projects imbue treasure.md
 src-tauri/Draw Steel Summoner Icon.png
 fixture header.png
 
+# Local cloned rules references
+external/SteelCompendium/
+
 # Recursive OS files (subdirectories)
 **/.DS_Store
 

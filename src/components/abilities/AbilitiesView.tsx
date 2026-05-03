@@ -11,6 +11,7 @@ import AbilityCard from '../shared/AbilityCard';
 import ActionCard from '../ui/ActionCard';
 import { ClassAbilityWidget } from './classWidgets';
 import LevelProgressionSection from './LevelProgressionSection';
+import { getSummonerAbilitiesForLevel } from '../../data/abilities/summoner-abilities';
 import './AbilitiesView.css';
 
 type ReferenceSection = 'overview' | 'moves' | 'maneuvers' | 'triggered' | 'commands' | null;
@@ -29,6 +30,14 @@ const AbilitiesView: React.FC = () => {
   // Check if Summoner for formation-specific commands
   const isSummoner = isSummonerHero(hero);
   const heroFormation = isSummoner ? hero.formation : null;
+  const displayedAbilities = useMemo(() => {
+    if (!isSummoner) return hero.abilities;
+
+    const abilitiesById = new Map<string, Ability>();
+    getSummonerAbilitiesForLevel(hero.level).forEach((ability) => abilitiesById.set(ability.id, ability));
+    hero.abilities.forEach((ability) => abilitiesById.set(ability.id, ability));
+    return Array.from(abilitiesById.values()).filter((ability) => (ability.minLevel ?? 1) <= hero.level);
+  }, [hero.abilities, hero.level, isSummoner]);
 
   const handleAbilityRoll = (ability: Ability, result: PowerRollResult) => {
     addRoll(result, ability.name, 'ability');
@@ -46,11 +55,14 @@ const AbilitiesView: React.FC = () => {
   // Map Ability actionType to ActionCard type
   const mapActionType = (actionType: string): ActionType => {
     const typeMap: Record<string, ActionType> = {
+      'action': 'main',
       'main': 'main',
       'maneuver': 'maneuver',
       'triggered': 'triggered',
+      'freeManeuver': 'free',
       'freeTriggered': 'free',
       'move': 'utility',
+      'noAction': 'utility',
     };
     return typeMap[actionType] || 'utility';
   };
@@ -176,7 +188,7 @@ const AbilitiesView: React.FC = () => {
         <ClassAbilityWidget hero={hero} />
 
         <div className="class-abilities-grid">
-          {hero.abilities.map((ability) => (
+          {displayedAbilities.map((ability) => (
             <AbilityCard
               key={ability.id}
               ability={ability}

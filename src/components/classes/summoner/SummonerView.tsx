@@ -10,31 +10,31 @@ const CIRCLE_INFO: Record<SummonerCircle, { name: string; portfolio: string; des
   blight: {
     name: 'Circle of Blight',
     portfolio: 'Demons',
-    description: 'Command fiendish entities',
+    description: 'Death Snap and Soulsense',
   },
   graves: {
     name: 'Circle of Graves',
     portfolio: 'Undead',
-    description: 'Raise the dead to serve',
+    description: 'Dead Men Tell All Tales and Rise!',
   },
   spring: {
     name: 'Circle of Spring',
     portfolio: 'Fey',
-    description: 'Call upon the fair folk',
+    description: 'Fairy Whispers and Pixie Dust',
   },
   storms: {
     name: 'Circle of Storms',
     portfolio: 'Elementals',
-    description: 'Summon elemental forces',
+    description: 'Elemental Affinity and Heart of Nature',
   },
 };
 
 // Formation bonuses
 const FORMATION_INFO: Record<Formation, { name: string; bonus: string }> = {
-  horde: { name: 'Horde', bonus: '+0 Stamina' },
-  platoon: { name: 'Platoon', bonus: '+3 Stamina' },
-  elite: { name: 'Elite', bonus: '+6 Stamina' },
-  leader: { name: 'Leader', bonus: '+9 Stamina' },
+  horde: { name: 'Horde', bonus: '+4 maximum minions; summon up to four signature minions at start of turn' },
+  platoon: { name: 'Platoon', bonus: 'One squad ability target takes extra damage equal to Reason' },
+  elite: { name: 'Elite', bonus: '+3 Stamina and +1 Stability for minions' },
+  leader: { name: 'Leader', bonus: 'Ignore excess squad-wipe damage; take damage in place of a minion' },
 };
 
 export const SummonerView: React.FC<BaseClassViewProps> = ({
@@ -107,6 +107,7 @@ export const SummonerView: React.FC<BaseClassViewProps> = ({
           <div className="circle-badge">
             <span className="circle-name">{circleInfo.name}</span>
             <span className="circle-portfolio">Portfolio: {circleInfo.portfolio}</span>
+            <span className="circle-portfolio">{circleInfo.description}</span>
           </div>
         </div>
       )}

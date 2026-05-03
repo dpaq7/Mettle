@@ -175,7 +175,7 @@ function AppContent() {
     updateHero({
       xp: newXp,
       victories: 0,
-      stamina: { ...hero.stamina, current: hero.stamina.max },
+      stamina: { ...hero.stamina, current: hero.stamina.max, temporary: 0 },
       recoveries: { ...hero.recoveries, current: hero.recoveries.max },
       surges: 0,
       activeSquads: [],

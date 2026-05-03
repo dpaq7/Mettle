@@ -34,6 +34,7 @@ interface StatChipsRowProps {
   onTogglePin: (type: StatCardType) => void;
   onUnpinAll: () => void;
   onStaminaChange: (value: number) => void;
+  onTempStaminaChange?: (value: number) => void;
   onRecoveriesChange: (value: number) => void;
   onResourceChange?: (value: number) => void;
   onSurgesChange: (value: number) => void;
@@ -52,6 +53,7 @@ export const StatChipsRow: React.FC<StatChipsRowProps> = ({
   onTogglePin,
   onUnpinAll,
   onStaminaChange,
+  onTempStaminaChange: _onTempStaminaChange,
   onRecoveriesChange,
   onResourceChange,
   onSurgesChange,

@@ -22,12 +22,16 @@ export const useSummoner = () => {
     (amount: number) => {
       if (!hero) return;
 
+      const temporary = hero.stamina.temporary ?? 0;
+      const absorbed = Math.min(temporary, Math.max(0, amount));
+      const remainingDamage = Math.max(0, amount - absorbed);
       // Allow negative stamina for dying state (death occurs at -winded value)
-      const newCurrent = hero.stamina.current - amount;
+      const newCurrent = hero.stamina.current - remainingDamage;
       updateHero({
         stamina: {
           ...hero.stamina,
           current: newCurrent,
+          temporary: temporary - absorbed,
         },
       });
     },

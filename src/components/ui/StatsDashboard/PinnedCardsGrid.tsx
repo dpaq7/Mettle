@@ -25,6 +25,7 @@ interface PinnedCardsGridProps {
   resourceConfig: HeroicResourceConfig;
   onUnpin: (type: StatCardType) => void;
   onStaminaChange: (value: number) => void;
+  onTempStaminaChange?: (value: number) => void;
   onRecoveriesChange: (value: number) => void;
   onCatchBreath: (healAmount: number) => void;
   onResourceChange?: (value: number) => void;
@@ -70,6 +71,7 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
   resourceConfig,
   onUnpin,
   onStaminaChange,
+  onTempStaminaChange,
   onRecoveriesChange,
   onCatchBreath,
   onResourceChange,
@@ -104,6 +106,7 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
   const effectiveRecoveryValue = recoveryValue || hero.recoveries.value;
   const effectiveSpeed = speed || hero.speed;
   const effectiveStability = stability || hero.stability;
+  const temporaryStamina = hero.stamina.temporary ?? 0;
 
   return (
     <motion.div
@@ -128,9 +131,10 @@ export const PinnedCardsGrid: React.FC<PinnedCardsGridProps> = ({
               <StaminaCard
                 current={hero.stamina.current}
                 max={effectiveMaxStamina}
-                tempStamina={0}
+                tempStamina={temporaryStamina}
                 winded={effectiveWinded}
                 onChange={onStaminaChange}
+                onTempChange={onTempStaminaChange}
                 onUnpin={() => onUnpin('stamina')}
               />
             )}

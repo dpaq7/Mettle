@@ -152,7 +152,7 @@ export function StatRibbon() {
       <StaminaPopover>
         <StatRibbonItem
           label="STM"
-          value={`${hero.stamina.current}/${hero.stamina.max}`}
+          value={`${hero.stamina.current}/${hero.stamina.max}${(hero.stamina.temporary ?? 0) > 0 ? ` +${hero.stamina.temporary}` : ''}`}
           warning={isWinded && !isDying}
           critical={isDying}
           clickable

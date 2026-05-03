@@ -71,6 +71,10 @@ export const resourceGainRules: Record<HeroClass, ResourceGainRule> = {
     triggers: [
       { condition: 'First time/round a minion dies unwillingly', amount: 1 },
     ],
+    levelAdvancement: {
+      4: 'Essence Salvage: +2 when the first minion dies unwillingly each round',
+      7: 'Font of Creation: +3 essence at the start of your turn',
+    },
   },
   tactician: {
     startOfTurn: { amount: 2, dice: null },
@@ -118,10 +122,10 @@ export const ferocityTiers: FerocityTier[] = [
 
 // Formation bonuses for Summoner
 export const formationBonuses: Record<Formation, string> = {
-  horde: 'Minions deal +1 damage',
-  platoon: 'Minions have +2 speed',
+  horde: '+4 maximum minions; summon up to 4 signature minions at start of turn',
+  platoon: 'One target of a squad damaging ability takes extra damage equal to Reason',
   elite: 'Minions have +3 Stamina and +1 Stability',
-  leader: 'You can take excess damage instead of minions dying',
+  leader: 'Ignore excess squad-wipe damage; can take damage in place of a minion',
 };
 
 // Circle to Portfolio mapping for Summoner
@@ -140,7 +144,7 @@ export const potencyCharacteristic: Record<HeroClass, string> = {
   fury: 'Might',
   null: 'Intuition',
   shadow: 'Agility',
-  summoner: 'Presence',
+  summoner: 'Reason',
   tactician: 'Reason',
   talent: 'Reason',
   troubadour: 'Presence',

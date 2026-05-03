@@ -1,4 +1,4 @@
-import { MinionTemplate, FixtureTemplate, Portfolio } from '../../types';
+import { MinionTemplate, FixtureTemplate, Portfolio, ChampionTemplate } from '../../types';
 
 // =============================================================================
 // DEMON PORTFOLIO - MCDM Summoner v1.0
@@ -486,10 +486,56 @@ const theBoil: FixtureTemplate = {
 };
 
 // -----------------------------------------------------------------------------
-// CHAMPION: Aspect (9 Essence)
+// CHAMPION: Demon Lord's Aspect
 // -----------------------------------------------------------------------------
 
-// Champion data available in compendium but not yet implemented
+const demonLordsAspect: ChampionTemplate = {
+  id: 'demon_lords_aspect',
+  name: "Demon Lord's Aspect",
+  portfolioType: 'demon',
+  description: 'An Aspect of a demon lord that pulls enemies into reach and feeds the horde.',
+  essenceCost: 9,
+  size: '2',
+  speed: 5,
+  stamina: 0,
+  stability: 2,
+  freeStrike: 9,
+  characteristics: {
+    might: 2,
+    agility: 5,
+    reason: 5,
+    intuition: 2,
+    presence: 2,
+  },
+  role: 'brute',
+  keywords: ['Champion', 'Abyssal', 'Demon'],
+  immunities: [{ type: 'corruption', value: 5 }],
+  weaknesses: [],
+  movementModes: ['Teleport'],
+  freeStrikeDamageType: 'corruption',
+  signatureAbility: {
+    id: 'demon_lords_aspect_grasping_appendages',
+    name: 'Grasping Appendages',
+    actionType: 'action',
+    keywords: ['Melee', 'Strike', 'Weapon'],
+    distance: 'Melee 5',
+    target: 'Two creatures or objects',
+    powerRoll: {
+      characteristic: 'reason',
+      tier1: '9 corruption damage; pull 2',
+      tier2: '12 corruption damage; pull 4',
+      tier3: '14 corruption damage; pull 5',
+    },
+    effect: 'A target pulled adjacent to the Aspect is grabbed.',
+  },
+  traits: [
+    { name: 'Warping Strike', description: 'The Aspect\'s free strikes teleport the target 5 squares.' },
+    { name: 'Champion\'s Ire', description: 'If the Aspect only targets one creature or object with a strike, they deal additional damage to the target equal to your Reason.' },
+    { name: 'I Like Your Taste', description: 'Free triggered action, trigger: the Aspect takes damage from an enemy. The Aspect has a double edge on their next power roll, or gives this benefit to an ally within Summoner\'s Range.' },
+    { name: 'Frenzy', description: 'When the Aspect is reduced to 0 Stamina, they make a free strike against each adjacent enemy before dying.' },
+    { name: 'Level 10: Reality Flense', description: '1 Eidos, Champion Action: 20 burst. Self and each non-minion ally teleport up to their speed and make a free strike. A target with a Save Ends condition can inflict that condition with their strike and end it on themself.' },
+  ],
+};
 
 // -----------------------------------------------------------------------------
 // COMPLETE PORTFOLIO
@@ -513,5 +559,5 @@ export const demonPortfolio: Portfolio = {
     vicisittante,
   ],
   fixture: theBoil,
-  champion: null, // Aspect - Level 8+
+  champion: demonLordsAspect,
 };

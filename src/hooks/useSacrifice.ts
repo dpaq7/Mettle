@@ -3,8 +3,8 @@
  *
  * Summoner v1.0 SRD:
  * - Sacrificing minions reduces the essence cost of summoning
- * - Base: Cost reduced by 1 per minion sacrificed
- * - Level 10 (No Matter the Cost): Each minion reduces cost by its essence value
+ * - Base: Sacrificing one or more minions reduces the cost by 1 total
+ * - Level 10 (No Matter the Cost): Cost reduction equals minions sacrificed
  * - Can't sacrifice minions that used main action or maneuver this turn
  * - Can sacrifice more minions than needed to reduce cost
  */
@@ -48,7 +48,7 @@ export const useSacrifice = () => {
       squad.members
         .filter((m) => m.isAlive)
         .forEach((minion) => {
-          const canSacrifice = !minion.hasActedThisTurn && !minion.hasMovedThisTurn;
+          const canSacrifice = !minion.hasActedThisTurn;
           sacrifiable.push({
             minionId: minion.id,
             squadId: squad.id,
@@ -56,7 +56,7 @@ export const useSacrifice = () => {
             canSacrifice,
             reason: canSacrifice
               ? undefined
-              : 'Minion has already acted or moved this turn',
+              : 'Minion has already used a main action or maneuver this turn',
           });
         });
     });
@@ -255,6 +255,7 @@ export const useSacrifice = () => {
       ...squad,
       hasMoved: false,
       hasActed: false,
+      hasUsedManeuver: false,
       members: squad.members.map((minion) => ({
         ...minion,
         hasActedThisTurn: false,

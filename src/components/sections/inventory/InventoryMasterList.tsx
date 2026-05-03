@@ -9,6 +9,7 @@ import {
   TRINKET_ITEMS,
   LEVELED_ITEMS,
   ARTIFACT_ITEMS,
+  getItemById,
   ItemCategory,
 } from '@/data/magicItems';
 
@@ -98,6 +99,7 @@ export function InventoryMasterList() {
             <MasterListItem
               key={item.id}
               label={item.name}
+              value={item.sourceItemId ? `E${getItemById(item.sourceItemId)?.echelon ?? item.level ?? '?'}` : undefined}
               badge={item.quantity > 1 ? item.quantity : undefined}
               selected={selectedItemId === `inv:${item.id}`}
               onClick={() => setSelectedItem(`inv:${item.id}`)}
@@ -113,6 +115,7 @@ export function InventoryMasterList() {
             <MasterListItem
               key={item.id}
               label={item.name}
+              value={item.sourceItemId ? getItemById(item.sourceItemId)?.slot ?? 'Treasure' : undefined}
               badge={item.quantity > 1 ? item.quantity : undefined}
               selected={selectedItemId === `inv:${item.id}`}
               onClick={() => setSelectedItem(`inv:${item.id}`)}

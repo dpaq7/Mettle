@@ -115,6 +115,7 @@
 
 .ability-grid-card.level-locked .ability-grid-header {
   background: var(--bg-deep);
+  padding-right: 112px;
 }
 
 .ability-grid-card.level-locked .ability-grid-name {
@@ -150,6 +151,10 @@
 /* Selected ability indicator */
 .ability-grid-card.selected {
   border-color: var(--status-success);
+}
+
+.ability-grid-card.selected .ability-grid-header {
+  padding-right: 32px;
 }
 
 .ability-grid-card.selected::before {

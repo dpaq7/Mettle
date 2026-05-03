@@ -1,4 +1,4 @@
-import { MinionTemplate, FixtureTemplate, Portfolio } from '../../types';
+import { MinionTemplate, FixtureTemplate, Portfolio, ChampionTemplate } from '../../types';
 
 // =============================================================================
 // ELEMENTAL PORTFOLIO - Draw Steel Compendium
@@ -7,6 +7,52 @@ import { MinionTemplate, FixtureTemplate, Portfolio } from '../../types';
 // -----------------------------------------------------------------------------
 // SIGNATURE MINIONS (1 Essence each)
 // -----------------------------------------------------------------------------
+
+const elementalMote: MinionTemplate = {
+  id: 'elemental_mote',
+  name: 'Elemental Mote',
+  essenceCost: 1,
+  minionsPerSummon: 1,
+  size: '1T',
+  speed: 5,
+  stamina: 1,
+  stability: 0,
+  freeStrike: 1,
+  characteristics: { might: 0, agility: 0, reason: 0, intuition: 0, presence: 2 },
+  role: 'hexer',
+  keywords: ['Elemental'],
+  immunities: [],
+  weaknesses: [],
+  movementModes: ['Fly'],
+  freeStrikeDamageType: 'untyped',
+  traits: [
+    { name: 'Dweomer Burst', description: 'When the mote is reduced to 0 Stamina, each enemy adjacent to the mote has a bane on their next strike.' },
+    { name: 'Catalyst', description: 'Once per turn, the mote can transform into an adjacent allied signature minion, maintaining current Stamina. Alternatively, you can spend 1 essence to transform the mote into any signature minion in the elemental portfolio you do not have, as if you summoned the new minion into the mote\'s space.' },
+  ],
+};
+
+const briskGale: MinionTemplate = {
+  id: 'elemental_brisk_gale',
+  name: 'Brisk Gale',
+  essenceCost: 1,
+  minionsPerSummon: 1,
+  size: '1S',
+  speed: 5,
+  stamina: 2,
+  stability: 0,
+  freeStrike: 1,
+  characteristics: { might: -2, agility: 2, reason: 0, intuition: 0, presence: 1 },
+  role: 'harrier',
+  keywords: ['Elemental', 'Air'],
+  immunities: [{ type: 'sonic', value: undefined }],
+  weaknesses: [],
+  movementModes: ['Fly'],
+  freeStrikeDamageType: 'sonic',
+  traits: [
+    { name: 'Cutting the Air', description: 'The gale doesn\'t provoke opportunity attacks by moving.' },
+    { name: 'Whirlwind', description: 'When the gale is reduced to 0 Stamina, winds whip in their space until the end of the encounter. You or an ally that enters this space or starts their turn there can immediately shift, including vertically.' },
+  ],
+};
 
 const firePlume: MinionTemplate = {
   id: 'elemental_fire_plume',
@@ -305,14 +351,57 @@ const primordialCrystal: FixtureTemplate = {
 // COMPLETE PORTFOLIO
 // -----------------------------------------------------------------------------
 
+const dragonsPortent: ChampionTemplate = {
+  id: 'elemental_dragons_portent',
+  name: "Dragon's Portent",
+  portfolioType: 'elemental',
+  description: 'A Portent of a dragon yet to manifest, lending elemental ruin and control to your army.',
+  essenceCost: 9,
+  size: '2',
+  speed: 6,
+  stamina: 0,
+  stability: 4,
+  freeStrike: 9,
+  characteristics: { might: 2, agility: 2, reason: 5, intuition: 5, presence: 2 },
+  role: 'controller',
+  keywords: ['Champion', 'Dragon', 'Elemental'],
+  immunities: [{ type: 'varies', value: 5 }],
+  weaknesses: [],
+  movementModes: ['Fly'],
+  freeStrikeDamageType: 'varies',
+  signatureAbility: {
+    id: 'dragons_portent_elemental_tail_swing',
+    name: 'Elemental Tail Swing',
+    actionType: 'action',
+    keywords: ['Charge', 'Melee', 'Strike', 'Weapon'],
+    distance: 'Melee 2',
+    target: 'Two creatures or objects',
+    powerRoll: {
+      characteristic: 'reason',
+      tier1: '9 affinity damage; push 2',
+      tier2: '12 affinity damage; push 4',
+      tier3: '14 affinity damage; push 6',
+    },
+    effect: '',
+  },
+  traits: [
+    { name: 'Affinity', description: 'When summoned, choose acid, cold, corruption, fire, lightning, or poison. This determines the Portent\'s affinity immunity and ability damage type.' },
+    { name: 'Sealing Strike', description: 'The Portent\'s free strikes inflict M < Strong slowed (save ends). While slowed this way, the target takes 1d6 affinity damage at the start of each of their turns.' },
+    { name: 'Champion\'s Ire', description: 'If the Portent only targets one creature or object with a strike, they deal additional damage to the target equal to your Reason.' },
+    { name: 'Searing Wyrmscale', description: 'Whenever an adjacent creature deals damage to the Portent, they take 4 affinity damage.' },
+    { name: 'Dragon Heart', description: 'Once per turn, the Portent can take 10 irreducible damage to allow you or an ally within Summoner\'s Range to gain 1 heroic resource.' },
+    { name: 'Level 10: A Breath Felt in a Hurricane', description: '1 Eidos, Champion Action: 4 cube within 10. Each enemy and object takes 9 affinity damage that ignores immunity. The area becomes difficult terrain, and enemies have affinity weakness 5 while occupying it.' },
+  ],
+};
+
 export const elementalPortfolio: Portfolio = {
   type: 'elemental',
-  signatureMinions: [firePlume, walkingBoulder],
+  signatureMinions: [elementalMote, briskGale, firePlume, walkingBoulder],
   unlockedMinions: [
     cruxOfAsh, flowOfMagma, desolationOfSand,
     dancingSilk, principleOfTheSwamp, quietOfSnow,
     ironReaver, knightOfBlood, lightOfTheSun,
   ],
   fixture: primordialCrystal,
-  champion: null,
+  champion: dragonsPortent,
 };

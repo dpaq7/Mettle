@@ -326,6 +326,12 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.squad-quick-list-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .squad-quick-list-title {
   margin: 0;
   font-size: var(--text-xs);
@@ -333,6 +339,27 @@
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   color: var(--text-muted);
+}
+
+.squad-quick-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.squad-quick-summary span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .squad-quick-list-empty {
@@ -354,9 +381,13 @@
 
 .squad-quick-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2);
+}
+
+.squad-quick-title {
+  min-width: 0;
 }
 
 .squad-quick-name {
@@ -369,19 +400,76 @@
   text-overflow: ellipsis;
 }
 
+.squad-quick-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
 .squad-quick-count {
   font-size: var(--text-xs);
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
+.squad-quick-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.squad-quick-count-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 4px;
+  row-gap: 1px;
+  align-items: center;
+  min-width: 0;
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.squad-quick-count-card svg {
+  color: var(--heroic-summoner);
+}
+
+.squad-quick-count-card strong {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.squad-quick-count-card span {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
 .squad-quick-hp {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-1);
+}
+
+.squad-quick-hp-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.squad-quick-hp-topline strong {
+  color: var(--text-primary);
 }
 
 .squad-quick-hp-bar {
+  position: relative;
   height: 6px;
   background: var(--bg-surface);
   border-radius: 3px;
@@ -402,16 +490,76 @@
   background: var(--status-danger);
 }
 
+.squad-quick-threshold {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  transform: translateX(-50%);
+  opacity: 0.6;
+}
+
 .squad-quick-hp-text {
   font-size: var(--text-xs);
   color: var(--text-muted);
   text-align: right;
 }
 
+.squad-quick-minion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.squad-quick-minion-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.squad-quick-minion-chip.alive {
+  border-color: color-mix(in srgb, var(--status-success) 55%, var(--border-subtle));
+  color: var(--status-success);
+}
+
+.squad-quick-minion-chip.dead {
+  opacity: 0.45;
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.squad-quick-minion-chip.moved {
+  box-shadow: inset 0 -2px 0 var(--status-warning);
+}
+
+.squad-quick-minion-chip.acted {
+  box-shadow: inset 0 -2px 0 var(--heroic-summoner);
+}
+
 .squad-quick-actions {
   display: flex;
   gap: var(--space-1);
   flex-wrap: wrap;
+}
+
+.squad-quick-damage-row,
+.squad-quick-roll-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.squad-quick-roll-row {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .squad-quick-btn {
@@ -428,6 +576,24 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--duration-fast);
+}
+
+.squad-quick-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.squad-quick-icon-btn:hover {
+  border-color: var(--status-danger);
+  color: var(--status-danger);
 }
 
 .squad-quick-btn:hover:not(:disabled) {
@@ -449,6 +615,14 @@
   border-color: var(--status-danger);
 }
 
+.squad-quick-btn--heal {
+  color: var(--status-success);
+}
+
+.squad-quick-btn--heal:hover:not(:disabled) {
+  border-color: var(--status-success);
+}
+
 .squad-quick-btn--sacrifice {
   color: var(--heroic-summoner);
 }
@@ -463,4 +637,129 @@
 
 .squad-quick-btn--dismiss:hover:not(:disabled) {
   border-color: var(--status-danger);
+}
+
+.squad-quick-damage-input {
+  min-width: 0;
+  width: 100%;
+  padding: var(--space-1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.squad-quick-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.squad-quick-action,
+.squad-quick-roll-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 32px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--duration-fast);
+}
+
+.squad-quick-action:hover:not(:disabled),
+.squad-quick-roll-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.squad-quick-action:disabled,
+.squad-quick-roll-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.squad-quick-action.used {
+  border-color: var(--heroic-summoner);
+  background: color-mix(in srgb, var(--heroic-summoner) 15%, var(--bg-surface));
+  color: var(--text-primary);
+}
+
+.squad-quick-action.modifier.edge {
+  border-color: var(--status-success);
+  color: var(--status-success);
+}
+
+.squad-quick-action.modifier.bane {
+  border-color: var(--status-danger);
+  color: var(--status-danger);
+}
+
+.squad-quick-roll-btn {
+  min-height: 34px;
+}
+
+.squad-quick-roll-btn.sacrifice {
+  color: var(--heroic-summoner);
+}
+
+.squad-quick-roll-result {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2);
+  background: var(--bg-surface);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.squad-quick-roll-result strong {
+  font-size: var(--text-base);
+}
+
+.squad-quick-roll-label {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.squad-quick-details {
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.squad-quick-details summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.squad-quick-detail-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.35;
+}
+
+.squad-quick-detail-line strong {
+  color: var(--text-primary);
 }

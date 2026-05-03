@@ -53,9 +53,12 @@ export const useEssence = () => {
           },
         };
       }
-      return validateSummon(hero, minion, options);
+      return validateSummon(hero, minion, {
+        ...options,
+        sacrificeCount: options.sacrificeCount ?? (essenceState.pendingSacrificeCount ?? 0),
+      });
     },
-    [hero]
+    [hero, essenceState.pendingSacrificeCount]
   );
 
   /**
@@ -65,10 +68,12 @@ export const useEssence = () => {
   const canAffordMinion = useCallback(
     (minion: MinionTemplate): boolean => {
       if (!hero) return false;
-      const result = validateSummon(hero, minion);
+      const result = validateSummon(hero, minion, {
+        sacrificeCount: essenceState.pendingSacrificeCount ?? 0,
+      });
       return result.canSummon;
     },
-    [hero]
+    [hero, essenceState.pendingSacrificeCount]
   );
 
   /**
@@ -77,10 +82,13 @@ export const useEssence = () => {
   const getSummonBlockReason = useCallback(
     (minion: MinionTemplate, options: SummonOptions = {}): string => {
       if (!hero) return 'No hero';
-      const result = validateSummon(hero, minion, options);
+      const result = validateSummon(hero, minion, {
+        ...options,
+        sacrificeCount: options.sacrificeCount ?? (essenceState.pendingSacrificeCount ?? 0),
+      });
       return getShortFailureReason(result);
     },
-    [hero]
+    [hero, essenceState.pendingSacrificeCount]
   );
 
   const getActualCost = useCallback(

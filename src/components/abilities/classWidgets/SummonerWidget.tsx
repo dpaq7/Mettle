@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { SummonerHeroV2, Formation } from '../../../types/hero';
 import { useHeroContext } from '../../../context/HeroContext';
+import { calculateEssencePerTurn, calculateMinionDeathEssence } from '../../../utils/calculations';
 
 interface SummonerWidgetProps {
   hero: SummonerHeroV2;
 }
 
 const FORMATION_INFO: Record<Formation, { name: string; bonus: string }> = {
-  horde: { name: 'Horde', bonus: 'Minions deal +1 damage' },
-  platoon: { name: 'Platoon', bonus: 'Minions have +2 speed' },
+  horde: { name: 'Horde', bonus: 'Maximum minions +4; summon up to four signature minions at the start of your turn' },
+  platoon: { name: 'Platoon', bonus: 'One target of a squad damaging ability takes extra damage equal to your Reason' },
   elite: { name: 'Elite', bonus: 'Minions have +3 Stamina, +1 Stability' },
-  leader: { name: 'Leader', bonus: 'You can take excess damage instead of minions dying' },
+  leader: { name: 'Leader', bonus: 'Ignore excess squad-wipe damage; you can take damage in place of a minion' },
 };
 
 const CIRCLE_INFO: Record<string, { name: string; portfolio: string }> = {
@@ -27,6 +28,8 @@ export const SummonerWidget: React.FC<SummonerWidgetProps> = ({ hero }) => {
   const { heroicResource, formation, subclass: circle, activeSquads } = hero;
   const currentEssence = heroicResource?.current ?? 0;
   const maxPerTurn = heroicResource?.maxPerTurn ?? 5;
+  const startOfTurnEssence = calculateEssencePerTurn(hero.level);
+  const deathEssence = calculateMinionDeathEssence(hero.level);
 
   // Count active minions
   const totalMinions = activeSquads?.reduce((sum, squad) => sum + squad.members.length, 0) ?? 0;
@@ -146,10 +149,10 @@ export const SummonerWidget: React.FC<SummonerWidgetProps> = ({ hero }) => {
           <h4 className="class-widget__gain-title">Essence Gain</h4>
           <ul className="class-widget__gain-list">
             <li className="class-widget__gain-item">
-              Start of turn: <strong>+2 Essence</strong> (max {maxPerTurn}/turn)
+              Start of turn: <strong>+{startOfTurnEssence} Essence</strong> (max {maxPerTurn}/turn)
             </li>
             <li className="class-widget__gain-item">
-              First time/round a minion dies unwillingly: <strong>+1 Essence</strong>
+              First time/round a minion dies unwillingly: <strong>+{deathEssence} Essence</strong>
             </li>
           </ul>
         </div>

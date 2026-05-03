@@ -49,6 +49,7 @@ export interface Ability {
   id: string;
   name: string;
   flavorText?: string;
+  minLevel?: number;
 
   // Action economy
   actionType: ActionType;

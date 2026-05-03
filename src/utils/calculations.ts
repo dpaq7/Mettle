@@ -95,20 +95,23 @@ export const calculateSignatureMinionsPerTurn = (
 
 /**
  * Calculate essence gained per turn
- * Summoner SRD: Always +2 essence per turn (no level upgrades)
- * Note: Unlike Elementalist, Summoner does NOT get level-based upgrades to essence gain
+ * Summoner v1.0 SRD:
+ * - Base: +2 essence
+ * - Level 7+ (Font of Creation): +3 essence instead
  */
-export const calculateEssencePerTurn = (_level: number): number => {
-  return 2; // SRD: Always +2, no level upgrades
+export const calculateEssencePerTurn = (level: number): number => {
+  return level >= 7 ? 3 : 2;
 };
 
 /**
  * Calculate essence gained from minion death
- * Summoner SRD: +1 essence when any minion dies within Summoner's Range
- * Note: No level upgrades - always +1 (limit once per round)
+ * Summoner v1.0 SRD:
+ * - Base: +1 essence when any minion dies unwillingly within Summoner's Range
+ * - Level 4+ (Essence Salvage): +2 essence instead
+ * - Limit once per round
  */
-export const calculateMinionDeathEssence = (_level: number): number => {
-  return 1; // SRD: Always +1, once per round
+export const calculateMinionDeathEssence = (level: number): number => {
+  return level >= 4 ? 2 : 1;
 };
 
 /**
@@ -214,15 +217,12 @@ export const getKitStaminaPerEchelon = (kit: Kit | undefined): number => {
 
 /**
  * Calculate essence cost with formation modifications
- * Elite formation reduces essence costs by 1 for minions costing 5+
+ * Summoner v1.0 formations do not modify essence costs.
  */
 export const calculateEssenceCost = (
   baseCost: number,
-  formation: Formation
+  _formation: Formation
 ): number => {
-  if (formation === 'elite' && baseCost >= 5) {
-    return Math.max(1, baseCost - 1);
-  }
   return baseCost;
 };
 
@@ -236,18 +236,19 @@ export const calculateMinionBonusStamina = (formation: Formation): number => {
 
 /**
  * Calculate minion characteristic bonus from formation
- * Elite formation grants +1 to all characteristics
+ * Formations do not modify minion characteristics in Summoner v1.0.
  */
-export const calculateMinionCharacteristicBonus = (formation: Formation): number => {
-  return formation === 'elite' ? 1 : 0;
+export const calculateMinionCharacteristicBonus = (_formation: Formation): number => {
+  return 0;
 };
 
 /**
  * Calculate minion free strike bonus from formation
- * Platoon formation grants +1 to all free strikes
+ * Platoon adds Reason-score damage to one target of a squad's damaging ability;
+ * it does not change the minion stat block free strike value.
  */
-export const calculateMinionFreeStrikeBonus = (formation: Formation): number => {
-  return formation === 'platoon' ? 1 : 0;
+export const calculateMinionFreeStrikeBonus = (_formation: Formation): number => {
+  return 0;
 };
 
 /**
@@ -281,13 +282,11 @@ export const generateId = (): string => {
 /**
  * Calculate sacrifice cost reduction
  * Summoner v1.0 SRD:
- * - Base: Each sacrificed minion reduces cost by 1
- * - Level 10 (No Matter the Cost): Each minion reduces cost by its essence value
+ * - Base: Sacrificing one or more minions reduces the cost by 1 total
+ * - Level 10 (No Matter the Cost): Cost is reduced by the number of minions sacrificed
  *
- * Note: Can only sacrifice signature minions (1 essence each), so pre-L10
- * each sacrifice reduces cost by 1. At L10, each signature reduces by 1 too.
- * For non-signature minions being sacrificed (if ever allowed), this would
- * return the minion's essence cost instead.
+ * The minionEssenceCosts parameter is retained for backwards-compatible call sites,
+ * but Summoner v1.0 keys the level 10 reduction to sacrificed minion count.
  *
  * @param minionsToSacrifice - Number of minions being sacrificed
  * @param level - Summoner's level
@@ -296,22 +295,38 @@ export const generateId = (): string => {
 export const calculateSacrificeCostReduction = (
   minionsToSacrifice: number,
   level: number,
-  minionEssenceCosts: number[] = []
+  _minionEssenceCosts: number[] = []
 ): number => {
   if (minionsToSacrifice <= 0) return 0;
 
-  // Fill with 1s (signature minion cost) if not provided
-  const costs = minionEssenceCosts.length > 0
-    ? minionEssenceCosts
-    : Array(minionsToSacrifice).fill(1);
-
-  // Level 10 (No Matter the Cost): Full essence value per minion
   if (level >= 10) {
-    return costs.reduce((sum, cost) => sum + cost, 0);
+    return minionsToSacrifice;
   }
 
-  // Before Level 10: 1 per minion regardless of essence cost
-  return minionsToSacrifice;
+  return 1;
+};
+
+/**
+ * Calculate final essence cost after formation and sacrifice adjustments.
+ *
+ * At level 10, No Matter the Cost explicitly keeps the reduced cost at a
+ * minimum of 1. Before level 10 the base sacrifice rule can reduce a cost by 1.
+ */
+export const calculateEffectiveEssenceCost = (
+  baseCost: number,
+  formation: Formation,
+  level: number,
+  sacrificeCount: number = 0
+): number => {
+  const formationAdjustedCost = calculateEssenceCost(baseCost, formation);
+  const reduction = calculateSacrificeCostReduction(sacrificeCount, level);
+
+  if (reduction <= 0) {
+    return formationAdjustedCost;
+  }
+
+  const minimumCost = level >= 10 ? 1 : 0;
+  return Math.max(minimumCost, formationAdjustedCost - reduction);
 };
 
 // =============================================================================

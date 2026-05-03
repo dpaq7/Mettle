@@ -151,7 +151,7 @@ function AbilityGridCard({
   const actionTypeLabel = ACTION_TYPE_LABELS[ability.actionType] || ability.actionType;
 
   // Level gating - check if character level is high enough to use this ability
-  const minLevelRequired = cost > 0 ? GameData.getMinLevelForAbilityCost(cost) : 1;
+  const minLevelRequired = ability.minLevel ?? (cost > 0 ? GameData.getMinLevelForAbilityCost(cost) : 1);
   const isLevelLocked = heroLevel < minLevelRequired;
   const canUse = canAfford && !isLevelLocked;
 

@@ -133,7 +133,7 @@ function AbilityCard({
   const costDisplay = formatCost(ability, resourceName);
 
   // Level gating - check if character level is high enough to use this ability
-  const minLevelRequired = cost > 0 ? GameData.getMinLevelForAbilityCost(cost) : 1;
+  const minLevelRequired = ability.minLevel ?? (cost > 0 ? GameData.getMinLevelForAbilityCost(cost) : 1);
   const isLevelLocked = heroLevel < minLevelRequired;
   const canUse = canAfford && !isLevelLocked;
 

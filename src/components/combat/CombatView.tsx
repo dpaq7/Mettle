@@ -4,6 +4,7 @@ import { useCombatContext } from '../../context/CombatContext';
 import { useSquads } from '../../hooks/useSquads';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useEssence } from '../../hooks/useEssence';
+import { useSacrifice } from '../../hooks/useSacrifice';
 import { useRollHistory } from '../../context/RollHistoryContext';
 import { isSummonerHero, SummonerHeroV2 } from '../../types/hero';
 import { Squad, MinionTemplate } from '../../types';
@@ -16,9 +17,10 @@ import './CombatView.css';
 
 const CombatView: React.FC = () => {
   const { hero: genericHero, updateHero } = useSummonerContext();
-  const { isInCombat, essenceState, hasSacrificedThisTurn, sacrificeMinion } = useCombatContext();
+  const { isInCombat, essenceState, sacrificeMinion } = useCombatContext();
   const { createSquad, addSquad, removeSquad, updateSquad, damageSquad, healSquad } = useSquads();
-  const { getSignatureMinions, getUnlockedMinions, getMinionById, getActualEssenceCost, isMinionUnlockedByLevel, getRequiredLevel, isSignatureMinion } = usePortfolio();
+  const { executeSacrifice, getSacrifiableMinions } = useSacrifice();
+  const { getSignatureMinions, getUnlockedMinions, getMinionById, getActualEssenceCost, isMinionUnlockedByLevel, getRequiredLevel } = usePortfolio();
   const { canAffordMinion, spendForMinion, currentEssence } = useEssence();
   const { addRoll } = useRollHistory();
 
@@ -219,31 +221,17 @@ const CombatView: React.FC = () => {
     removeSquad(squadId);
   };
 
-  // Sacrifice a signature minion for 1 essence (1/turn)
+  // Willingly sacrifice a minion to reduce the next essence cost.
   const handleSacrifice = (squad: Squad) => {
-    const template = getMinionById(squad.templateId);
-    if (!template || !isSignatureMinion(template)) return;
-    if (hasSacrificedThisTurn) return;
-
-    const aliveMembers = squad.members.filter(m => m.isAlive);
-    if (aliveMembers.length === 0) return;
-
-    // Kill one minion from the squad
-    const minionToKill = aliveMembers[aliveMembers.length - 1]; // Kill the last one
-    const updatedMembers = squad.members.map(m =>
-      m.id === minionToKill.id ? { ...m, isAlive: false } : m
+    const sacrifiable = getSacrifiableMinions().find(
+      (minion) => minion.squadId === squad.id && minion.canSacrifice
     );
+    if (!sacrifiable) return;
 
-    // Update stamina pool
-    const newCurrentStamina = Math.max(0, squad.currentStamina - minionToKill.maxStamina);
-
-    updateSquad(squad.id, {
-      members: updatedMembers,
-      currentStamina: newCurrentStamina,
-    });
-
-    // Gain essence via sacrificeMinion (handles the once-per-turn tracking)
-    sacrificeMinion();
+    const result = executeSacrifice([sacrifiable.minionId]);
+    if (result.success) {
+      sacrificeMinion();
+    }
   };
 
   const handleDamageSquad = (squadId: string, amount: number) => {
@@ -627,6 +615,9 @@ const CombatView: React.FC = () => {
               const rollMod = getRollModifier(squad.id);
               const freeStrikeResult = rollStates[squad.id];
               const sigResult = rollStates[`${squad.id}_sig`];
+              const canSacrifice = getSacrifiableMinions().some(
+                (minion) => minion.squadId === squad.id && minion.canSacrifice
+              );
 
               return (
                 <div key={squad.id} className="squad-card">
@@ -728,10 +719,10 @@ const CombatView: React.FC = () => {
                       </button>
                     )}
                     <button
-                      className={`roll-btn sacrifice ${hasSacrificedThisTurn ? 'used' : ''}`}
+                      className={`roll-btn sacrifice ${essenceState.pendingSacrificeCount > 0 ? 'used' : ''}`}
                       onClick={() => handleSacrifice(squad)}
-                      disabled={hasSacrificedThisTurn || alive === 0}
-                      title={hasSacrificedThisTurn ? 'Already sacrificed this turn' : 'Sacrifice a minion'}
+                      disabled={!canSacrifice || alive === 0}
+                      title={canSacrifice ? 'Sacrifice to reduce the next essence cost' : 'No eligible minions to sacrifice'}
                     >
                       Sacrifice
                     </button>

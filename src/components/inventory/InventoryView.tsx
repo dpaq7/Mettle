@@ -4,7 +4,7 @@ import { usePortrait } from '../../hooks/usePortrait';
 import { useCustomItems, CustomMagicItem } from '../../hooks/useCustomItems';
 import { useSummonerContext } from '../../context/HeroContext';
 import { useDerivedStats } from '../../hooks/useDerivedStats';
-import { MagicItem, EquipmentSlot, CONSUMABLE_ITEMS } from '../../data/magicItems';
+import { MagicItem, EquipmentSlot, CONSUMABLE_ITEMS, getItemRulesText } from '../../data/magicItems';
 import { EquippedItem } from '../../types/equipment';
 import { VisualSlot, SLOT_CONFIG } from './slotConfig';
 import EquipmentLayout from './EquipmentLayout';
@@ -60,9 +60,10 @@ function parseConsumableEffect(itemId: string, hero: Hero): Partial<Hero> | null
 
   // Chocolate of Immovability: gain 15 Temp Stamina
   if (itemId === 'chocolate-of-immovability') {
-    // Note: We don't have tempStamina in stamina pool, so just add to current
-    const newStamina = Math.min(hero.stamina.max, hero.stamina.current + 15);
-    updates.stamina = { ...hero.stamina, current: newStamina };
+    updates.stamina = {
+      ...hero.stamina,
+      temporary: Math.max(hero.stamina.temporary ?? 0, 15),
+    };
     return updates;
   }
 
@@ -247,7 +248,10 @@ const InventoryView: React.FC = () => {
           category: 'consumable' as const,
           rarity: 'uncommon' as const,
           quantity,
-          description: item.effect,
+          description: getItemRulesText(item, hero.level),
+          sourceItemId: item.id,
+          keywords: item.keywords,
+          level: item.echelon,
         };
         updateHero({ inventory: [...existingInventory, newItem] });
       }

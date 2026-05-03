@@ -360,7 +360,7 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
           stamina={{
             current: hero.stamina.current,
             max: hero.stamina.max + (totalBonuses.stamina || 0),
-            temporary: 0,
+            temporary: hero.stamina.temporary ?? 0,
             winded: windedOverride,
             dying: dyingOverride,
             dyingThreshold: 0, // Dying occurs at 0 HP per Draw Steel rules
@@ -378,6 +378,9 @@ const CharacterStatsPanel: React.FC<CharacterStatsPanelProps> = ({ onLevelUp, on
           onStaminaChange={(updates) => {
             if (updates.current !== undefined) {
               updateHero({ stamina: { ...hero.stamina, current: updates.current } });
+            }
+            if (updates.temporary !== undefined) {
+              updateHero({ stamina: { ...hero.stamina, temporary: updates.temporary } });
             }
             if (updates.winded !== undefined) {
               setWindedOverride(updates.winded);

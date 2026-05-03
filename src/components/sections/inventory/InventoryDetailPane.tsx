@@ -1,12 +1,18 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useHeroContext } from '@/context/HeroContext';
 import { useNavigation } from '@/context/NavigationContext';
 import { useEquipment } from '@/hooks/useEquipment';
 import { SLOT_LABELS } from '@/types/equipment';
 import type { InventoryItem } from '@/types/projects';
+import type { Hero } from '@/types/hero';
 import {
   MagicItem,
+  MagicItemAction,
+  MagicItemStatRow,
   getItemById,
+  getItemActions,
+  getItemRulesText,
+  getItemStatBlock,
   parseItemBonuses,
   CONSUMABLE_ITEMS,
   TRINKET_ITEMS,
@@ -24,6 +30,77 @@ const ALL_COMPENDIUM_ITEMS = [
   ...LEVELED_ITEMS,
   ...ARTIFACT_ITEMS,
 ];
+
+function getCompendiumItemForInventoryItem(item: InventoryItem): MagicItem | undefined {
+  if (item.sourceItemId) {
+    return getItemById(item.sourceItemId);
+  }
+
+  return ALL_COMPENDIUM_ITEMS.find((compendiumItem) => compendiumItem.name === item.name);
+}
+
+function parseConsumableUseUpdates(itemId: string, hero: Hero): Partial<Hero> | null {
+  const item = CONSUMABLE_ITEMS.find((consumable) => consumable.id === itemId);
+  if (!item) return null;
+
+  const effect = item.effect.toLowerCase();
+  const updates: Partial<Hero> = {};
+
+  if (itemId === 'healing-potion' || effect.includes('recovery value')) {
+    updates.stamina = {
+      ...hero.stamina,
+      current: Math.min(hero.stamina.max, hero.stamina.current + hero.recoveries.value),
+    };
+    return updates;
+  }
+
+  if (itemId === 'buzz-balm') {
+    updates.activeConditions = hero.activeConditions.filter(
+      (condition) => condition.conditionId !== 'bleeding' && condition.conditionId !== 'weakened'
+    );
+    return updates;
+  }
+
+  if (itemId === 'breath-of-dawn') {
+    updates.activeConditions = hero.activeConditions.filter(
+      (condition) =>
+        condition.conditionId !== 'frightened' &&
+        condition.conditionId !== 'slowed' &&
+        condition.conditionId !== 'taunted'
+    );
+    return updates;
+  }
+
+  if (itemId === 'wellness-tonic') {
+    updates.activeConditions = hero.activeConditions.slice(3);
+    return updates;
+  }
+
+  if (itemId === 'chocolate-of-immovability') {
+    updates.stamina = {
+      ...hero.stamina,
+      temporary: Math.max(hero.stamina.temporary ?? 0, 15),
+    };
+    return updates;
+  }
+
+  if (itemId === 'restorative-bright-court') {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    updates.recoveries = {
+      ...hero.recoveries,
+      current: Math.min(hero.recoveries.max, hero.recoveries.current + roll),
+    };
+    return updates;
+  }
+
+  if (effect.includes('surge') && effect.includes('gain')) {
+    const surgeMatch = effect.match(/(\d+)\s*surge/);
+    updates.surges = hero.surges + (surgeMatch ? parseInt(surgeMatch[1], 10) : 1);
+    return updates;
+  }
+
+  return null;
+}
 
 function EmptyState() {
   return (
@@ -46,6 +123,66 @@ const CATEGORY_LABELS: Record<string, string> = {
   leveled: 'Leveled Item',
   artifact: 'Artifact',
 };
+
+const ACTION_TYPE_LABELS: Record<MagicItemAction['type'], string> = {
+  main: 'Main',
+  maneuver: 'Maneuver',
+  triggered: 'Triggered',
+  free: 'Free',
+  freeManeuver: 'Free Maneuver',
+  move: 'Move',
+  respite: 'Respite',
+  useConsumable: 'Use',
+};
+
+function ItemStatBlock({ rows }: { rows: MagicItemStatRow[] }) {
+  if (rows.length === 0) return null;
+
+  return (
+    <section className="detail-section">
+      <h2 className="detail-section-title">Stat Block</h2>
+      <div className="item-stat-block">
+        {rows.map((row) => (
+          <div key={`${row.label}-${row.value}`} className={`item-stat-row ${row.tone ?? ''}`}>
+            <span className="item-stat-row-label">{row.label}</span>
+            <span className="item-stat-row-value">{row.value}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+interface ItemRuleActionsProps {
+  actions: MagicItemAction[];
+  onActionClick: (action: MagicItemAction) => void;
+  disabled?: boolean;
+}
+
+function ItemRuleActions({ actions, onActionClick, disabled = false }: ItemRuleActionsProps) {
+  if (actions.length === 0) return null;
+
+  return (
+    <section className="detail-section">
+      <h2 className="detail-section-title">Actions</h2>
+      <div className="item-rule-actions">
+        {actions.map((action) => (
+          <button
+            key={action.id}
+            className="item-rule-action-btn"
+            onClick={() => onActionClick(action)}
+            disabled={disabled}
+            title={action.summary}
+          >
+            <span className="item-rule-action-type">{ACTION_TYPE_LABELS[action.type]}</span>
+            <span className="item-rule-action-label">{action.label}</span>
+            <span className="item-rule-action-summary">{action.summary}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function GoldDisplay() {
   const { hero, updateHero } = useHeroContext();
@@ -116,6 +253,7 @@ interface EquippedItemDisplayProps {
 function EquippedItemDisplay({ itemId }: EquippedItemDisplayProps) {
   const { hero } = useHeroContext();
   const { equippedItems, unequipItem } = useEquipment();
+  const [lastAction, setLastAction] = useState<string | null>(null);
 
   const equippedItem = equippedItems.find((e) => e.itemId === itemId);
   const magicItem = getItemById(itemId);
@@ -129,6 +267,9 @@ function EquippedItemDisplay({ itemId }: EquippedItemDisplayProps) {
 
   // Get current bonuses from item
   const bonuses = magicItem ? parseItemBonuses(magicItem, hero.level) : [];
+  const actions = magicItem ? getItemActions(magicItem, hero.level) : [];
+  const statBlock = magicItem ? getItemStatBlock(magicItem, hero.level) : [];
+  const rulesText = magicItem ? getItemRulesText(magicItem, hero.level) : equippedItem.effect;
 
   return (
     <div className="detail-content">
@@ -146,8 +287,10 @@ function EquippedItemDisplay({ itemId }: EquippedItemDisplayProps) {
       {/* Effect */}
       <section className="detail-section">
         <h2 className="detail-section-title">Effect</h2>
-        <p className="detail-text">{equippedItem.effect}</p>
+        <p className="detail-text item-rules-text">{rulesText}</p>
       </section>
+
+      <ItemStatBlock rows={statBlock} />
 
       {/* Stat Bonuses */}
       {bonuses.length > 0 && (
@@ -191,6 +334,11 @@ function EquippedItemDisplay({ itemId }: EquippedItemDisplayProps) {
         </section>
       )}
 
+      <ItemRuleActions actions={actions} onActionClick={(action) => setLastAction(action.label)} />
+      {lastAction && (
+        <div className="item-action-feedback">Marked: {lastAction}</div>
+      )}
+
       {/* Actions */}
       <section className="item-actions">
         <button className="item-action-btn danger" onClick={() => unequipItem(itemId)}>
@@ -208,8 +356,18 @@ interface InventoryItemDisplayProps {
 function InventoryItemDisplay({ item }: InventoryItemDisplayProps) {
   const { hero, updateHero } = useHeroContext();
   const { setSelectedItem } = useNavigation();
+  const { equipItem, isEquipped, unequipItem } = useEquipment();
+  const [lastAction, setLastAction] = useState<string | null>(null);
 
-  const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
+  const magicItem = getCompendiumItemForInventoryItem(item);
+  const categoryLabel = magicItem
+    ? CATEGORY_LABELS[magicItem.category]
+    : CATEGORY_LABELS[item.category] || item.category;
+  const slotLabel = magicItem?.slot ? SLOT_LABELS[magicItem.slot as keyof typeof SLOT_LABELS] : null;
+  const equipped = magicItem ? isEquipped(magicItem.id) : false;
+  const actions = magicItem && hero ? getItemActions(magicItem, hero.level) : [];
+  const statBlock = magicItem && hero ? getItemStatBlock(magicItem, hero.level) : [];
+  const rulesText = magicItem && hero ? getItemRulesText(magicItem, hero.level) : item.description;
 
   const handleQuantityChange = useCallback(
     (delta: number) => {
@@ -234,8 +392,48 @@ function InventoryItemDisplay({ item }: InventoryItemDisplayProps) {
   );
 
   const handleUse = useCallback(() => {
-    handleQuantityChange(-1);
-  }, [handleQuantityChange]);
+    if (!hero?.inventory) return;
+
+    const newQuantity = Math.max(0, item.quantity - 1);
+    const updatedInventory =
+      newQuantity === 0
+        ? hero.inventory.filter((inventoryItem) => inventoryItem.id !== item.id)
+        : hero.inventory.map((inventoryItem) =>
+            inventoryItem.id === item.id ? { ...inventoryItem, quantity: newQuantity } : inventoryItem
+          );
+    const sourceItemId = magicItem?.id ?? item.sourceItemId ?? item.id;
+    const effectUpdates =
+      item.category === 'consumable' ? parseConsumableUseUpdates(sourceItemId, hero) : null;
+
+    updateHero({
+      ...(effectUpdates ?? {}),
+      inventory: updatedInventory,
+    });
+
+    if (newQuantity === 0) {
+      setSelectedItem(null);
+    }
+  }, [hero, item, magicItem?.id, updateHero, setSelectedItem]);
+
+  const handleEquip = useCallback(() => {
+    if (!magicItem?.slot) return;
+
+    if (equipped) {
+      unequipItem(magicItem.id);
+    } else {
+      equipItem(magicItem);
+    }
+  }, [equipped, equipItem, magicItem, unequipItem]);
+
+  const handleRuleAction = useCallback(
+    (action: MagicItemAction) => {
+      setLastAction(action.label);
+      if (action.expendable) {
+        handleUse();
+      }
+    },
+    [handleUse]
+  );
 
   const handleDrop = useCallback(() => {
     if (!hero?.inventory) return;
@@ -252,8 +450,31 @@ function InventoryItemDisplay({ item }: InventoryItemDisplayProps) {
           <span className="detail-subtitle">{categoryLabel}</span>
           <span className={`item-rarity ${item.rarity}`}>{item.rarity}</span>
           {item.level && <span className="item-level-badge">Lv {item.level}</span>}
+          {slotLabel && (
+            <span className="item-slot-badge">
+              <Shield size={12} />
+              {slotLabel}
+            </span>
+          )}
+          {equipped && <span className="item-equipped-badge">Equipped</span>}
         </div>
       </header>
+
+      {magicItem?.keywords && magicItem.keywords.length > 0 && (
+        <div className="item-keywords">
+          {magicItem.keywords.map((keyword) => (
+            <span key={keyword} className="item-keyword">
+              {keyword}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {magicItem?.flavorText && (
+        <section className="detail-section">
+          <p className="item-flavor">{magicItem.flavorText}</p>
+        </section>
+      )}
 
       {/* Quantity Controls */}
       <section className="detail-section">
@@ -276,12 +497,14 @@ function InventoryItemDisplay({ item }: InventoryItemDisplayProps) {
       </section>
 
       {/* Description */}
-      {item.description && (
+      {rulesText && (
         <section className="detail-section">
-          <h2 className="detail-section-title">Description</h2>
-          <p className="detail-text">{item.description}</p>
+          <h2 className="detail-section-title">Effect</h2>
+          <p className="detail-text item-rules-text">{rulesText}</p>
         </section>
       )}
+
+      <ItemStatBlock rows={statBlock} />
 
       {/* Enhancements */}
       {item.enhancements && item.enhancements.length > 0 && (
@@ -307,9 +530,25 @@ function InventoryItemDisplay({ item }: InventoryItemDisplayProps) {
         </section>
       )}
 
+      <ItemRuleActions actions={actions} onActionClick={handleRuleAction} disabled={item.quantity <= 0} />
+      {lastAction && (
+        <div className="item-action-feedback">
+          {lastAction} {item.category === 'consumable' ? 'used from inventory.' : 'marked for this item.'}
+        </div>
+      )}
+
       {/* Action Buttons */}
       <section className="item-actions">
-        {item.category === 'consumable' && (
+        {magicItem?.slot && (
+          <button
+            className={`item-action-btn ${equipped ? 'ghost' : 'primary'}`}
+            onClick={handleEquip}
+          >
+            <Shield size={14} />
+            {equipped ? 'Unequip' : 'Equip'}
+          </button>
+        )}
+        {item.category === 'consumable' && actions.length === 0 && (
           <button className="item-action-btn primary" onClick={handleUse}>
             <Zap size={14} />
             Use
@@ -331,6 +570,7 @@ interface CompendiumItemDisplayProps {
 function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
   const { hero, updateHero } = useHeroContext();
   const { equipItem, isEquipped, unequipItem } = useEquipment();
+  const [lastAction, setLastAction] = useState<string | null>(null);
 
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const slotLabel = item.slot ? SLOT_LABELS[item.slot as keyof typeof SLOT_LABELS] : null;
@@ -338,6 +578,9 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
 
   // Get bonuses based on hero level
   const bonuses = hero ? parseItemBonuses(item, hero.level) : [];
+  const actions = hero ? getItemActions(item, hero.level) : [];
+  const statBlock = hero ? getItemStatBlock(item, hero.level) : getItemStatBlock(item);
+  const rulesText = hero ? getItemRulesText(item, hero.level) : item.effect;
 
   const handleEquip = useCallback(() => {
     if (equipped) {
@@ -350,7 +593,7 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
   const handleAddToInventory = useCallback(() => {
     if (!hero) return;
 
-    const existingItem = hero.inventory?.find((i) => i.name === item.name);
+    const existingItem = hero.inventory?.find((i) => i.sourceItemId === item.id || i.name === item.name);
 
     if (existingItem && item.category === 'consumable') {
       // Increase quantity for consumables
@@ -366,7 +609,10 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
         category: item.category === 'consumable' ? 'consumable' : 'treasure',
         rarity: item.echelon === 1 ? 'common' : item.echelon === 2 ? 'uncommon' : item.echelon === 3 ? 'rare' : 'legendary',
         quantity: 1,
-        description: item.effect,
+        description: getItemRulesText(item, hero.level),
+        sourceItemId: item.id,
+        slot: item.slot,
+        keywords: item.keywords,
         level: item.echelon,
         enhancements: item.enhancements?.map((e) => ({
           level: e.level,
@@ -419,8 +665,10 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
       {/* Effect */}
       <section className="detail-section">
         <h2 className="detail-section-title">Effect</h2>
-        <p className="detail-text">{item.effect}</p>
+        <p className="detail-text item-rules-text">{rulesText}</p>
       </section>
+
+      <ItemStatBlock rows={statBlock} />
 
       {/* Stat Bonuses */}
       {bonuses.length > 0 && (
@@ -464,6 +712,11 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
         </section>
       )}
 
+      <ItemRuleActions actions={actions} onActionClick={(action) => setLastAction(action.label)} />
+      {lastAction && (
+        <div className="item-action-feedback">Referenced: {lastAction}</div>
+      )}
+
       {/* Prerequisite */}
       {item.prerequisite && (
         <section className="detail-section">
@@ -493,12 +746,10 @@ function CompendiumItemDisplay({ item }: CompendiumItemDisplayProps) {
             {equipped ? 'Unequip' : 'Equip'}
           </button>
         )}
-        {item.category === 'consumable' && (
-          <button className="item-action-btn ghost" onClick={handleAddToInventory}>
-            <Package size={14} />
-            Add to Inventory
-          </button>
-        )}
+        <button className="item-action-btn ghost" onClick={handleAddToInventory}>
+          <Package size={14} />
+          Add to Inventory
+        </button>
       </section>
     </div>
   );

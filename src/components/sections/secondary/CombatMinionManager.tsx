@@ -10,7 +10,7 @@
  * - Max Squads: 2 total
  * - Combat Start: 2 free signature minions, essence = victories
  * - Each Turn: +2 essence, 3 free signature minions (varies by formation/level)
- * - Sacrifice: 1 per turn, reduces essence cost by 1 per minion sacrificed
+ * - Sacrifice: willing minions reduce the next essence cost
  */
 
 import { memo } from 'react';

@@ -72,12 +72,19 @@ export const useEquipment = () => {
           item.category === 'leveled' ? getEnhancementTier(item, hero.level) : undefined,
       };
 
-      // Remove any existing item in the same slot, then add new item
+      // Remove any existing item in the same slot, then add new item. Rings are the
+      // exception: heroes can wear two, so keep the newest two equipped rings.
       const currentItems = hero.equippedItems || [];
-      const filteredItems = currentItems.filter((e) => e.slot !== slot);
+      const filteredItems = currentItems.filter((e) => e.itemId !== item.id);
+      const itemsForSlot = filteredItems.filter((e) => e.slot === slot);
+      const itemsOutsideSlot = filteredItems.filter((e) => e.slot !== slot);
+      const nextItems =
+        slot === 'ring'
+          ? [...itemsOutsideSlot, ...itemsForSlot.slice(-1), equipped]
+          : [...itemsOutsideSlot, equipped];
 
       updateHero({
-        equippedItems: [...filteredItems, equipped],
+        equippedItems: nextItems,
       });
     },
     [hero, updateHero]

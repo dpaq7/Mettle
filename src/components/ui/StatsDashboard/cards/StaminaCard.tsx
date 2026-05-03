@@ -15,6 +15,7 @@ export const StaminaCard: React.FC<StaminaCardProps> = ({
   tempStamina = 0,
   winded,
   onChange,
+  onTempChange,
   onUnpin,
 }) => {
   // Death threshold is negative half max stamina
@@ -24,6 +25,20 @@ export const StaminaCard: React.FC<StaminaCardProps> = ({
   const isDying = current <= 0 && current > deathThreshold;
   const isDead = current <= deathThreshold;
   const isCritical = percentage < 10 && current > 0;
+  const applyDamage = (amount: number) => {
+    const absorbed = Math.min(tempStamina, amount);
+    const remainingDamage = amount - absorbed;
+    if (absorbed > 0) {
+      onTempChange?.(tempStamina - absorbed);
+    }
+    if (remainingDamage > 0) {
+      onChange(Math.max(deathThreshold, current - remainingDamage));
+    }
+  };
+
+  const adjustTemp = (delta: number) => {
+    onTempChange?.(Math.max(0, tempStamina + delta));
+  };
 
   return (
     <div
@@ -82,7 +97,7 @@ export const StaminaCard: React.FC<StaminaCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onChange(Math.max(deathThreshold, current - 5))}
+              onClick={() => applyDamage(5)}
               disabled={isDead}
               className="adjust-btn"
             >
@@ -91,7 +106,7 @@ export const StaminaCard: React.FC<StaminaCardProps> = ({
             <Button
               variant="outline"
               size="icon"
-              onClick={() => onChange(Math.max(deathThreshold, current - 1))}
+              onClick={() => applyDamage(1)}
               disabled={isDead}
               className="adjust-btn"
             >
@@ -120,6 +135,50 @@ export const StaminaCard: React.FC<StaminaCardProps> = ({
             </Button>
           </div>
         </div>
+
+        {onTempChange && (
+          <div className="stamina-controls temp-controls">
+            <div className="control-group">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => adjustTemp(-5)}
+                disabled={tempStamina <= 0}
+                className="adjust-btn"
+              >
+                Temp −5
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => adjustTemp(-1)}
+                disabled={tempStamina <= 0}
+                className="adjust-btn"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="control-group">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => adjustTemp(1)}
+                className="adjust-btn"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => adjustTemp(5)}
+                className="adjust-btn"
+              >
+                Temp +5
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Status Row */}
         <div className="stamina-status">

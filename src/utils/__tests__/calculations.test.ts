@@ -13,6 +13,7 @@ import {
   calculateSpeed,
   calculateStability,
   calculateEssenceCost,
+  calculateEffectiveEssenceCost,
   calculateMinionBonusStamina,
   calculateMinionCharacteristicBonus,
   calculateMinionFreeStrikeBonus,
@@ -156,37 +157,50 @@ describe('Minion Calculations', () => {
 
 describe('Essence Calculations', () => {
   describe('calculateEssencePerTurn', () => {
-    it('always returns 2 regardless of level', () => {
+    it('returns 2 before Font of Creation', () => {
       expect(calculateEssencePerTurn(1)).toBe(2);
-      expect(calculateEssencePerTurn(5)).toBe(2);
-      expect(calculateEssencePerTurn(10)).toBe(2);
+      expect(calculateEssencePerTurn(6)).toBe(2);
+    });
+
+    it('returns 3 at level 7+', () => {
+      expect(calculateEssencePerTurn(7)).toBe(3);
+      expect(calculateEssencePerTurn(10)).toBe(3);
     });
   });
 
   describe('calculateMinionDeathEssence', () => {
-    it('always returns 1 regardless of level', () => {
+    it('returns 1 before Essence Salvage', () => {
       expect(calculateMinionDeathEssence(1)).toBe(1);
-      expect(calculateMinionDeathEssence(10)).toBe(1);
+      expect(calculateMinionDeathEssence(3)).toBe(1);
+    });
+
+    it('returns 2 at level 4+', () => {
+      expect(calculateMinionDeathEssence(4)).toBe(2);
+      expect(calculateMinionDeathEssence(10)).toBe(2);
     });
   });
 
   describe('calculateEssenceCost', () => {
-    it('reduces cost by 1 for elite formation on 5+ cost minions', () => {
-      expect(calculateEssenceCost(5, 'elite')).toBe(4);
-      expect(calculateEssenceCost(7, 'elite')).toBe(6);
+    it('does not modify costs by formation', () => {
+      expect(calculateEssenceCost(5, 'elite')).toBe(5);
+      expect(calculateEssenceCost(7, 'platoon')).toBe(7);
+      expect(calculateEssenceCost(3, 'horde')).toBe(3);
+    });
+  });
+
+  describe('calculateEffectiveEssenceCost', () => {
+    it('applies the base sacrifice rule as a single total reduction', () => {
+      expect(calculateEffectiveEssenceCost(5, 'platoon', 5, 1)).toBe(4);
+      expect(calculateEffectiveEssenceCost(5, 'platoon', 5, 3)).toBe(4);
     });
 
-    it('does not reduce cost below 1', () => {
-      expect(calculateEssenceCost(1, 'elite')).toBe(1);
+    it('allows pre-level-10 sacrifice to reduce a 1-cost summon to 0', () => {
+      expect(calculateEffectiveEssenceCost(1, 'platoon', 5, 1)).toBe(0);
     });
 
-    it('does not reduce cost for non-elite formations', () => {
-      expect(calculateEssenceCost(5, 'platoon')).toBe(5);
-      expect(calculateEssenceCost(5, 'horde')).toBe(5);
-    });
-
-    it('does not reduce cost for minions under 5 essence', () => {
-      expect(calculateEssenceCost(3, 'elite')).toBe(3);
+    it('applies No Matter the Cost at level 10 with a minimum cost of 1', () => {
+      expect(calculateEffectiveEssenceCost(7, 'platoon', 10, 3)).toBe(4);
+      expect(calculateEffectiveEssenceCost(1, 'platoon', 10, 3)).toBe(1);
     });
   });
 });
@@ -205,21 +219,15 @@ describe('Formation Bonuses', () => {
   });
 
   describe('calculateMinionCharacteristicBonus', () => {
-    it('returns 1 for elite formation', () => {
-      expect(calculateMinionCharacteristicBonus('elite')).toBe(1);
-    });
-
-    it('returns 0 for other formations', () => {
+    it('returns 0 for formations', () => {
+      expect(calculateMinionCharacteristicBonus('elite')).toBe(0);
       expect(calculateMinionCharacteristicBonus('platoon')).toBe(0);
     });
   });
 
   describe('calculateMinionFreeStrikeBonus', () => {
-    it('returns 1 for platoon formation', () => {
-      expect(calculateMinionFreeStrikeBonus('platoon')).toBe(1);
-    });
-
-    it('returns 0 for other formations', () => {
+    it('returns 0 for formations', () => {
+      expect(calculateMinionFreeStrikeBonus('platoon')).toBe(0);
       expect(calculateMinionFreeStrikeBonus('elite')).toBe(0);
       expect(calculateMinionFreeStrikeBonus('horde')).toBe(0);
     });
@@ -310,14 +318,15 @@ describe('Sacrifice Mechanics', () => {
       expect(calculateSacrificeCostReduction(0, 5)).toBe(0);
     });
 
-    it('returns 1 per minion before level 10', () => {
-      expect(calculateSacrificeCostReduction(3, 5)).toBe(3);
-      expect(calculateSacrificeCostReduction(2, 9)).toBe(2);
+    it('returns 1 total before level 10 when one or more minions are sacrificed', () => {
+      expect(calculateSacrificeCostReduction(1, 5)).toBe(1);
+      expect(calculateSacrificeCostReduction(3, 5)).toBe(1);
+      expect(calculateSacrificeCostReduction(2, 9)).toBe(1);
     });
 
-    it('returns full essence value at level 10', () => {
+    it('returns the sacrificed minion count at level 10', () => {
       expect(calculateSacrificeCostReduction(3, 10, [1, 1, 1])).toBe(3);
-      expect(calculateSacrificeCostReduction(2, 10, [3, 5])).toBe(8);
+      expect(calculateSacrificeCostReduction(2, 10, [3, 5])).toBe(2);
     });
 
     it('defaults to 1-cost minions if not specified', () => {

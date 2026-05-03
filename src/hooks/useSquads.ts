@@ -56,6 +56,7 @@ export const useSquads = () => {
         maxStamina: totalStamina,
         hasMoved: false,
         hasActed: false,
+        hasUsedManeuver: false,
       };
     },
     [hero]
@@ -145,17 +146,23 @@ export const useSquads = () => {
       const squad = hero.activeSquads.find((s) => s.id === squadId);
       if (!squad) return { overflowDamage: 0, minionsKilled: 0 };
 
-      let remainingDamage = damage;
-      let newStamina = squad.currentStamina;
+      const aliveMembersBeforeDamage = squad.members.filter((minion) => minion.isAlive);
+      const alivePoolMaxStamina = aliveMembersBeforeDamage.reduce(
+        (sum, minion) => sum + minion.maxStamina,
+        0
+      );
+      const currentAlivePoolStamina = Math.min(squad.currentStamina, alivePoolMaxStamina);
+      let newStamina = currentAlivePoolStamina;
       let minionsKilled = 0;
       const newMembers = [...squad.members];
 
       // Apply damage to the pool
       newStamina -= damage;
 
-      // Calculate how many minions should die based on damage thresholds
-      // SRD: When pool reduction equals 1 minion's max HP, that minion dies
-      let accumulatedDamage = squad.maxStamina - newStamina;
+      // Calculate deaths against the currently alive pool only. Dead members remain
+      // in the squad history, so using squad.maxStamina here would double-count
+      // earlier damage and kill extra minions on later hits.
+      const accumulatedDamage = alivePoolMaxStamina - newStamina;
       let staminaThreshold = 0;
 
       for (let i = 0; i < newMembers.length; i++) {
@@ -168,8 +175,11 @@ export const useSquads = () => {
           // This minion dies
           newMembers[i] = { ...minion, isAlive: false };
           minionsKilled++;
-          onMinionDeath(); // Trigger essence gain
         }
+      }
+
+      if (minionsKilled > 0) {
+        onMinionDeath();
       }
 
       // Calculate overflow damage
@@ -198,11 +208,14 @@ export const useSquads = () => {
 
       // Apply overflow damage to summoner (allow negative for dying state)
       if (overflowDamage > 0) {
-        const newSummonerStamina = hero.stamina.current - overflowDamage;
+        const temporary = hero.stamina.temporary ?? 0;
+        const absorbed = Math.min(temporary, overflowDamage);
+        const newSummonerStamina = hero.stamina.current - (overflowDamage - absorbed);
         updateHero({
           stamina: {
             ...hero.stamina,
             current: newSummonerStamina,
+            temporary: temporary - absorbed,
           },
         });
       }

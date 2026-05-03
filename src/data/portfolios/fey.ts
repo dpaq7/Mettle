@@ -1,4 +1,4 @@
-import { MinionTemplate, FixtureTemplate, Portfolio } from '../../types';
+import { MinionTemplate, FixtureTemplate, Portfolio, ChampionTemplate } from '../../types';
 
 // ============================================================
 // FEY PORTFOLIO - SRD Section 5.3
@@ -515,6 +515,48 @@ const gladePond: FixtureTemplate = {
 };
 
 // Complete Fey Portfolio
+const celestialAttendant: ChampionTemplate = {
+  id: 'fey_celestial_attendant',
+  name: 'Celestial Attendant',
+  portfolioType: 'fey',
+  description: 'An Attendant of a celestial that swarms the field with pixies and neurotoxic strikes.',
+  essenceCost: 9,
+  size: '2',
+  speed: 7,
+  stamina: 0,
+  stability: 0,
+  freeStrike: 9,
+  characteristics: { might: 2, agility: 2, reason: 5, intuition: 2, presence: 5 },
+  role: 'support',
+  keywords: ['Champion', 'Fey'],
+  immunities: [{ type: 'damage', value: 2 }],
+  weaknesses: [],
+  movementModes: ['Fly', 'Hover'],
+  freeStrikeDamageType: 'poison',
+  signatureAbility: {
+    id: 'fey_celestial_attendant_pixie_swarm',
+    name: 'Pixie Swarm',
+    actionType: 'action',
+    keywords: ['Magic', 'Ranged', 'Strike'],
+    distance: 'Ranged 10',
+    target: 'Two creatures or objects',
+    powerRoll: {
+      characteristic: 'reason',
+      tier1: '9 damage; slide 3',
+      tier2: '12 damage; slide 5',
+      tier3: '14 damage; slide 6',
+    },
+    effect: 'An ally targeted by this ability can instead spend a Recovery and shift the slide amount.',
+  },
+  traits: [
+    { name: 'Neurotoxic Strike', description: 'A creature that takes damage from the Attendant\'s free strike is I < Average unable to establish line of effect beyond 3 squares (EoT).' },
+    { name: 'Champion\'s Ire', description: 'If the Attendant only targets one creature or object with a strike, they deal additional damage to the target equal to your Reason.' },
+    { name: 'Celestial Bell', description: 'Free triggered action, trigger: the Attendant takes damage from an enemy. You summon a signature minion into an unoccupied space adjacent to the Attendant.' },
+    { name: 'Pixie Bouquet', description: 'The Attendant starts their turn with temporary Stamina equal to 2 x the number of fey minions within 1 square. This lasts until the start of their next turn.' },
+    { name: 'Level 10: A Shower of Dust', description: '1 Eidos, Champion Action: 20 burst. Self and each non-minion ally gain 20 temporary Stamina and the benefits of one Flash Powder effect until the end of their next turn.' },
+  ],
+};
+
 export const feyPortfolio: Portfolio = {
   type: 'fey',
   signatureMinions: [nixieSoakreed, pixieBellringer, spriteDandeknight],
@@ -533,5 +575,5 @@ export const feyPortfolio: Portfolio = {
     spriteOlyender,
   ],
   fixture: gladePond,
-  champion: null,
+  champion: celestialAttendant,
 };

@@ -1,4 +1,4 @@
-import { MinionTemplate, FixtureTemplate, Portfolio } from '../../types';
+import { MinionTemplate, FixtureTemplate, Portfolio, ChampionTemplate } from '../../types';
 
 // =============================================================================
 // UNDEAD PORTFOLIO - SRD Section 5.4
@@ -596,6 +596,48 @@ const barrowGates: FixtureTemplate = {
 // COMPLETE PORTFOLIO
 // -----------------------------------------------------------------------------
 
+const avatarOfDeath: ChampionTemplate = {
+  id: 'undead_avatar_of_death',
+  name: 'Avatar of Death',
+  portfolioType: 'undead',
+  description: 'An Avatar of death that weighs foes down with conditions and culls the winded.',
+  essenceCost: 9,
+  size: '2',
+  speed: 6,
+  stamina: 0,
+  stability: 3,
+  freeStrike: 9,
+  characteristics: { might: 5, agility: 2, reason: 5, intuition: 2, presence: 2 },
+  role: 'hexer',
+  keywords: ['Champion', 'Undead'],
+  immunities: [{ type: 'corruption', value: 5 }, { type: 'poison', value: 5 }],
+  weaknesses: [],
+  movementModes: ['Fly'],
+  freeStrikeDamageType: 'holy',
+  signatureAbility: {
+    id: 'undead_avatar_of_death_culling_scythe',
+    name: 'Culling Scythe',
+    actionType: 'action',
+    keywords: ['Melee', 'Strike', 'Weapon'],
+    distance: 'Melee 2',
+    target: 'Two creatures or objects',
+    powerRoll: {
+      characteristic: 'reason',
+      tier1: '9 corruption damage; M < Weak bleeding (save ends)',
+      tier2: '12 corruption damage; M < Average bleeding (save ends)',
+      tier3: '14 corruption damage; M < Strong bleeding (save ends)',
+    },
+    effect: 'If the target is a creature that is not a leader or solo and is still bleeding at the end of the encounter, they instantly die.',
+  },
+  traits: [
+    { name: 'Revelation Strike', description: 'The Avatar\'s melee free strikes P < Weak instantly reduce a winded non-leader or non-solo creature to 0 Stamina, including targets winded by the strike.' },
+    { name: 'Champion\'s Ire', description: 'If the Avatar only targets one creature or object with a strike, they deal additional damage to the target equal to your Reason.' },
+    { name: 'Dust and Rot', description: 'Free triggered action, trigger: the Avatar takes damage. Area 1 burst, each enemy in the burst is M < Average weakened (EoT).' },
+    { name: 'Drifting Spirit', description: 'The Avatar is unaffected by difficult terrain and damage from forced movement.' },
+    { name: 'Level 10: Gravemaker', description: '1 Eidos, Champion Action: 5 x 3 line within 1. Each enemy and object takes 9 holy damage and is vertically pulled straight down a number of squares equal to their size, ignoring stability. Targets force moved into the ground are buried.' },
+  ],
+};
+
 export const undeadPortfolio: Portfolio = {
   type: 'undead',
   signatureMinions: [husk, skeleton, shrieker],
@@ -614,5 +656,5 @@ export const undeadPortfolio: Portfolio = {
     phantomOfTheRipper,
   ],
   fixture: barrowGates,
-  champion: null, // Avatar of Death - Level 8+
+  champion: avatarOfDeath,
 };

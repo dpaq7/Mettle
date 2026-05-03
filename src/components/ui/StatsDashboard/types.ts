@@ -197,6 +197,7 @@ export interface StatsDashboardProps {
 
   // Stamina
   onStaminaChange: (value: number) => void;
+  onTempStaminaChange?: (value: number) => void;
 
   // Recoveries
   onRecoveriesChange: (value: number) => void;
@@ -284,6 +285,7 @@ export interface StaminaCardProps extends BaseCardProps {
   tempStamina: number;
   winded: number;
   onChange: (value: number) => void;
+  onTempChange?: (value: number) => void;
 }
 
 export interface RecoveriesCardProps extends BaseCardProps {

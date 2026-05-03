@@ -6,18 +6,46 @@ interface MinionInfoCardProps {
   minion: MinionTemplate | ChampionTemplate;
   isUnlocked?: boolean;
   requiredLevel?: number;
+  canSummon?: boolean;
+  summonTitle?: string;
+  onSummon?: () => void;
 }
 
 export const MinionInfoCard: React.FC<MinionInfoCardProps> = ({
   minion,
   isUnlocked = true,
   requiredLevel,
+  canSummon = true,
+  summonTitle,
+  onSummon,
 }) => {
   const formatCharacteristic = (value: number) => {
     return value >= 0 ? `+${value}` : `${value}`;
   };
+  const formatStamina = (value: MinionTemplate['stamina'] | ChampionTemplate['stamina']) => {
+    if (Array.isArray(value)) return value.join('/');
+    return value <= 0 ? 'Your max' : value;
+  };
 
   const roleColorClass = `role-${minion.role.toLowerCase()}`;
+  const canClickSummon = Boolean(onSummon) && isUnlocked && canSummon;
+  const summonBadgeTitle = summonTitle ?? `${minion.essenceCost} essence`;
+  const essenceBadge = onSummon ? (
+    <button
+      type="button"
+      className={`minion-info-essence-badge minion-info-essence-badge--clickable ${canClickSummon ? '' : 'disabled'}`}
+      onClick={canClickSummon ? onSummon : undefined}
+      disabled={!canClickSummon}
+      title={summonBadgeTitle}
+      aria-label={summonBadgeTitle}
+    >
+      {minion.essenceCost}★
+    </button>
+  ) : (
+    <span className="minion-info-essence-badge" title={summonBadgeTitle}>
+      {minion.essenceCost}★
+    </span>
+  );
 
   return (
     <div className={`minion-info-card ${!isUnlocked ? 'locked' : ''}`}>
@@ -25,7 +53,7 @@ export const MinionInfoCard: React.FC<MinionInfoCardProps> = ({
       <div className="minion-info-header">
         <div className="minion-info-name-row">
           <h3 className="minion-info-name">{minion.name}</h3>
-          <span className="minion-info-essence-badge">{minion.essenceCost}★</span>
+          {essenceBadge}
         </div>
         <span className={`minion-info-role ${roleColorClass}`}>{minion.role}</span>
         {!isUnlocked && requiredLevel && (
@@ -45,9 +73,7 @@ export const MinionInfoCard: React.FC<MinionInfoCardProps> = ({
         </div>
         <div className="minion-info-stat">
           <span className="minion-info-stat-label">Stamina</span>
-          <span className="minion-info-stat-value">
-            {Array.isArray(minion.stamina) ? minion.stamina.join('/') : minion.stamina}
-          </span>
+          <span className="minion-info-stat-value">{formatStamina(minion.stamina)}</span>
         </div>
         <div className="minion-info-stat">
           <span className="minion-info-stat-label">Stability</span>

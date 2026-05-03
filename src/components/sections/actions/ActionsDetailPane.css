@@ -75,6 +75,10 @@
   border-left-width: 3px;
 }
 
+.ability-card.selected .ability-card-header {
+  padding-right: 32px;
+}
+
 .ability-card.insufficient-resource {
   opacity: 0.7;
 }
@@ -88,6 +92,7 @@
 
 .ability-card.level-locked .ability-card-header {
   background: var(--bg-deep);
+  padding-right: 112px;
 }
 
 .ability-card.level-locked .ability-card-name {

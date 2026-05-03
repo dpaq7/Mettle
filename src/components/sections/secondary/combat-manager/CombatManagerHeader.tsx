@@ -9,7 +9,7 @@
  */
 
 import { memo } from 'react';
-import { Sparkles, Users, Flag, Clock } from 'lucide-react';
+import { Sparkles, Users, Flag, Clock, Skull } from 'lucide-react';
 import { useHeroContext } from '@/context/HeroContext';
 import { useCombatContext } from '@/context/CombatContext';
 import { isSummonerHero } from '@/types/hero';
@@ -17,7 +17,7 @@ import { useEssence } from '@/hooks/useEssence';
 
 export const CombatManagerHeader = memo(function CombatManagerHeader() {
   const { hero } = useHeroContext();
-  const { turnState, combatTurnNumber } = useCombatContext();
+  const { essenceState, combatTurnNumber } = useCombatContext();
   const { currentEssence, getMinionCounts, getSquadCount } = useEssence();
 
   if (!hero || !isSummonerHero(hero)) {
@@ -57,6 +57,18 @@ export const CombatManagerHeader = memo(function CombatManagerHeader() {
             <span className="combat-resource-value">Turn {combatTurnNumber}</span>
           </div>
         </div>
+
+        {essenceState.pendingSacrificeCount > 0 && (
+          <div className="combat-resource-item combat-resource-item--warning">
+            <div className="combat-resource-icon">
+              <Skull size={16} />
+            </div>
+            <div>
+              <span className="combat-resource-value">{essenceState.pendingSacrificeCount}</span>
+              <span className="combat-resource-label"> Sacrifice</span>
+            </div>
+          </div>
+        )}
 
         {/* Minion Count */}
         <div className={`combat-resource-item ${isAtMinionLimit ? 'combat-resource-item--warning' : ''}`}>

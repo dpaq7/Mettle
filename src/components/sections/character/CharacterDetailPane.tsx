@@ -13,6 +13,8 @@ import { CONDITIONS, ALL_CONDITIONS, performSavingThrow, getDefaultEndType } fro
 import { isSummonerHero, isTacticianHero, isFuryHero, isConduitHero } from '@/types/hero';
 import type { ConditionId, ConditionEndType, ActiveCondition } from '@/types/common';
 import type { SummonerHeroV2, TacticianHero, FuryHero, Formation } from '@/types/hero';
+import type { MinionTemplate } from '@/types/minion';
+import { useSummonMinion } from '@/hooks/useSummonMinion';
 import { LevelUpDetail } from './LevelUpDetail';
 import { RespecDetail } from './RespecDetail';
 import { RulesLink } from '@/components/shared/RulesLink';
@@ -1571,10 +1573,10 @@ function ConditionsDetail() {
 // ============================================
 
 const FORMATION_INFO: Record<Formation, { name: string; bonus: string }> = {
-  horde: { name: 'Horde', bonus: 'Minions deal +1 damage' },
-  platoon: { name: 'Platoon', bonus: 'Minions have +2 speed' },
+  horde: { name: 'Horde', bonus: 'Maximum minions +4; summon up to four signature minions at the start of your turn' },
+  platoon: { name: 'Platoon', bonus: 'One target of a squad damaging ability takes extra damage equal to your Reason' },
   elite: { name: 'Elite', bonus: 'Minions have +3 Stamina, +1 Stability' },
-  leader: { name: 'Leader', bonus: 'You can take excess damage instead of minions dying' },
+  leader: { name: 'Leader', bonus: 'Ignore excess squad-wipe damage; you can take damage in place of a minion' },
 };
 
 const FEROCITY_TIERS = [
@@ -1793,6 +1795,8 @@ const MINION_LEVEL_REQUIREMENTS: Record<number, number> = {
 
 function PortfolioDetail() {
   const { hero } = useHeroContext();
+  const { summonMinion, validateMinionSummon } = useSummonMinion();
+  const [summonFeedback, setSummonFeedback] = useState<string | null>(null);
 
   if (!hero || !isSummonerHero(hero)) {
     return (
@@ -1820,6 +1824,29 @@ function PortfolioDetail() {
     return MINION_LEVEL_REQUIREMENTS[essenceCost] || 1;
   };
 
+  const getSummonControls = (minion: MinionTemplate, isUnlocked: boolean) => {
+    const validation = validateMinionSummon(minion);
+    const minionsToSummon = validation.details.minionsToSummon;
+    const summonTitle = isUnlocked && validation.canSummon
+      ? `Spend ${validation.details.requiredEssence} essence to summon ${minionsToSummon} ${minion.name}${minionsToSummon === 1 ? '' : 's'}`
+      : isUnlocked
+        ? validation.message
+        : `Unlocks at level ${getRequiredLevel(minion.essenceCost)}`;
+
+    return {
+      canSummon: isUnlocked && validation.canSummon,
+      summonTitle,
+      onSummon: () => {
+        const result = summonMinion(minion);
+        setSummonFeedback(
+          result.success
+            ? `Summoned ${result.minionsCreated ?? minionsToSummon} ${minion.name}${(result.minionsCreated ?? minionsToSummon) === 1 ? '' : 's'} for ${result.essenceSpent ?? validation.details.requiredEssence} essence.`
+            : result.validation.message
+        );
+      },
+    };
+  };
+
   // Group unlocked minions by essence tier
   const threeEssence = unlockedMinions.filter(m => m.essenceCost === 3);
   const fiveEssence = unlockedMinions.filter(m => m.essenceCost === 5);
@@ -1834,6 +1861,10 @@ function PortfolioDetail() {
         <span className="detail-subtitle">Level {hero.level}</span>
       </header>
 
+      {summonFeedback && (
+        <div className="portfolio-summon-feedback">{summonFeedback}</div>
+      )}
+
       {/* Signature Minions (1 Essence) */}
       {signatureMinions.length > 0 && (
         <section className="detail-section">
@@ -1843,6 +1874,7 @@ function PortfolioDetail() {
               key={minion.id}
               minion={minion}
               isUnlocked={true}
+              {...getSummonControls(minion, true)}
             />
           ))}
         </section>
@@ -1858,6 +1890,7 @@ function PortfolioDetail() {
               minion={minion}
               isUnlocked={isMinionUnlockedByLevel(3)}
               requiredLevel={getRequiredLevel(3)}
+              {...getSummonControls(minion, isMinionUnlockedByLevel(3))}
             />
           ))}
         </section>
@@ -1873,6 +1906,7 @@ function PortfolioDetail() {
               minion={minion}
               isUnlocked={isMinionUnlockedByLevel(5)}
               requiredLevel={getRequiredLevel(5)}
+              {...getSummonControls(minion, isMinionUnlockedByLevel(5))}
             />
           ))}
         </section>
@@ -1888,6 +1922,7 @@ function PortfolioDetail() {
               minion={minion}
               isUnlocked={isMinionUnlockedByLevel(7)}
               requiredLevel={getRequiredLevel(7)}
+              {...getSummonControls(minion, isMinionUnlockedByLevel(7))}
             />
           ))}
         </section>

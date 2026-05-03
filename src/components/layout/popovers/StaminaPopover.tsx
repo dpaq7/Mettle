@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/shadcn';
-import { Minus, Plus, Heart } from 'lucide-react';
+import { Minus, Plus, Heart, Shield } from 'lucide-react';
 import './ResourcePopovers.css';
 
 interface StaminaPopoverProps {
@@ -16,7 +16,8 @@ export function StaminaPopover({ children }: StaminaPopoverProps) {
 
   if (!hero) return <>{children}</>;
 
-  const { current, max, winded } = hero.stamina;
+  const { current, max } = hero.stamina;
+  const temporary = hero.stamina.temporary ?? 0;
 
   // Calculate thresholds per Draw Steel rules
   const windedThreshold = Math.floor(max / 2);
@@ -32,9 +33,32 @@ export function StaminaPopover({ children }: StaminaPopoverProps) {
   const windedPercent = (windedThreshold / max) * 100;
 
   const handleCurrentChange = (delta: number) => {
+    if (delta < 0 && temporary > 0) {
+      const damage = Math.abs(delta);
+      const absorbed = Math.min(temporary, damage);
+      const remainingDamage = damage - absorbed;
+      const newCurrent = Math.max(deathThreshold, current - remainingDamage);
+
+      updateHero({
+        stamina: {
+          ...hero.stamina,
+          current: newCurrent,
+          temporary: temporary - absorbed,
+        },
+      });
+      return;
+    }
+
     const newValue = Math.max(deathThreshold, Math.min(max, current + delta));
     updateHero({
       stamina: { ...hero.stamina, current: newValue },
+    });
+  };
+
+  const handleTemporaryChange = (delta: number) => {
+    const newTemporary = Math.max(0, temporary + delta);
+    updateHero({
+      stamina: { ...hero.stamina, temporary: newTemporary },
     });
   };
 
@@ -75,6 +99,43 @@ export function StaminaPopover({ children }: StaminaPopoverProps) {
           <span className="resource-max">{max}</span>
         </div>
 
+        {/* Temporary Stamina */}
+        <div className={`temp-stamina-panel ${temporary > 0 ? 'active' : ''}`}>
+          <div className="temp-stamina-header">
+            <Shield size={14} />
+            <span>Temporary</span>
+            <strong>+{temporary}</strong>
+          </div>
+          <div className="resource-controls-grid temp-controls">
+            <button
+              className="resource-adjust-btn large"
+              onClick={() => handleTemporaryChange(-5)}
+              disabled={temporary <= 0}
+            >
+              <Minus size={12} />5
+            </button>
+            <button
+              className="resource-adjust-btn"
+              onClick={() => handleTemporaryChange(-1)}
+              disabled={temporary <= 0}
+            >
+              <Minus size={14} />
+            </button>
+            <button
+              className="resource-adjust-btn"
+              onClick={() => handleTemporaryChange(1)}
+            >
+              <Plus size={14} />
+            </button>
+            <button
+              className="resource-adjust-btn large"
+              onClick={() => handleTemporaryChange(5)}
+            >
+              <Plus size={12} />5
+            </button>
+          </div>
+        </div>
+
         {/* Status Badges */}
         <div className="stamina-status-badges">
           {isWinded && !isDying && (
@@ -85,6 +146,9 @@ export function StaminaPopover({ children }: StaminaPopoverProps) {
           )}
           {isDead && (
             <span className="status-badge dead">DEAD</span>
+          )}
+          {temporary > 0 && (
+            <span className="status-badge temp">TEMP +{temporary}</span>
           )}
         </div>
 
@@ -123,7 +187,7 @@ export function StaminaPopover({ children }: StaminaPopoverProps) {
         {/* Info Footer */}
         <div className="resource-popover-footer">
           <span className="resource-info">
-            Winded at {windedThreshold} | Dead at {deathThreshold}
+            Winded at {windedThreshold} | Dead at {deathThreshold} | Temp absorbs damage first
           </span>
         </div>
       </PopoverContent>

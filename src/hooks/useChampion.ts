@@ -159,11 +159,13 @@ export const useChampion = () => {
     }
 
     // Create champion instance
-    const championStamina = calculateChampionStamina(
-      template.stamina,
-      hero.level,
-      hero.formation
-    );
+    const championStamina = template.stamina <= 0
+      ? hero.stamina.max
+      : calculateChampionStamina(
+        template.stamina,
+        hero.level,
+        hero.formation
+      );
 
     const champion: Champion = {
       templateId: template.id,

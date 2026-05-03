@@ -63,6 +63,9 @@ export interface InventoryItem {
   rarity: ItemRarity;
   quantity: number;
   description: string;
+  sourceItemId?: string; // Draw Steel compendium item ID, when this inventory row came from a treasure
+  slot?: string;
+  keywords?: string[];
   level?: number; // For leveled treasures
   enhancements?: ItemEnhancement[];
   notes?: string;

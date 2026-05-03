@@ -24,6 +24,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
     onEndCombat,
     onRespite,
     onStaminaChange,
+    onTempStaminaChange,
     onRecoveriesChange,
     onCatchBreath,
     resourceConfig,
@@ -185,6 +186,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
             onTogglePin={togglePin}
             onUnpinAll={unpinAll}
             onStaminaChange={onStaminaChange}
+            onTempStaminaChange={onTempStaminaChange}
             onRecoveriesChange={onRecoveriesChange}
             onResourceChange={onResourceChange}
             onSurgesChange={onSurgesChange}
@@ -206,6 +208,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = (props) => {
                 resourceConfig={resourceConfig}
                 onUnpin={togglePin}
                 onStaminaChange={onStaminaChange}
+                onTempStaminaChange={onTempStaminaChange}
                 onRecoveriesChange={onRecoveriesChange}
                 onCatchBreath={onCatchBreath}
                 onResourceChange={onResourceChange}

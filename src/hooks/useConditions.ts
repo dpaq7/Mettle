@@ -175,11 +175,16 @@ export const useConditions = () => {
 
       const { roll, total } = calculateBleedingDamage(hero.level);
 
-      // Apply damage to hero stamina
+      const temporary = hero.stamina.temporary ?? 0;
+      const absorbed = Math.min(temporary, total);
+      const remainingDamage = total - absorbed;
+
+      // Apply damage to temporary stamina first, then hero stamina.
       updateHero({
         stamina: {
           ...hero.stamina,
-          current: hero.stamina.current - total,
+          current: hero.stamina.current - remainingDamage,
+          temporary: temporary - absorbed,
         },
       });
 

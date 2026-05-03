@@ -15,6 +15,9 @@ export interface EssenceEconomy {
 
   // Pending free signature minions to be selected by player
   pendingFreeMinions: number;
+
+  // Willing sacrifices queued to reduce the next essence cost
+  pendingSacrificeCount: number;
 }
 
 export interface SummoningAction {

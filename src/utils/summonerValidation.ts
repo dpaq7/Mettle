@@ -12,7 +12,7 @@
 import { SummonerHeroV2, Formation } from '../types/hero';
 import { MinionTemplate, Squad } from '../types/minion';
 import {
-  calculateEssenceCost,
+  calculateEffectiveEssenceCost,
   calculateMaxMinions as calcMaxMinions,
   calculateSignatureMinionsPerTurn,
   calculateCombatStartMinions,
@@ -178,8 +178,12 @@ export function validateSummon(
 
   // Calculate costs
   const baseCost = minionTemplate.essenceCost;
-  const formationAdjustedCost = calculateEssenceCost(baseCost, hero.formation);
-  const adjustedCost = Math.max(0, formationAdjustedCost - sacrificeCount);
+  const adjustedCost = calculateEffectiveEssenceCost(
+    baseCost,
+    hero.formation,
+    hero.level,
+    sacrificeCount
+  );
   const effectiveCost = isFreeSummon ? 0 : adjustedCost;
   const minionsToSummon = minionTemplate.minionsPerSummon ?? 1;
 

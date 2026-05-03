@@ -42,6 +42,7 @@ export interface StaminaPool {
   current: number;
   max: number;
   winded: number;
+  temporary?: number;
 }
 
 // Shared recovery pool interface

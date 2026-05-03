@@ -70,6 +70,7 @@ export interface Squad {
   // Squad-level state
   hasMoved: boolean;
   hasActed: boolean;
+  hasUsedManeuver?: boolean;
 }
 
 export interface FixtureTemplate {
